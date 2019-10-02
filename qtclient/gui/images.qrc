@@ -1,0 +1,10 @@
+<RCC>
+    <qresource prefix="/">
+        <file>pixmaps/qvd-big.png</file>
+        <file>pixmaps/qvd-client-front.gif</file>
+        <file>pixmaps/qvd-small.png</file>
+        <file>pixmaps/qvd.ico</file>
+        <file>pixmaps/qvd.svg</file>
+        <file>pixmaps/qvd.xpm</file>
+    </qresource>
+</RCC>
