@@ -3,6 +3,9 @@
 
 #include <QMainWindow>
 #include <qvdclient.h>
+#include "backends/qvdbackend.h"
+#include "backends/qvdnxbackend.h"
+
 
 namespace Ui {
 class MainWindow;
@@ -14,6 +17,7 @@ class MainWindow : public QMainWindow
 
 private:
 	QVDClient *m_client;
+    QVDBackend *m_backend = nullptr;
 
 public:
     explicit MainWindow(QWidget *parent = nullptr);

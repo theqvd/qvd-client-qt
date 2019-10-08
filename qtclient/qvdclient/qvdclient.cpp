@@ -11,13 +11,11 @@
 #include <QTcpServer>
 #include <QJsonParseError>
 
-
-
-
-#include "qvdnetworkaccessmanager.h"
 #include "qvdnetworkreply.h"
 #include "qvdhttp.h"
 #include "util/qvdsysteminfo.h"
+#include "backends/qvdbackend.h"
+
 
 
 /**
@@ -27,10 +25,9 @@
  */
 
 
-QVDClient::QVDClient(QObject *parent) : QObject(parent), m_proxy_listener(this)
+QVDClient::QVDClient(QObject *parent) : QObject(parent)
 {
-	setKeyboard( QVDSystemInfo::getKeyboardLayout() );
-    setNXProxy( "/usr/bin/nxproxy" );
+
 }
 
 QTcpSocket *QVDClient::getSocket()
@@ -39,134 +36,21 @@ QTcpSocket *QVDClient::getSocket()
 }
 
 
-
-QString QVDClient::getUsername() const
+QVDBackend *QVDClient::getBackend() const
 {
-	return m_username;
+    return m_backend;
 }
 
-
-void QVDClient::setUsername(const QString &username)
+void QVDClient::setBackend(QVDBackend *backend)
 {
-	m_username = username;
+    m_backend = backend;
 }
-
-QString QVDClient::getPassword() const
-{
-	return m_password;
-}
-
-void QVDClient::setPassword(const QString &password)
-{
-	m_password = password;
-}
-
-QString QVDClient::getHost() const
-{
-	return m_host;
-}
-
-void QVDClient::setHost(const QString &host)
-{
-	m_host = host;
-}
-
-int QVDClient::getPort() const
-{
-	return m_port;
-}
-
-void QVDClient::setPort(int port)
-{
-	m_port = port;
-}
-
-
-
-QVDClient::ConnectionSpeed QVDClient::getConnectionSpeed() const
-{
-	return m_connectionSpeed;
-}
-
-void QVDClient::setConnectionSpeed(const ConnectionSpeed &connectionSpeed)
-{
-	m_connectionSpeed = connectionSpeed;
-}
-
-bool QVDClient::getFullscreen() const
-{
-	return m_fullscreen;
-}
-
-void QVDClient::setFullscreen(bool fullscreen)
-{
-	m_fullscreen = fullscreen;
-}
-
-bool QVDClient::getPrinting() const
-{
-	return m_printing;
-}
-
-void QVDClient::setPrinting(bool printing)
-{
-	m_printing = printing;
-}
-
-bool QVDClient::getUsbForwarding() const
-{
-	return m_usb_forwarding;
-}
-
-void QVDClient::setUsbForwarding(bool usb_forwarding)
-{
-	m_usb_forwarding = usb_forwarding;
-}
-
-QSize QVDClient::getGeometry() const
-{
-	return m_geometry;
-}
-
-void QVDClient::setGeometry(const QSize &geometry)
-{
-	m_geometry = geometry;
-}
-
-QString QVDClient::getKeyboard() const
-{
-	return m_keyboard;
-}
-
-void QVDClient::setKeyboard(const QString &keyboard)
-{
-	m_keyboard = keyboard;
-}
-
-QString QVDClient::getNxagentExtraArgs() const
-{
-	return m_nxagent_extra_args;
-}
-
-void QVDClient::setNxagentExtraArgs(const QString &nxagent_extra_args)
-{
-	m_nxagent_extra_args = nxagent_extra_args;
-}
-
-QString QVDClient::getNXProxy() const {
-    return m_nx_proxy;
-}
-
-void QVDClient::setNXProxy(const QString &proxy) {
-    m_nx_proxy = proxy;
-}
-
 
 QNetworkRequest QVDClient::createRequest(const QUrl &url)
 {
-	QNetworkRequest req = QNetworkRequest(url);
+    QNetworkRequest req = QNetworkRequest(url);
 
-	QString concat = m_username + ":" + m_password;
+    QString concat = getParameters().username() + ":" + getParameters().password();
 	QByteArray authdata = concat.toLocal8Bit().toBase64();
 
 	QString headerdata = "Basic " + authdata;
@@ -177,12 +61,22 @@ QNetworkRequest QVDClient::createRequest(const QUrl &url)
 
 }
 
+QVDConnectionParameters QVDClient::getParameters() const
+{
+    return m_parameters;
+}
+
+void QVDClient::setParameters(const QVDConnectionParameters &parameters)
+{
+    m_parameters = parameters;
+}
+
 bool QVDClient::checkReply(QVDNetworkReply *reply)
 {
-	Q_ASSERT(reply);
+    Q_ASSERT(reply);
 
-	int http_code = reply->attribute(QNetworkRequest::Attribute::HttpStatusCodeAttribute).toInt();
-	if ( http_code == 401 ) {
+    int http_code = reply->attribute(QNetworkRequest::Attribute::HttpStatusCodeAttribute).toInt();
+    if ( http_code == 401 ) {
 		emit connectionError(ConnectionError::AuthenticationError, "Incorrect username or password");
 		disconnect();
 		return false;
@@ -224,7 +118,7 @@ void QVDClient::connectToQVD() {
 	connect(m_socket, SIGNAL(hostFound()), this, SLOT(qvd_hostFound()));
 	connect(m_socket, SIGNAL(stateChanged(QAbstractSocket::SocketState)), this, SLOT(qvd_socketStateChanged(QAbstractSocket::SocketState)));
 
-	m_socket->connectToHostEncrypted(m_host, m_port);
+    m_socket->connectToHostEncrypted(getParameters().host(), getParameters().port());
 
 //	if ( !m_socket->waitForEncrypted( )) {
 //		qCritical() << "Failed to establish an encrypted connection to " << m_host << ":" << m_port << ": " << m_socket->errorString();
@@ -266,14 +160,16 @@ void QVDClient::connectToVM(int id)
 {
 	QUrl url = QUrl("https://localhost/qvd/connect_to_vm");
 	QUrlQuery query;
+    auto geometry = getParameters().geometry();
+
 	query.addQueryItem("id"                           , QString::number(id));
-	query.addQueryItem("qvd.client.keyboard"          , getKeyboard());
+    query.addQueryItem("qvd.client.keyboard"          , getParameters().keyboard());
 	query.addQueryItem("qvd.client.os"                , QSysInfo::kernelType() );
-	query.addQueryItem("qvd.client.nxagent.extra_args", getNxagentExtraArgs());
-	query.addQueryItem("qvd.client.geometry"          , QString("%1x%2").arg(getGeometry().width()).arg(getGeometry().height()));
-	query.addQueryItem("qvd.client.fullscreen"        , getFullscreen() ? "1" : "0");
-	query.addQueryItem("qvd.client.printing.enabled"  , getPrinting() ? "1" : "0");
-	query.addQueryItem("qvd.client.usb.enabled"       , getUsbForwarding() ? "1" : "0");
+    query.addQueryItem("qvd.client.nxagent.extra_args", getParameters().nxagent_extra_args());
+    query.addQueryItem("qvd.client.geometry"          , QString("%1x%2").arg(geometry.width()).arg(geometry.height()));
+    query.addQueryItem("qvd.client.fullscreen"        , getParameters().fullscreen() ? "1" : "0");
+    query.addQueryItem("qvd.client.printing.enabled"  , getParameters().printing() ? "1" : "0");
+    query.addQueryItem("qvd.client.usb.enabled"       , getParameters().usb_forwarding() ? "1" : "0");
 	query.addQueryItem("qvd.client.usb.implementation", "usbip");
 
 	url.setQuery(query);
@@ -287,7 +183,7 @@ void QVDClient::connectToVM(int id)
 	qInfo() << "Making request, url " << url;
 
 	QVDNetworkReply *ret = m_http->get(req);
-	connect(ret, SIGNAL(processing()), this, SLOT(qvd_vmProcessing()));
+    connect(ret, SIGNAL(processing()), this, SLOT(qvd_vmProcessing()));
 	connect(ret, SIGNAL(finished()), this, SLOT(qvd_vmConnected()));
 }
 
@@ -377,46 +273,7 @@ void QVDClient::qvd_vmConnected()
 
 	qInfo() << "VM connected! Status " << reply->attribute(QNetworkRequest::Attribute::HttpStatusCodeAttribute).toInt();
 
-	connect(&m_proxy_listener, SIGNAL(newConnection()), this, SLOT(qvd_proxyConnectionAccepted()));
-	m_proxy_listener.listen(QHostAddress::LocalHost, 4040);
-
-	m_proxy_process = new QProcess(this);
-	connect(m_proxy_process, SIGNAL(readyReadStandardOutput()), this, SLOT(qvd_proxyOutput()));
-	connect(m_proxy_process, SIGNAL(readyReadStandardError()), this, SLOT(qvd_proxyError()));
-    connect(m_proxy_process, SIGNAL(finished()), this, SLOT(qvd_proxyFinished()));
-    connect(m_proxy_process, SIGNAL(errorOccured()), this, SLOT(qvd_proxyErrorOccured));
-
-    auto nxproxy_args = QStringList({"-S", "cups=631", "slave=63640", "localhost:40"});
-
-    qInfo() << "Starting process " << m_nx_proxy << " with arguments " << nxproxy_args;
-    m_proxy_process->start( m_nx_proxy, nxproxy_args );
-
-
-}
-
-void QVDClient::qvd_proxyConnectionAccepted()
-{
-	QTcpSocket *connection = m_proxy_listener.nextPendingConnection();
-
-	m_socket_forwarder = new SocketForwarder(this, *connection, *m_socket);
-}
-
-void QVDClient::qvd_proxyOutput()
-{
-	qInfo() << "Proxy: " << m_proxy_process->readAllStandardOutput();
-}
-
-void QVDClient::qvd_proxyError()
-{
-	qCritical() << "Proxy: " << m_proxy_process->readAllStandardError();
-}
-
-void QVDClient::qvd_proxyErrorOccured(QProcess::ProcessError error) {
-    qCritical() << "Proxy error: " << error;
-}
-
-void QVDClient::qvd_proxyFinished(int exitCode, QProcess::ExitStatus exitStatus) {
-    qInfo() << "Proxy finished with exit code " << exitCode << "; status " << exitStatus;
+    m_backend->start(m_socket);
 }
 
 

@@ -9,7 +9,9 @@
 #include <QSslCertificate>
 
 #include "qvdhttp.h"
+#include "qvdconnectionparameters.h"
 #include "socketforwarder.h"
+#include "backends/qvdbackend.h"
 
 
 class QVDClient : public QObject
@@ -29,14 +31,6 @@ public:
 		VMState state;
 	} VMInfo;
 
-	typedef enum ConnectionSpeed {
-		Modem,
-		ISDN,
-		ADSL,
-		WAN,
-		LAN
-	} ConnectionSpeed;
-
 	typedef enum ConnectionError {
 		None,
 		AuthenticationError,  // bad pw
@@ -50,28 +44,18 @@ public:
 	} ConnectionError;
 
 private:
-	QString m_host;
-	int     m_port;
-	QString m_username;
-	QString m_password;
+
 
 	QSslSocket *m_socket = Q_NULLPTR;
 	QVDHTTP *m_http = Q_NULLPTR;
 
-	QSize m_geometry = QSize(1024, 768);
-	ConnectionSpeed m_connectionSpeed = ConnectionSpeed::ADSL;
-	QString m_keyboard;
-	QString m_nxagent_extra_args;
-	bool m_fullscreen = false;
-	bool m_printing = false;
-	bool m_usb_forwarding = false;
+    QVDBackend *m_backend = nullptr;
+
+
 
 	QNetworkRequest createRequest(const QUrl &url);
 
-	QTcpServer m_proxy_listener;
-	SocketForwarder *m_socket_forwarder;
-	QProcess *m_proxy_process;
-    QString m_nx_proxy;
+    QVDConnectionParameters m_parameters;
 
 	bool checkReply(QVDNetworkReply *reply);
 public:
@@ -92,26 +76,7 @@ public:
 	 */
 	QTcpSocket *getSocket();
 
-	/**
-	 * @brief Returns the QVD user name
-	 * @return QVD user name
-	 */
-	QString getUsername() const;
 
-	/**
-	 * @brief Sets the QVD user name
-	 * @param username
-	 */
-	void setUsername(const QString &username);
-
-	QString getPassword() const;
-	void setPassword(const QString &password);
-
-	QString getHost() const;
-	void setHost(const QString &host);
-
-	int getPort() const;
-	void setPort(int port);
 
 
 	void connectToQVD();
@@ -122,30 +87,16 @@ public:
 	void disconnect();
 
 
-	ConnectionSpeed getConnectionSpeed() const;
-	void setConnectionSpeed(const ConnectionSpeed &connectionSpeed);
 
-	bool getFullscreen() const;
-	void setFullscreen(bool fullscreen);
+    QVDConnectionParameters getParameters() const;
+    void setParameters(const QVDConnectionParameters &parameters);
 
-	bool getPrinting() const;
-	void setPrinting(bool printing);
-
-	bool getUsbForwarding() const;
-	void setUsbForwarding(bool usb_forwarding);
-
-	QSize getGeometry() const;
-	void setGeometry(const QSize &geometry);
-
-	QString getKeyboard() const;
-	void setKeyboard(const QString &keyboard);
-
-	QString getNxagentExtraArgs() const;
-	void setNxagentExtraArgs(const QString &nxagent_extra_args);
+    QVDBackend *getBackend() const;
+    void setBackend(QVDBackend *backend);
 
 signals:
-	void connectionEstablished();
-	void connectionError(QVDClient::ConnectionError error, QString error_text);
+    void connectionEstablished();
+    void connectionError(QVDClient::ConnectionError error, QString error_text);
 
 	void vmListReceived(const QList<QVDClient::VMInfo> &vm_list);
 	void socketError(QAbstractSocket::SocketError  error);
@@ -159,11 +110,6 @@ private slots:
 	void qvd_vmListDownloaded();
 	void qvd_vmProcessing();
 	void qvd_vmConnected();
-	void qvd_proxyConnectionAccepted();
-	void qvd_proxyOutput();
-	void qvd_proxyError();
-    void qvd_proxyErrorOccured(QProcess::ProcessError error);
-    void qvd_proxyFinished(int exitCode, QProcess::ExitStatus exitStatus);
 	void qvd_pong();
 
 

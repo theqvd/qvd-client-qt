@@ -3,6 +3,8 @@
 #include "sslerrordialog.h"
 #include "ui_sslerrordialog.h"
 #include "util/qvdsysteminfo.h"
+#include "backends/qvdnxbackend.h"
+#include "qvdconnectionparameters.h"
 
 #include <QDebug>
 #include <QMessageBox>
@@ -31,9 +33,9 @@ MainWindow::MainWindow(QWidget *parent) :
 	ui->setupUi(this);
 
 
-    ui->connectionTypeComboBox->addItem( "Local", QVDClient::ConnectionSpeed::LAN );
-    ui->connectionTypeComboBox->addItem( "ADSL", QVDClient::ConnectionSpeed::ADSL );
-    ui->connectionTypeComboBox->addItem( "Modem", QVDClient::ConnectionSpeed::Modem );
+    ui->connectionTypeComboBox->addItem( "Local", QVDConnectionParameters::ConnectionSpeed::LAN );
+    ui->connectionTypeComboBox->addItem( "ADSL", QVDConnectionParameters::ConnectionSpeed::ADSL );
+    ui->connectionTypeComboBox->addItem( "Modem", QVDConnectionParameters::ConnectionSpeed::Modem );
 
     loadSettings();
 }
@@ -63,22 +65,30 @@ void MainWindow::connect() {
 
     saveSettings();
 
-    auto speed = static_cast<QVDClient::ConnectionSpeed>( ui->connectionTypeComboBox->currentData().toInt() );
+    auto speed = static_cast<QVDConnectionParameters::ConnectionSpeed>( ui->connectionTypeComboBox->currentData().toInt() );
 
     settings.beginGroup("paths");
 
-    m_client->setNXProxy( settings.value("nxproxy", "/usr/bin/nxproxy").toString());
+    QVDNXBackend *nx_backend = new QVDNXBackend(this);
+    nx_backend->setNxproxyBinary(settings.value("nxproxy", "/usr/bin/nxproxy").toString());
+
+
+
     settings.endGroup();
 
 
     settings.beginGroup("Connection");
-	m_client->setUsername( ui->username->text() );
-	m_client->setPassword( ui->password->text() );
-    m_client->setHost( ui->serverLineEdit->text() );
-    m_client->setPort( settings.value("port", 8443).toInt());
-    m_client->setConnectionSpeed(speed);
+    QVDConnectionParameters params;
+    params.setUsername(ui->username->text());
+    params.setPassword(ui->password->text());
+    params.setHost((ui->serverLineEdit->text()));
+    params.setPort( quint16( settings.value("port", 8443).toInt() ));
+    params.setConnectionSpeed(speed);
 
+    m_client->setBackend(nx_backend);
+    m_client->setParameters(params);
 	m_client->connectToQVD();
+
 	ui->progressBar->setMinimum(0);
 	ui->progressBar->setMaximum(0);
 }
@@ -114,13 +124,13 @@ void MainWindow::vmListReceived(const QList<QVDClient::VMInfo> &vmlist)
 
 void MainWindow::socketError(QAbstractSocket::SocketError error)
 {
-    qWarning() << "socketError " << error << " connecting to " << m_client->getHost() << ":" << m_client->getPort();
+    qWarning() << "socketError " << error << " connecting with " << m_client->getParameters();
     qWarning() << "Socket error: " << m_client->getSocket()->errorString();
 
 
     QString message = QString("Failed to connect to QVD at %1:%2\n%3")
-                            .arg(m_client->getHost())
-                            .arg(m_client->getPort())
+                            .arg(m_client->getParameters().host())
+                            .arg(m_client->getParameters().port())
                             .arg(m_client->getSocket()->errorString());
 
     QMessageBox::critical(this, "QVD", message);
@@ -194,7 +204,7 @@ void MainWindow::loadSettings() {
 
     for(int i=0;i<ui->connectionTypeComboBox->count(); i++) {
         ui->connectionTypeComboBox->setCurrentIndex(i);
-        if ( ui->connectionTypeComboBox->currentData() == settings.value("speed", QVDClient::ConnectionSpeed::LAN ))
+        if ( ui->connectionTypeComboBox->currentData() == settings.value("speed", QVDConnectionParameters::ConnectionSpeed::LAN ))
             break;
     }
 

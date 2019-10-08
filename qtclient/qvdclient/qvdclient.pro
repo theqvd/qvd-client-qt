@@ -9,9 +9,11 @@ CONFIG += c++17
 QT = core network
 
 SOURCES += \
+    backends/qvdbackend.cpp \
+    backends/qvdnxbackend.cpp \
+    qvdconnectionparameters.cpp \
     qvdhttpserver.cpp \
     qvdhttp.cpp \
-    qvdnetworkaccessmanager.cpp \
     qvdnetworkreply.cpp \
     socketforwarder.cpp \
     util/qvdsysteminfo.cpp \
@@ -22,9 +24,11 @@ win32:SOURCES += util/qvdsysteminfo_windows.cpp
 
 
 HEADERS  += \
+    backends/qvdbackend.h \
+    backends/qvdnxbackend.h \
+    qvdconnectionparameters.h \
     qvdhttpserver.h \
     qvdhttp.h \
-    qvdnetworkaccessmanager.h \
     qvdnetworkreply.h \
     socketforwarder.h \
     util/qvdsysteminfo.h \
