@@ -10,9 +10,6 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = QVD_Client
 TEMPLATE = app
-
-INCLUDEPATH += ../qvdclient
-LIBS += -L../qvdclient -lqvdclient
 CONFIG += c++17
 
 
@@ -31,3 +28,11 @@ FORMS    += mainwindow.ui \
 RESOURCES += \
     images.qrc
 
+
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../qvdclient/release/ -lqvdclient
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../qvdclient/debug/ -lqvdclient
+else:unix: LIBS += -L$$OUT_PWD/../qvdclient/ -lqvdclient
+
+INCLUDEPATH += $$PWD/../qvdclient
+DEPENDPATH += $$PWD/../qvdclient
