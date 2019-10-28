@@ -19,13 +19,16 @@ SOURCES += \
     util/qvdsysteminfo.cpp \
     qvdclient.cpp
 
-unix:SOURCES += util/qvdsysteminfo_linux.cpp
-win32:SOURCES += util/qvdsysteminfo_windows.cpp
+unix:SOURCES += util/qvdsysteminfo_linux.cpp \
+    backends/xserverlauncher_linux.cpp
 
+win32:SOURCES += util/qvdsysteminfo_windows.cpp \
+    backends/xserverlauncher_windows.cpp
 
 HEADERS  += \
     backends/qvdbackend.h \
     backends/qvdnxbackend.h \
+    backends/xserverlauncher.h \
     qvdconnectionparameters.h \
     qvdhttpserver.h \
     qvdhttp.h \

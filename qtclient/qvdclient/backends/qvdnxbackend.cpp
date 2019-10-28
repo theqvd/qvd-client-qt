@@ -1,5 +1,7 @@
 #include "qvdnxbackend.h"
 #include <QProcess>
+#include <QtGlobal>
+
 
 QVDNXBackend::QVDNXBackend(QObject *parent) : QVDBackend(parent)
 {
@@ -8,6 +10,9 @@ QVDNXBackend::QVDNXBackend(QObject *parent) : QVDBackend(parent)
     QObject::connect(&m_process, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(processFinished(int, QProcess::ExitStatus)));
     QObject::connect(&m_process, SIGNAL(readyReadStandardError()), this, SLOT(processStderrReady()));
     QObject::connect(&m_process, SIGNAL(readyReadStandardOutput()), this, SLOT(processStdoutReady()));
+
+    QObject::connect(&m_x_server_launcher, SIGNAL(running()), this, SLOT(XServerReady()));
+
 }
 
 QVDNXBackend::~QVDNXBackend()
@@ -28,17 +33,7 @@ void QVDNXBackend::setNxproxyBinary(const QString &nxproxy_binary)
 void QVDNXBackend::start(QTcpSocket *socket)
 {
     m_qvd_connection_socket = socket;
-
-    auto nxproxy_args = QStringList({"-S", "cups=631", "slave=63640", "localhost:40"});
-
-
-
-    qInfo() << "Starting listener at localhost:4040";
-    m_proxy_listener.listen(QHostAddress::LocalHost, 4040);
-
-    qInfo() << "Starting process " << nxproxyBinary() << " with arguments " << nxproxy_args;
-    m_process.start( nxproxyBinary(), nxproxy_args );
-
+    m_x_server_launcher.start();
 }
 
 void QVDNXBackend::stop()
@@ -116,6 +111,31 @@ void QVDNXBackend::processStderrReady()
     QByteArray data = m_process.readAllStandardError();
     qInfo() << "Proxy: " << data;
     emit standardError(data);
+}
+
+void QVDNXBackend::XServerReady()
+{
+    auto nxproxy_args = QStringList({"-S", "cups=631", "slave=63640", "localhost:40"});
+
+
+
+    qInfo() << "Starting listener at localhost:4040";
+    m_proxy_listener.listen(QHostAddress::LocalHost, 4040);
+
+    qInfo() << "Starting process " << nxproxyBinary() << " with arguments " << nxproxy_args << QString(" against display on 127.0.0.1:%1").arg(m_x_server_launcher.display());
+
+    auto env = QProcessEnvironment::systemEnvironment();
+
+#ifdef Q_OS_WIN
+    env.insert("DISPLAY", QString("127.0.0.1:%1").arg( m_x_server_launcher.display() ));
+    env.insert("NX_ROOT", qgetenv("LOCALAPPDATA"));
+#endif
+
+    m_process.setProcessEnvironment(env);
+
+
+    //qputenv("DISPLAY", QString("127.0.0.1:%1").arg( m_x_server_launcher.display() ).toUtf8());
+    m_process.start( nxproxyBinary(), nxproxy_args );
 }
 
 

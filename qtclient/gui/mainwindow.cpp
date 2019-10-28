@@ -70,9 +70,14 @@ void MainWindow::connect() {
     settings.beginGroup("paths");
 
     QVDNXBackend *nx_backend = new QVDNXBackend(this);
+
+
+#ifdef Q_OS_WIN
+    // TODO: Detect location of nxproxy
+    nx_backend->setNxproxyBinary("C:\\Program Files (x86)\\QVD Client\\bin\\nxproxy.exe");
+#else
     nx_backend->setNxproxyBinary(settings.value("nxproxy", "/usr/bin/nxproxy").toString());
-
-
+#endif
 
     settings.endGroup();
 

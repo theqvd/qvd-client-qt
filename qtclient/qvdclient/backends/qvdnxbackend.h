@@ -7,6 +7,8 @@
 
 #include "qvdbackend.h"
 #include "socketforwarder.h"
+#include "xserverlauncher.h"
+
 
 class QVDNXBackend : public QVDBackend
 {
@@ -35,6 +37,7 @@ private slots:
     void processStdoutReady();
     void processStderrReady();
 
+    void XServerReady();
 private:
     QString m_nxproxyBinary = "/usr/bin/nxproxy";
 
@@ -43,6 +46,9 @@ private:
     QTcpServer m_proxy_listener;
 
     QProcess m_process;
+
+    XServerLauncher m_x_server_launcher;
+
 };
 
 #endif // QVDNXBACKEND_H
