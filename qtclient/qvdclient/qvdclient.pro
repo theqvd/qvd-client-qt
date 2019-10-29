@@ -4,9 +4,16 @@ TARGET=qvdclient
 TEMPLATE=lib
 #CONFIG=dll
 
+# c++17 causes a problem on osx:
+# /opt/X11/include/X11/XKBlib.h:399: error: ISO C++17 does not allow 'register' storage class specifier [-Wregister]
+#    register KeySym *           /* sym_return */,
+#    ^~~~~~~~~
+
 CONFIG += c++17
 
-QT = core network
+
+
+QT = core network gui
 
 SOURCES += \
     backends/qvdbackend.cpp \
@@ -16,13 +23,19 @@ SOURCES += \
     qvdhttp.cpp \
     qvdnetworkreply.cpp \
     socketforwarder.cpp \
-    util/qvdsysteminfo.cpp \
     qvdclient.cpp
 
-unix:SOURCES += util/qvdsysteminfo_linux.cpp \
+macx:INCLUDEPATH += "/opt/X11/include"
+macx:LIBS += "-L/opt/X11/lib"
+
+
+macx:SOURCES += \
+    backends/xserverlauncher_osx.cpp
+
+linux:SOURCES += \
     backends/xserverlauncher_linux.cpp
 
-win32:SOURCES += util/qvdsysteminfo_windows.cpp \
+win32:SOURCES += \
     backends/xserverlauncher_windows.cpp
 
 HEADERS  += \
@@ -34,13 +47,13 @@ HEADERS  += \
     qvdhttp.h \
     qvdnetworkreply.h \
     socketforwarder.h \
-    util/qvdsysteminfo.h \
     qvdclient.h
 
-win32:HEADERS += util/qvdsysteminfo_windows.h
-unix:HEADERS += util/qvdsysteminfo_linux.h
+win32:HEADERS +=
+linux:HEADERS +=
+macx:HEADERS +=
 
 win32:LIBS += -lkernel32 -lUser32
-unix:LIBS += -lX11
+linux:LIBS += -lX11
 
 

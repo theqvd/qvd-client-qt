@@ -2,7 +2,6 @@
 #include "ui_mainwindow.h"
 #include "sslerrordialog.h"
 #include "ui_sslerrordialog.h"
-#include "util/qvdsysteminfo.h"
 #include "backends/qvdnxbackend.h"
 #include "qvdconnectionparameters.h"
 
@@ -84,6 +83,7 @@ void MainWindow::connect() {
 
     settings.beginGroup("Connection");
     QVDConnectionParameters params;
+    params.setKeyboard(qApp->inputMethod()->locale().bcp47Name() );
     params.setUsername(ui->username->text());
     params.setPassword(ui->password->text());
     params.setHost((ui->serverLineEdit->text()));

@@ -1,9 +1,8 @@
 #include "qvdconnectionparameters.h"
-#include "util/qvdsysteminfo.h"
 
 QVDConnectionParameters::QVDConnectionParameters()
 {
-    setKeyboard( QVDSystemInfo::getKeyboardLayout() );
+
 }
 
 QString QVDConnectionParameters::host() const
