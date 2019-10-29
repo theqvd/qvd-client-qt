@@ -3,3 +3,4 @@
 *.bak
 *.pro.user
 *.pro.user*
+build-*
