@@ -32,6 +32,10 @@ FORMS    += mainwindow.ui \
 RESOURCES += \
     images.qrc
 
+macx {
+    ICON = pixmaps/qvd.icns
+    QMAKE_INFO_PLIST = Info.plist
+}
 
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../qvdclient/release/ -lqvdclient

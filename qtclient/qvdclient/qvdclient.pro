@@ -55,5 +55,3 @@ macx:HEADERS +=
 
 win32:LIBS += -lkernel32 -lUser32
 linux:LIBS += -lX11
-
-

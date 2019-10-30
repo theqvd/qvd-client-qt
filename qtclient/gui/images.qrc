@@ -6,5 +6,6 @@
         <file>pixmaps/qvd.ico</file>
         <file>pixmaps/qvd.svg</file>
         <file>pixmaps/qvd.xpm</file>
+        <file>pixmaps/qvd.icns</file>
     </qresource>
 </RCC>
