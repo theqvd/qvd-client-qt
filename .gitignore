@@ -4,3 +4,4 @@
 *.pro.user
 *.pro.user*
 build-*
+.DS_Store
