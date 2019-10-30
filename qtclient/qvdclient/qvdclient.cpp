@@ -13,7 +13,6 @@
 
 #include "qvdnetworkreply.h"
 #include "qvdhttp.h"
-#include "util/qvdsysteminfo.h"
 #include "backends/qvdbackend.h"
 
 

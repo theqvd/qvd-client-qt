@@ -61,7 +61,11 @@ private:
     ConnectionSpeed m_connectionSpeed = ConnectionSpeed::ADSL;
     QSize m_geometry = QSize(1024, 768);
 
-    QString m_keyboard = "pc105/en";
+    // The "empty/empty" value is a special magic one that switches things into
+    // transparent mode that should work in almost all cases.
+    // https://sourceforge.net/p/opennx/bugs/31
+
+    QString m_keyboard = "empty/empty";
     QString m_nxagent_extra_args = "";
     bool m_fullscreen = false;
     bool m_printing = false;

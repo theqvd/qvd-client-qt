@@ -4,6 +4,8 @@
 #include "ui_sslerrordialog.h"
 #include "backends/qvdnxbackend.h"
 #include "qvdconnectionparameters.h"
+#include "keyboard_detector/keyboarddetector.h"
+
 
 #include <QDebug>
 #include <QMessageBox>
@@ -71,9 +73,11 @@ void MainWindow::connect() {
     QVDNXBackend *nx_backend = new QVDNXBackend(this);
 
 
-#ifdef Q_OS_WIN
+#if defined(Q_OS_WIN)
     // TODO: Detect location of nxproxy
     nx_backend->setNxproxyBinary("C:\\Program Files (x86)\\QVD Client\\bin\\nxproxy.exe");
+#elif defined(Q_OS_MACOS)
+    nx_backend->setNxproxyBinary("/Applications/Qvd.app/Contents/Resources/usr/lib/qvd/bin/nxproxy");
 #else
     nx_backend->setNxproxyBinary(settings.value("nxproxy", "/usr/bin/nxproxy").toString());
 #endif
@@ -83,12 +87,14 @@ void MainWindow::connect() {
 
     settings.beginGroup("Connection");
     QVDConnectionParameters params;
-    params.setKeyboard(qApp->inputMethod()->locale().bcp47Name() );
+    params.setKeyboard( KeyboardDetector::getKeyboardLayout() );
     params.setUsername(ui->username->text());
     params.setPassword(ui->password->text());
     params.setHost((ui->serverLineEdit->text()));
     params.setPort( quint16( settings.value("port", 8443).toInt() ));
     params.setConnectionSpeed(speed);
+
+    qDebug() << "Connecting with parameters " << params;
 
     m_client->setBackend(nx_backend);
     m_client->setParameters(params);

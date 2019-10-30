@@ -13,12 +13,16 @@ TEMPLATE = app
 CONFIG += c++17
 
 
-SOURCES += \
-    main.cpp \
+SOURCES += main.cpp \
     mainwindow.cpp \
     sslerrordialog.cpp
 
+macx:SOURCES  += keyboard_detector/keyboarddetector_osx.cpp
+linux:SOURCES += keyboard_detector/keyboarddetector_linux.cpp
+win32:SOURCES += keyboard_detector/keyboarddetector_windows.cpp
+
 HEADERS  += \
+    keyboard_detector/keyboarddetector.h \
     mainwindow.h \
     sslerrordialog.h
 
