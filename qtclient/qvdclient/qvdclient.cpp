@@ -170,7 +170,7 @@ void QVDClient::connectToVM(int id)
     query.addQueryItem("qvd.client.printing.enabled"  , getParameters().printing() ? "1" : "0");
     query.addQueryItem("qvd.client.usb.enabled"       , getParameters().usb_forwarding() ? "1" : "0");
 	query.addQueryItem("qvd.client.usb.implementation", "usbip");
-
+    query.addQueryItem("qvd.client.link", "local");
 	url.setQuery(query);
 
 
