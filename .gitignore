@@ -4,4 +4,6 @@
 *.pro.user
 *.pro.user*
 build-*
+*.swp
 .DS_Store
+doc/
