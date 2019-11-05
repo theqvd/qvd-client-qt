@@ -37,6 +37,8 @@ macx {
     QMAKE_INFO_PLIST = Info.plist
 }
 
+unix:LIBS += -lX11
+
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../qvdclient/release/ -lqvdclient
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../qvdclient/debug/ -lqvdclient
