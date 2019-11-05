@@ -17,6 +17,7 @@ QT = core network gui
 
 SOURCES += \
     backends/qvdbackend.cpp \
+    backends/qvdlibnxbackend.cpp \
     backends/qvdnxbackend.cpp \
     qvdconnectionparameters.cpp \
     qvdhttpserver.cpp \
@@ -24,6 +25,12 @@ SOURCES += \
     qvdnetworkreply.cpp \
     socketforwarder.cpp \
     qvdclient.cpp
+
+# Allow for building against nxlibs source that's
+# checked out in the same directory as ours.
+#INCLUDEPATH += "../../../nx-libs/nxcomp/include/"
+#LIBS += "-L../../../nx-libs/nx-X11/exports/lib/"
+
 
 macx:INCLUDEPATH += "/opt/X11/include"
 macx:LIBS += "-L/opt/X11/lib"
@@ -40,6 +47,7 @@ win32:SOURCES += \
 
 HEADERS  += \
     backends/qvdbackend.h \
+    backends/qvdlibnxbackend.h \
     backends/qvdnxbackend.h \
     backends/xserverlauncher.h \
     qvdconnectionparameters.h \
@@ -53,5 +61,5 @@ win32:HEADERS +=
 linux:HEADERS +=
 macx:HEADERS +=
 
+LIBS += -lNX_X11
 win32:LIBS += -lkernel32 -lUser32
-linux:LIBS += -lX11
