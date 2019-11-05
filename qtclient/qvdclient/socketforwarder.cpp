@@ -12,7 +12,7 @@ int64_t SocketForwarder::getBytesBtoA() const
 	return bytes_b_to_a;
 }
 
-SocketForwarder::SocketForwarder(QObject *parent, QTcpSocket &a, QTcpSocket &b)
+SocketForwarder::SocketForwarder(QObject *parent, QIODevice &a, QIODevice &b)
 	: QObject(parent), m_socket_a(a), m_socket_b(b)
 {
 	connect(&m_socket_a, SIGNAL(readyRead()), this, SLOT(socketA_readyRead()));
@@ -36,7 +36,7 @@ SocketForwarder::SocketForwarder(QObject *parent, QTcpSocket &a, QTcpSocket &b)
 void SocketForwarder::socketA_readyRead()
 {
 	QByteArray data = m_socket_a.readAll();
-//	qInfo() << "Forwarding " << data.length() << " bytes from A to B";
+    qInfo() << "Forwarding " << data.length() << " bytes from A to B";
 	bytes_a_to_b += data.length();
 	m_socket_b.write(data);
 
@@ -45,7 +45,7 @@ void SocketForwarder::socketA_readyRead()
 void SocketForwarder::socketB_readyRead()
 {
 	QByteArray data = m_socket_b.readAll();
-//	qInfo() << "Forwarding " << data.length() << " bytes from B to A";
+    qInfo() << "Forwarding " << data.length() << " bytes from B to A";
 	bytes_b_to_a += data.length();
 	m_socket_a.write(data);
 
@@ -59,6 +59,7 @@ void SocketForwarder::socketA_finished()
 		QByteArray data = m_socket_a.readAll();
 		bytes_a_to_b += data.length();
 		m_socket_b.write( data );
+
 	}
 
 	m_socket_b.close();
