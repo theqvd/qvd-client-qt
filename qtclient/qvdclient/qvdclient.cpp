@@ -108,8 +108,8 @@ void QVDClient::connectToQVD() {
 	m_socket->setPeerVerifyMode(QSslSocket::QueryPeer);
 
 
-	m_http = new QVDHTTP(*m_socket, this);
 
+	m_http = new QVDHTTP(*m_socket, this);
 
 	connect(m_socket, SIGNAL(encrypted()), this, SLOT(qvd_connectionEstablished()));
 	connect(m_socket, SIGNAL(sslErrors(QList<QSslError>)), this, SLOT(qvd_sslErrors(QList<QSslError>)));

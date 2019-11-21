@@ -177,7 +177,7 @@ void QVDNetworkReply::readyRead() {
 				break;
 			case ReadState::Error:
 				qFatal("Received data from socket during error state!");
-				break;
+                                //break;
 		}
 	}
 }

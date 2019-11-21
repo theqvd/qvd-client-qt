@@ -6,22 +6,17 @@
 #include "qvdconnectionparameters.h"
 #include "keyboard_detector/keyboarddetector.h"
 
-
 #include <QDebug>
 #include <QMessageBox>
 #include <QSslCertificate>
 #include <QSettings>
 #include <QIcon>
 
-
 MainWindow::MainWindow(QWidget *parent) :
 	QMainWindow(parent),
 	ui(new Ui::MainWindow)
 {
 	m_client = new QVDClient(this);
-
-
-
 
 	QObject::connect(m_client, SIGNAL(vmListReceived(QList<QVDClient::VMInfo>)), this, SLOT(vmListReceived(QList<QVDClient::VMInfo>)));
 	QObject::connect(m_client, SIGNAL(socketError(QAbstractSocket::SocketError)), this, SLOT(socketError(QAbstractSocket::SocketError)));
@@ -32,7 +27,6 @@ MainWindow::MainWindow(QWidget *parent) :
     setWindowIcon(QIcon(":/pixmaps/qvd.ico"));
 
 	ui->setupUi(this);
-
 
     ui->connectionTypeComboBox->addItem( "Local", QVDConnectionParameters::ConnectionSpeed::LAN );
     ui->connectionTypeComboBox->addItem( "ADSL", QVDConnectionParameters::ConnectionSpeed::ADSL );
@@ -53,7 +47,11 @@ void MainWindow::setUI(bool enabled)
 		ui->progressBar->setMaximum(100);
 		ui->progressBar->setValue(0);
 	}
-
+    else
+    {
+        ui->progressBar->setMaximum(0);
+        ui->progressBar->setValue(0);
+    }
 
 }
 
@@ -62,7 +60,6 @@ void MainWindow::connect() {
 
 	setUI(false);
     QSettings settings;
-
 
     saveSettings();
 
@@ -84,7 +81,6 @@ void MainWindow::connect() {
 
     settings.endGroup();
 
-
     settings.beginGroup("Connection");
     QVDConnectionParameters params;
     params.setKeyboard( KeyboardDetector::getKeyboardLayout() );
@@ -96,12 +92,14 @@ void MainWindow::connect() {
 
     qDebug() << "Connecting with parameters " << params;
 
+    //QList<QSslCertificate> certs = QSslCertificate::fromPath(":/certificate.pem");
+
     m_client->setBackend(nx_backend);
     m_client->setParameters(params);
-	m_client->connectToQVD();
+    m_client->connectToQVD();
 
 	ui->progressBar->setMinimum(0);
-	ui->progressBar->setMaximum(0);
+    ui->progressBar->setMaximum(0);
 }
 
 void MainWindow::vmListReceived(const QList<QVDClient::VMInfo> &vmlist)
@@ -132,7 +130,6 @@ void MainWindow::vmListReceived(const QList<QVDClient::VMInfo> &vmlist)
     }
 }
 
-
 void MainWindow::socketError(QAbstractSocket::SocketError error)
 {
     qWarning() << "socketError " << error << " connecting with " << m_client->getParameters();
@@ -151,8 +148,6 @@ void MainWindow::socketError(QAbstractSocket::SocketError error)
 
 void MainWindow::connectionEstablished()
 {
-	qInfo() << "Connection established";
-
 	m_client->requestVMList();
 }
 
@@ -182,8 +177,11 @@ void MainWindow::connectionError(QVDClient::ConnectionError error, QString error
 void MainWindow::sslErrors(const QList<QSslError> &errors, const QList<QSslCertificate> &cert_chain)
 {
 	SSLErrorDialog *dlg = new SSLErrorDialog(this);
-	dlg->displayErrors(errors, cert_chain);
-	dlg->exec();
+    dlg->resize(700, 380);
+
+    dlg->displayErrors(errors, cert_chain);
+    qDebug () << dlg->result();
+    dlg->exec();
 }
 
 void MainWindow::saveSettings() {
