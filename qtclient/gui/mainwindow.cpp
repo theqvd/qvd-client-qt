@@ -16,13 +16,13 @@ MainWindow::MainWindow(QWidget *parent) :
 	QMainWindow(parent),
 	ui(new Ui::MainWindow)
 {
-	m_client = new QVDClient(this);
+    m_client = new QVDClient(this);
 
 	QObject::connect(m_client, SIGNAL(vmListReceived(QList<QVDClient::VMInfo>)), this, SLOT(vmListReceived(QList<QVDClient::VMInfo>)));
 	QObject::connect(m_client, SIGNAL(socketError(QAbstractSocket::SocketError)), this, SLOT(socketError(QAbstractSocket::SocketError)));
 	QObject::connect(m_client, SIGNAL(connectionEstablished()), this, SLOT(connectionEstablished()));
 	QObject::connect(m_client, SIGNAL(connectionError(QVDClient::ConnectionError,QString)), this, SLOT(connectionError(QVDClient::ConnectionError,QString)));
-	QObject::connect(m_client, SIGNAL(sslErrors(QList<QSslError>, QList<QSslCertificate>)), this, SLOT(sslErrors(QList<QSslError>, QList<QSslCertificate>)));
+    QObject::connect(m_client, SIGNAL(sslErrors(QList<QSslError>, QList<QSslCertificate>)), this, SLOT(sslErrors(QList<QSslError>, QList<QSslCertificate>)));
 
     setWindowIcon(QIcon(":/pixmaps/qvd.ico"));
 
@@ -176,12 +176,17 @@ void MainWindow::connectionError(QVDClient::ConnectionError error, QString error
 
 void MainWindow::sslErrors(const QList<QSslError> &errors, const QList<QSslCertificate> &cert_chain)
 {
-	SSLErrorDialog *dlg = new SSLErrorDialog(this);
-    dlg->resize(700, 380);
+    QSettings settings_cert;
+    settings_cert.beginGroup("SSL");
+    if (settings_cert.value("PEM", "").toString() == "")
+       {
+        SSLErrorDialog *dlg = new SSLErrorDialog(this);
+        dlg->resize(700, 380);
 
-    dlg->displayErrors(errors, cert_chain);
-    qDebug () << dlg->result();
-    dlg->exec();
+        dlg->displayErrors(errors, cert_chain);
+        qDebug () << dlg->result();
+        dlg->exec();
+       }
 }
 
 void MainWindow::saveSettings() {
