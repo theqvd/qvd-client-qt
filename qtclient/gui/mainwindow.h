@@ -5,6 +5,7 @@
 #include <qvdclient.h>
 #include "backends/qvdbackend.h"
 #include "backends/qvdnxbackend.h"
+#include "QSettings"
 
 
 namespace Ui {
@@ -24,6 +25,8 @@ public:
 	~MainWindow();
 	void setUI(bool enabled);
     void closeEvent(QCloseEvent *event);
+
+    QSettings settings_cert;
 
 public slots:
 	void connect();

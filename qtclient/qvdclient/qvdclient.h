@@ -7,6 +7,7 @@
 #include <QTcpServer>
 #include <QProcess>
 #include <QSslCertificate>
+#include "QSettings"
 
 #include "qvdhttp.h"
 #include "qvdconnectionparameters.h"
@@ -76,8 +77,7 @@ public:
 	 */
 	QTcpSocket *getSocket();
 
-
-
+    QSettings settings_cert; //Declaración global
 
 	void connectToQVD();
 	void requestVMList();

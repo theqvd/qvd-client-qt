@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <QSslError>
+#include "QSettings"
 
 namespace Ui {
 class SSLErrorDialog;
@@ -17,6 +18,8 @@ public:
 	~SSLErrorDialog();
 
 	void displayErrors(const QList<QSslError> &errors, const QList<QSslCertificate> &cert_chain);
+
+    QSettings settings_cert;
 
 private slots:
     void accept_ssl();

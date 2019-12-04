@@ -16,7 +16,6 @@
 #include "backends/qvdbackend.h"
 
 
-
 /**
  * @brief The QVDClient class
  *
@@ -135,6 +134,7 @@ void QVDClient::requestVMList()
 	QUrl url = QUrl("https://localhost/");
 	url.setPath("/qvd/list_of_vm");
 
+
 	QNetworkRequest req = createRequest(url);
 
 	req.setRawHeader(QByteArray("Accept"), QByteArray("application/json"));
@@ -184,6 +184,7 @@ void QVDClient::connectToVM(int id)
 	QVDNetworkReply *ret = m_http->get(req);
     connect(ret, SIGNAL(processing()), this, SLOT(qvd_vmProcessing()));
 	connect(ret, SIGNAL(finished()), this, SLOT(qvd_vmConnected()));
+
 }
 
 void QVDClient::disconnect()

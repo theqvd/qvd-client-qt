@@ -17,16 +17,17 @@ MainWindow::MainWindow(QWidget *parent) :
 	ui(new Ui::MainWindow)
 {
     m_client = new QVDClient(this);
+    settings_cert.beginReadArray("SSL");
 
-	QObject::connect(m_client, SIGNAL(vmListReceived(QList<QVDClient::VMInfo>)), this, SLOT(vmListReceived(QList<QVDClient::VMInfo>)));
-	QObject::connect(m_client, SIGNAL(socketError(QAbstractSocket::SocketError)), this, SLOT(socketError(QAbstractSocket::SocketError)));
-	QObject::connect(m_client, SIGNAL(connectionEstablished()), this, SLOT(connectionEstablished()));
-	QObject::connect(m_client, SIGNAL(connectionError(QVDClient::ConnectionError,QString)), this, SLOT(connectionError(QVDClient::ConnectionError,QString)));
+    QObject::connect(m_client, SIGNAL(vmListReceived(QList<QVDClient::VMInfo>)), this, SLOT(vmListReceived(QList<QVDClient::VMInfo>)));
+    QObject::connect(m_client, SIGNAL(socketError(QAbstractSocket::SocketError)), this, SLOT(socketError(QAbstractSocket::SocketError)));
+    QObject::connect(m_client, SIGNAL(connectionEstablished()), this, SLOT(connectionEstablished()));
+    QObject::connect(m_client, SIGNAL(connectionError(QVDClient::ConnectionError,QString)), this, SLOT(connectionError(QVDClient::ConnectionError,QString)));
     QObject::connect(m_client, SIGNAL(sslErrors(QList<QSslError>, QList<QSslCertificate>)), this, SLOT(sslErrors(QList<QSslError>, QList<QSslCertificate>)));
 
-    setWindowIcon(QIcon(":/pixmaps/qvd.ico"));
+    ui->setupUi(this);
 
-	ui->setupUi(this);
+    setWindowIcon(QIcon(":/pixmaps/qvd.ico"));
 
     ui->connectionTypeComboBox->addItem( "Local", QVDConnectionParameters::ConnectionSpeed::LAN );
     ui->connectionTypeComboBox->addItem( "ADSL", QVDConnectionParameters::ConnectionSpeed::ADSL );
@@ -97,8 +98,12 @@ void MainWindow::connect() {
     m_client->setBackend(nx_backend);
     m_client->setParameters(params);
     m_client->connectToQVD();
+    setUI(false);
 
-	ui->progressBar->setMinimum(0);
+//    QMessageBox msgBox;
+//    msgBox.setText("The document has been modified.");
+//    msgBox.exec();
+    ui->progressBar->setMinimum(0);
     ui->progressBar->setMaximum(0);
 }
 
@@ -176,9 +181,10 @@ void MainWindow::connectionError(QVDClient::ConnectionError error, QString error
 
 void MainWindow::sslErrors(const QList<QSslError> &errors, const QList<QSslCertificate> &cert_chain)
 {
-    QSettings settings_cert;
-    settings_cert.beginGroup("SSL");
-    if (settings_cert.value("PEM", "").toString() == "")
+    //settings_cert.setValue("PEM", "");
+    qDebug () << "###########data accept" << settings_cert.value("Accept").toString() << "#########";
+    //settings_cert.setValue("Accept","0");
+    if (settings_cert.value("Accept").toString() != "2")
        {
         SSLErrorDialog *dlg = new SSLErrorDialog(this);
         dlg->resize(700, 380);
@@ -229,5 +235,10 @@ void MainWindow::loadSettings() {
 
 void MainWindow::closeEvent(QCloseEvent *event) {
     saveSettings();
-    event->accept();
+    qDebug() << "-----------------------------------(" << settings_cert.value("Accept").toString() << ")------------------";
+
+    if (settings_cert.value("Accept").toString() != "0")
+    {
+        event->accept();
+    }
 }
