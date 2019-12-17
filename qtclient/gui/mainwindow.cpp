@@ -93,18 +93,13 @@ void MainWindow::connect() {
 
     qDebug() << "Connecting with parameters " << params;
 
-    //QList<QSslCertificate> certs = QSslCertificate::fromPath(":/certificate.pem");
-
     m_client->setBackend(nx_backend);
     m_client->setParameters(params);
     m_client->connectToQVD();
-    setUI(false);
+    //setUI(false);
 
-//    QMessageBox msgBox;
-//    msgBox.setText("The document has been modified.");
-//    msgBox.exec();
-    ui->progressBar->setMinimum(0);
-    ui->progressBar->setMaximum(0);
+//    ui->progressBar->setMinimum(0);
+//    ui->progressBar->setMaximum(0);
 }
 
 void MainWindow::vmListReceived(const QList<QVDClient::VMInfo> &vmlist)
@@ -181,18 +176,35 @@ void MainWindow::connectionError(QVDClient::ConnectionError error, QString error
 
 void MainWindow::sslErrors(const QList<QSslError> &errors, const QList<QSslCertificate> &cert_chain)
 {
-    //settings_cert.setValue("PEM", "");
-    qDebug () << "###########data accept" << settings_cert.value("Accept").toString() << "#########";
-    //settings_cert.setValue("Accept","0");
-    if (settings_cert.value("Accept").toString() != "2")
-       {
+    //qint8 i;
+    struct QVDCert{
+        QString PEM;
+        qint32 Accept;
+    };
+
+    QList<QVDCert> qvdCerts;
+    int size = settings_cert.beginReadArray("SSL");
+    for (int i = 0; i <= size; ++i) {
+        settings_cert.setArrayIndex(i);
+        QVDCert qvdCert;
+        qvdCert.PEM = settings_cert.value("PEM").toString();
+        qvdCert.Accept = settings_cert.value("Accept").toInt();
+        qvdCerts.append(qvdCert);
+    }
+    settings_cert.endArray();
+//    if (settings_cert.value("Accept").toString() != "2")
+//       {
         SSLErrorDialog *dlg = new SSLErrorDialog(this);
         dlg->resize(700, 380);
 
         dlg->displayErrors(errors, cert_chain);
         qDebug () << dlg->result();
         dlg->exec();
-       }
+//       }
+//    else
+//    {
+//        qDebug () << "no SSL";
+//    }
 }
 
 void MainWindow::saveSettings() {
@@ -235,10 +247,8 @@ void MainWindow::loadSettings() {
 
 void MainWindow::closeEvent(QCloseEvent *event) {
     saveSettings();
-    qDebug() << "-----------------------------------(" << settings_cert.value("Accept").toString() << ")------------------";
-
-    if (settings_cert.value("Accept").toString() != "0")
-    {
+//    if (settings_cert.value("Accept").toString() != "0")
+//    {
         event->accept();
-    }
+//    }
 }

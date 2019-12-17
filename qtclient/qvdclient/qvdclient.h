@@ -46,7 +46,6 @@ public:
 
 private:
 
-
 	QSslSocket *m_socket = Q_NULLPTR;
 	QVDHTTP *m_http = Q_NULLPTR;
 
@@ -100,12 +99,13 @@ signals:
 
 	void vmListReceived(const QList<QVDClient::VMInfo> &vm_list);
 	void socketError(QAbstractSocket::SocketError  error);
-	void sslErrors(const QList<QSslError> &errors, const QList<QSslCertificate> &cert_chain);
+    //void sslErrors(const QList<QSslError> &errors, const QList<QSslCertificate> &cert_chain, int &answer);
+    void sslErrors(const QList<QSslError> &errors, const QList<QSslCertificate> &cert_chain);
 	void hostFound();
 	void socketStateChanged(QAbstractSocket::SocketState socketState);
 
 private slots:
-	void qvd_sslErrors(const QList<QSslError> &errors);
+    void qvd_sslErrors(const QList<QSslError> &errors);
 	void qvd_connectionEstablished();
 	void qvd_vmListDownloaded();
 	void qvd_vmProcessing();

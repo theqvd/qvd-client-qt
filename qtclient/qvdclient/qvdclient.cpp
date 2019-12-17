@@ -111,12 +111,12 @@ void QVDClient::connectToQVD() {
 	m_http = new QVDHTTP(*m_socket, this);
 
 	connect(m_socket, SIGNAL(encrypted()), this, SLOT(qvd_connectionEstablished()));
-	connect(m_socket, SIGNAL(sslErrors(QList<QSslError>)), this, SLOT(qvd_sslErrors(QList<QSslError>)));
+    connect(m_socket, SIGNAL(sslErrors(QList<QSslError>)), this, SLOT(qvd_sslErrors(QList<QSslError>, false)));
 	connect(m_socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(qvd_socketError(QAbstractSocket::SocketError)));
 	connect(m_socket, SIGNAL(hostFound()), this, SLOT(qvd_hostFound()));
 	connect(m_socket, SIGNAL(stateChanged(QAbstractSocket::SocketState)), this, SLOT(qvd_socketStateChanged(QAbstractSocket::SocketState)));
 
-    m_socket->connectToHostEncrypted(getParameters().host(), getParameters().port());
+        m_socket->connectToHostEncrypted(getParameters().host(), getParameters().port());
 
 //	if ( !m_socket->waitForEncrypted( )) {
 //		qCritical() << "Failed to establish an encrypted connection to " << m_host << ":" << m_port << ": " << m_socket->errorString();
@@ -296,13 +296,19 @@ void QVDClient::qvd_socketStateChanged(QAbstractSocket::SocketState socketState)
 {
 	emit socketStateChanged(socketState);
 }
-
+//void QVDClient::qvd_sslErrors(const QList<QSslError> &errors, int Answer) {
 void QVDClient::qvd_sslErrors(const QList<QSslError> &errors) {
 	for(auto error : errors) {
 		qInfo() << "SSL error: " << error.errorString();
 
 	}
-
-
-	emit sslErrors(errors, m_socket->peerCertificateChain());
+//    Answer = settings_cert.value("Accept").toInt();
+//    qDebug() << "Answer:(" << Answer << ")";
+//    if ( Answer != 0 ){
+        emit sslErrors(errors, m_socket->peerCertificateChain());
+//    }
+//    else
+//    {
+//        qDebug() << "Cancel";
+//    }
 }

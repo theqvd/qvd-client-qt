@@ -3,6 +3,13 @@
 #include <QPushButton>
 #include "QDebug"
 
+struct QVDCert{
+    QString PEM;
+    qint32 Accept;
+};
+
+QList<QVDCert> qvdCerts;
+
 SSLErrorDialog::SSLErrorDialog(QWidget *parent) :
 	QDialog(parent),
     ui(new Ui::SSLErrorDialog)
@@ -25,20 +32,13 @@ SSLErrorDialog::SSLErrorDialog(QWidget *parent) :
 
 void SSLErrorDialog::displayErrors(const QList<QSslError> &errors, const QList<QSslCertificate> &cert_chain)
 {
-    qint8 i;
-
-    struct QVDCert{
-        QString PEM;
-        qint8 Accept;
-    };
-
-    QList<QVDCert> qvdCerts;
+    qint32 i;
 
     ui->errorTree->clear();
 
 	QMap<QByteArray, QTreeWidgetItem*> cert_list;
 
-    i=0;
+    i = settings_cert.beginReadArray("SSL");
     for(auto cert : cert_chain )
         {
 
@@ -49,25 +49,26 @@ void SSLErrorDialog::displayErrors(const QList<QSslError> &errors, const QList<Q
 
             ui->certDescription->setPlainText(cert.toText());
 
-            settings_cert.setArrayIndex(i);
+            //settings_cert.setArrayIndex(i);
             QVDCert qvdCert;
             qvdCert.PEM = cert.toPem();
             qvdCert.Accept = 0;
             qvdCerts.append(qvdCert);
 
+            qDebug() << "<<<<<<<< Index:" << i << ">>>>>>>>";
             settings_cert.setArrayIndex(i);
             settings_cert.setValue("PEM", qvdCerts.at(i).PEM);
             settings_cert.setValue("Accept", qvdCerts.at(i).Accept);
 
             qDebug() << "----------------------------------------------------------------";
-            qDebug() << " Values in PEM:" << settings_cert.value("PEM").toString();
-            qDebug() << " Values in Accept:" << settings_cert.value("Accept").toString();
+            qDebug() << " Values in Array PEM:" << settings_cert.value("PEM").toString();
+            qDebug() << " Values in Array Accept:" << settings_cert.value("Accept").toString();
             qDebug() << "----------------------------------------------------------------";
 
             i = i + 1;
         }
-        i = 0;
         settings_cert.endArray();
+        i = 0;
 
     for(auto error : errors ) {
 
