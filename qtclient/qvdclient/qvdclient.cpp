@@ -111,7 +111,7 @@ void QVDClient::connectToQVD() {
 	m_http = new QVDHTTP(*m_socket, this);
 
 	connect(m_socket, SIGNAL(encrypted()), this, SLOT(qvd_connectionEstablished()));
-    connect(m_socket, SIGNAL(sslErrors(QList<QSslError>)), this, SLOT(qvd_sslErrors(QList<QSslError>, false)));
+    connect(m_socket, SIGNAL(sslErrors(QList<QSslError>)), this, SLOT(qvd_sslErrors(QList<QSslError>)));
 	connect(m_socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(qvd_socketError(QAbstractSocket::SocketError)));
 	connect(m_socket, SIGNAL(hostFound()), this, SLOT(qvd_hostFound()));
 	connect(m_socket, SIGNAL(stateChanged(QAbstractSocket::SocketState)), this, SLOT(qvd_socketStateChanged(QAbstractSocket::SocketState)));
@@ -296,19 +296,20 @@ void QVDClient::qvd_socketStateChanged(QAbstractSocket::SocketState socketState)
 {
 	emit socketStateChanged(socketState);
 }
-//void QVDClient::qvd_sslErrors(const QList<QSslError> &errors, int Answer) {
+
 void QVDClient::qvd_sslErrors(const QList<QSslError> &errors) {
 	for(auto error : errors) {
 		qInfo() << "SSL error: " << error.errorString();
-
 	}
-//    Answer = settings_cert.value("Accept").toInt();
-//    qDebug() << "Answer:(" << Answer << ")";
-//    if ( Answer != 0 ){
-        emit sslErrors(errors, m_socket->peerCertificateChain());
-//    }
-//    else
-//    {
-//        qDebug() << "Cancel";
-//    }
+
+    bool continueConnection = false;
+    emit sslErrors(errors, m_socket->peerCertificateChain(), continueConnection);
+
+    if ( continueConnection ) {
+        qInfo() << "Continuing, SSL errors accepted by user.";
+    } else {
+        qInfo() << "Aborting due to SSL errors";
+        disconnect();
+    }
+
 }

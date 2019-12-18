@@ -38,9 +38,8 @@ void SSLErrorDialog::displayErrors(const QList<QSslError> &errors, const QList<Q
 
 	QMap<QByteArray, QTreeWidgetItem*> cert_list;
 
-    i = settings_cert.beginReadArray("SSL");
     for(auto cert : cert_chain )
-        {
+    {
 
             QTreeWidgetItem *cert_item = new QTreeWidgetItem( ui->errorTree );
             cert_item->setExpanded(true);
@@ -48,27 +47,7 @@ void SSLErrorDialog::displayErrors(const QList<QSslError> &errors, const QList<Q
             cert_list[cert.digest()] = cert_item;
 
             ui->certDescription->setPlainText(cert.toText());
-
-            //settings_cert.setArrayIndex(i);
-            QVDCert qvdCert;
-            qvdCert.PEM = cert.toPem();
-            qvdCert.Accept = 0;
-            qvdCerts.append(qvdCert);
-
-            qDebug() << "<<<<<<<< Index:" << i << ">>>>>>>>";
-            settings_cert.setArrayIndex(i);
-            settings_cert.setValue("PEM", qvdCerts.at(i).PEM);
-            settings_cert.setValue("Accept", qvdCerts.at(i).Accept);
-
-            qDebug() << "----------------------------------------------------------------";
-            qDebug() << " Values in Array PEM:" << settings_cert.value("PEM").toString();
-            qDebug() << " Values in Array Accept:" << settings_cert.value("Accept").toString();
-            qDebug() << "----------------------------------------------------------------";
-
-            i = i + 1;
-        }
-        settings_cert.endArray();
-        i = 0;
+    }
 
     for(auto error : errors ) {
 
@@ -84,21 +63,21 @@ void SSLErrorDialog::displayErrors(const QList<QSslError> &errors, const QList<Q
 void SSLErrorDialog::accept_ssl()
 {
     qDebug() << "(accept_ssl) Accepting settings certificate once";
-    settings_cert.setValue("Accept", 1);
+    setResult(1);
     close();
 }
 
 void SSLErrorDialog::accept_save_ssl()
 {
     qDebug() << "(accept_save_ssl) Saving settings certificate";
-    settings_cert.setValue("Accept", 2);
+    setResult(2);
     close();
 }
 
 void SSLErrorDialog::reject_ssl()
 {
     qDebug() << "(reject_ssl) Reject settings certificate";
-    settings_cert.setValue("Accept", 0);
+    setResult(0);
     close();
 }
 

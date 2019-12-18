@@ -26,15 +26,13 @@ public:
 	void setUI(bool enabled);
     void closeEvent(QCloseEvent *event);
 
-    QSettings settings_cert;
-
 public slots:
 	void connect();
 	void vmListReceived(const QList<QVDClient::VMInfo> &vmlist);
 	void socketError(QAbstractSocket::SocketError  error);
 	void connectionEstablished();
 	void connectionError(QVDClient::ConnectionError error, QString error_desc);
-	void sslErrors(const QList<QSslError> &errors, const QList<QSslCertificate> &cert_chain); 
+    void sslErrors(const QList<QSslError> &errors, const QList<QSslCertificate> &cert_chain, bool &continueConnection);
 private:
 	Ui::MainWindow *ui;
     void saveSettings();

@@ -99,8 +99,7 @@ signals:
 
 	void vmListReceived(const QList<QVDClient::VMInfo> &vm_list);
 	void socketError(QAbstractSocket::SocketError  error);
-    //void sslErrors(const QList<QSslError> &errors, const QList<QSslCertificate> &cert_chain, int &answer);
-    void sslErrors(const QList<QSslError> &errors, const QList<QSslCertificate> &cert_chain);
+    void sslErrors(const QList<QSslError> &errors, const QList<QSslCertificate> &cert_chain, bool &continueConnection);
 	void hostFound();
 	void socketStateChanged(QAbstractSocket::SocketState socketState);
 

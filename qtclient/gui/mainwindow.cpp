@@ -17,13 +17,12 @@ MainWindow::MainWindow(QWidget *parent) :
 	ui(new Ui::MainWindow)
 {
     m_client = new QVDClient(this);
-    settings_cert.beginReadArray("SSL");
 
     QObject::connect(m_client, SIGNAL(vmListReceived(QList<QVDClient::VMInfo>)), this, SLOT(vmListReceived(QList<QVDClient::VMInfo>)));
     QObject::connect(m_client, SIGNAL(socketError(QAbstractSocket::SocketError)), this, SLOT(socketError(QAbstractSocket::SocketError)));
     QObject::connect(m_client, SIGNAL(connectionEstablished()), this, SLOT(connectionEstablished()));
     QObject::connect(m_client, SIGNAL(connectionError(QVDClient::ConnectionError,QString)), this, SLOT(connectionError(QVDClient::ConnectionError,QString)));
-    QObject::connect(m_client, SIGNAL(sslErrors(QList<QSslError>, QList<QSslCertificate>)), this, SLOT(sslErrors(QList<QSslError>, QList<QSslCertificate>)));
+    QObject::connect(m_client, &QVDClient::sslErrors, this, &MainWindow::sslErrors);
 
     ui->setupUi(this);
 
@@ -174,37 +173,72 @@ void MainWindow::connectionError(QVDClient::ConnectionError error, QString error
 
 }
 
-void MainWindow::sslErrors(const QList<QSslError> &errors, const QList<QSslCertificate> &cert_chain)
+void MainWindow::sslErrors(const QList<QSslError> &errors, const QList<QSslCertificate> &cert_chain, bool &continueConnection)
 {
-    //qint8 i;
-    struct QVDCert{
-        QString PEM;
-        qint32 Accept;
-    };
+    QList<QString> certList;
+    QSet<QString> nonAcceptedHashes;
 
-    QList<QVDCert> qvdCerts;
-    int size = settings_cert.beginReadArray("SSL");
-    for (int i = 0; i <= size; ++i) {
-        settings_cert.setArrayIndex(i);
-        QVDCert qvdCert;
-        qvdCert.PEM = settings_cert.value("PEM").toString();
-        qvdCert.Accept = settings_cert.value("Accept").toInt();
-        qvdCerts.append(qvdCert);
+    for(auto cert : cert_chain ) {
+        QString hash = cert.digest(QCryptographicHash::Sha256 ).toHex();
+
+        qInfo() << "Hash: " << hash;
+        nonAcceptedHashes.insert(hash);
     }
-    settings_cert.endArray();
-//    if (settings_cert.value("Accept").toString() != "2")
-//       {
+
+    QSettings settings;
+
+    settings.beginGroup("SSL");
+    int size = settings.beginReadArray("AcceptedCertificates");
+    for (int i = 0; i < size; ++i) {
+        settings.setArrayIndex(i);
+        QString stored_hash = settings.value("hash").value<QString>();
+        certList.append(stored_hash);
+
+        qInfo() << "STORED: " << stored_hash;
+
+        if ( nonAcceptedHashes.contains( stored_hash ) ) {
+            nonAcceptedHashes.remove( stored_hash );
+        }
+    }
+    settings.endArray();
+    settings.endGroup();
+
+
+    if ( nonAcceptedHashes.empty() ) {
+        qInfo() << "All certs in the chain have been previously accepted";
+        continueConnection = true;
+    } else {
         SSLErrorDialog *dlg = new SSLErrorDialog(this);
         dlg->resize(700, 380);
 
         dlg->displayErrors(errors, cert_chain);
-        qDebug () << dlg->result();
         dlg->exec();
-//       }
-//    else
-//    {
-//        qDebug () << "no SSL";
-//    }
+
+        qInfo() << "Dialog result: " << dlg->result();
+
+        continueConnection = (dlg->result() > 0);
+
+        if ( dlg->result() == 2 ) {
+            // Save to config
+            settings.beginGroup("SSL");
+            settings.beginWriteArray("AcceptedCertificates");
+            int i=0;
+
+            for( auto hash : certList ) {
+                settings.setArrayIndex(i++);
+                settings.setValue("hash", hash);
+            }
+
+            for( auto hash : nonAcceptedHashes ) {
+                settings.setArrayIndex(i++);
+                settings.setValue("hash", hash);
+            }
+
+            settings.endArray();
+            settings.endGroup();
+        }
+    }
+
 }
 
 void MainWindow::saveSettings() {
