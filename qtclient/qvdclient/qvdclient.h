@@ -96,12 +96,15 @@ public:
 signals:
     void connectionEstablished();
     void connectionError(QVDClient::ConnectionError error, QString error_text);
+    void connectionTerminated();
 
 	void vmListReceived(const QList<QVDClient::VMInfo> &vm_list);
 	void socketError(QAbstractSocket::SocketError  error);
-    void sslErrors(const QList<QSslError> &errors, const QList<QSslCertificate> &cert_chain, bool &continueConnection);
+    void sslErrors(const QList<QSslError> &errors, const QList<QSslCertificate> &cert_chain, bool &continue_connection);
 	void hostFound();
 	void socketStateChanged(QAbstractSocket::SocketState socketState);
+
+
 
 private slots:
     void qvd_sslErrors(const QList<QSslError> &errors);

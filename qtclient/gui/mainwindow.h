@@ -6,6 +6,8 @@
 #include "backends/qvdbackend.h"
 #include "backends/qvdnxbackend.h"
 #include "QSettings"
+#include <QSsl>
+#include <QList>
 
 
 namespace Ui {
@@ -27,12 +29,14 @@ public:
     void closeEvent(QCloseEvent *event);
 
 public slots:
-	void connect();
+    void connectToVM();
 	void vmListReceived(const QList<QVDClient::VMInfo> &vmlist);
 	void socketError(QAbstractSocket::SocketError  error);
 	void connectionEstablished();
 	void connectionError(QVDClient::ConnectionError error, QString error_desc);
+    void connectionTerminated();
     void sslErrors(const QList<QSslError> &errors, const QList<QSslCertificate> &cert_chain, bool &continueConnection);
+
 private:
 	Ui::MainWindow *ui;
     void saveSettings();

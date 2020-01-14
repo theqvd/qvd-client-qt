@@ -382,7 +382,7 @@ Build: N/A</string>
    <sender>connectButton</sender>
    <signal>clicked()</signal>
    <receiver>MainWindow</receiver>
-   <slot>connect()</slot>
+   <slot>connectToVM()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>368</x>

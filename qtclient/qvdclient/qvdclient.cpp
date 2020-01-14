@@ -194,6 +194,8 @@ void QVDClient::disconnect()
 		m_socket->deleteLater();
 		m_socket = nullptr;
 	}
+
+    emit connectionTerminated();
 }
 
 void QVDClient::qvd_connectionEstablished() {
