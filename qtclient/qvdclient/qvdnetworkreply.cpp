@@ -130,7 +130,11 @@ void QVDNetworkReply::readyRead() {
 					for(int i=0;i<data.length();i++) {
 						if ( data.at(i) == ':' ) {
 							key = data.mid(0, i);
-							value = data.mid(i+1);
+                            value = data.mid(i+1).trimmed(); // Whitespace after the ':' is not part of the value
+
+                            // Remove line endings from value
+                            while( value.endsWith('\r') || value.endsWith('\n') )
+                                value.chop(1);
 
 							qInfo() << "Key = " << key << "; value = " << value;
 

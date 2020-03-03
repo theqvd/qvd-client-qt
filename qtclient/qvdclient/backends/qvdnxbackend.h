@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QProcess>
 #include <QTcpServer>
+#include <QStringBuilder>
 
 #include "qvdbackend.h"
 #include "socketforwarder.h"
@@ -48,6 +49,9 @@ private:
     QProcess m_process;
 
     XServerLauncher m_x_server_launcher;
+
+
+    QString m_buffer; // Buffer for nxproxy output, for output parsing
 
 };
 

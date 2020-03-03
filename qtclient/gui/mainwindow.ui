@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>386</width>
+    <width>385</width>
     <height>585</height>
    </rect>
   </property>
@@ -293,6 +293,9 @@
               <property name="text">
                <string>Enable shared folders</string>
               </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
              </widget>
             </item>
             <item>
@@ -385,17 +388,68 @@ Build: N/A</string>
    <slot>connectToVM()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>368</x>
-     <y>383</y>
+     <x>363</x>
+     <y>370</y>
     </hint>
     <hint type="destinationlabel">
-     <x>385</x>
+     <x>384</x>
      <y>584</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>addSharedFolderButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>addSharedFolder()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>232</x>
+     <y>288</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>383</x>
+     <y>252</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>removeSharedFolderButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>removeSharedFolder()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>311</x>
+     <y>293</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>381</x>
+     <y>217</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>enableSharedFoldersCheck</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>enableSharedFoldersClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>109</x>
+     <y>295</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>379</x>
+     <y>189</y>
     </hint>
    </hints>
   </connection>
  </connections>
  <slots>
   <slot>connect()</slot>
+  <slot>addSharedFolder()</slot>
+  <slot>removeSharedFolder()</slot>
+  <slot>enableSharedFoldersClicked()</slot>
  </slots>
 </ui>

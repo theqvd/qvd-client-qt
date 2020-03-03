@@ -23,6 +23,9 @@ SOURCES += \
     qvdhttpserver.cpp \
     qvdhttp.cpp \
     qvdnetworkreply.cpp \
+    slaveclient/commands/qvdslavecommand.cpp \
+    slaveclient/commands/slavesharefolderwithvm.cpp \
+    slaveclient/qvdslaveclient.cpp \
     socketforwarder.cpp \
     qvdclient.cpp
 
@@ -32,6 +35,7 @@ SOURCES += \
 #LIBS += "-L../../../nx-libs/nx-X11/exports/lib/"
 
 
+unix:INCLUDEPATH += "/usr/include/nx"
 macx:INCLUDEPATH += "/opt/X11/include"
 macx:LIBS += "-L/opt/X11/lib"
 
@@ -54,12 +58,15 @@ HEADERS  += \
     qvdhttpserver.h \
     qvdhttp.h \
     qvdnetworkreply.h \
+    slaveclient/commands/qvdslavecommand.h \
+    slaveclient/commands/slavesharefolderwithvm.h \
+    slaveclient/qvdslaveclient.h \
     socketforwarder.h \
     qvdclient.h
 
 win32:HEADERS +=
-linux:HEADERS +=
+unix:HEADERS +=
 macx:HEADERS +=
 
-LIBS += -lNX_X11
+LIBS += -lXcomp
 win32:LIBS += -lkernel32 -lUser32

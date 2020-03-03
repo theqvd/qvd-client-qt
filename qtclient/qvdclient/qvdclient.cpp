@@ -11,10 +11,11 @@
 #include <QTcpServer>
 #include <QJsonParseError>
 
+
 #include "qvdnetworkreply.h"
 #include "qvdhttp.h"
 #include "backends/qvdbackend.h"
-
+#include "slaveclient/qvdslaveclient.h"
 
 /**
  * @brief The QVDClient class
@@ -42,6 +43,8 @@ QVDBackend *QVDClient::getBackend() const
 void QVDClient::setBackend(QVDBackend *backend)
 {
     m_backend = backend;
+
+    connect(m_backend, &QVDBackend::listeningOnTcpPort, this, &QVDClient::backend_listeningOnTcp);
 }
 
 QNetworkRequest QVDClient::createRequest(const QUrl &url)
@@ -95,7 +98,7 @@ bool QVDClient::checkReply(QVDNetworkReply *reply)
 		return false;
 	}
 
-	return true;
+    return true;
 }
 
 
@@ -274,6 +277,12 @@ void QVDClient::qvd_vmConnected()
 	}
 
 	qInfo() << "VM connected! Status " << reply->attribute(QNetworkRequest::Attribute::HttpStatusCodeAttribute).toInt();
+    if ( reply->rawHeaderList().contains("X-QVD-Slave-Key") ) {
+        QString slave_key = reply->rawHeader("X-QVD-Slave-Key");
+
+        qInfo() << "Server provided a slave channel key: " << slave_key;
+        m_slave_key = slave_key;
+    }
 
     m_backend->start(m_socket);
 }
@@ -296,7 +305,61 @@ void QVDClient::qvd_hostFound()
 
 void QVDClient::qvd_socketStateChanged(QAbstractSocket::SocketState socketState)
 {
-	emit socketStateChanged(socketState);
+    emit socketStateChanged(socketState);
+}
+
+
+
+QVDSlaveClient *QVDClient::createSlaveClient()
+{
+    auto slave = new QVDSlaveClient(m_slave_port, m_slave_key);
+    connect( slave, &QVDSlaveClient::commandSuccessful, this, &QVDClient::slave_success);
+    connect( slave, &QVDSlaveClient::commandFailed, this, &QVDClient::slave_failure);
+    connect( slave, &QVDSlaveClient::finished, this, &QVDClient::slave_done);
+
+    m_active_slave_clients.append(slave);
+
+    return slave;
+}
+
+
+void QVDClient::backend_listeningOnTcp(QVDBackend::NXChannel channel, quint16 port)
+{
+    if ( channel == QVDBackend::Slave ) {
+        m_slave_port = port;
+
+
+
+        for(auto path : m_parameters.sharedFolders() ) {
+            qInfo() << "Sharing folder " << path << " with VM";
+
+            auto slave = createSlaveClient();
+            slave->shareFolderWithVM(path);
+        }
+    }
+}
+
+void QVDClient::slave_success(const QVDSlaveCommand &cmd)
+{
+    qInfo() << "Slave command completed";
+}
+
+void QVDClient::slave_failure(const QVDSlaveCommand &cmd)
+{
+    qInfo() << "Slave command failed";
+}
+
+void QVDClient::slave_done()
+{
+    QVDSlaveClient *slave = qobject_cast<QVDSlaveClient*>( sender() );
+
+    if ( slave == nullptr ) {
+        qCritical() << "slave_done called not from a QVDSlaveClient!";
+        return;
+    }
+
+    m_active_slave_clients.removeAll(slave);
+    slave->deleteLater();
 }
 
 void QVDClient::qvd_sslErrors(const QList<QSslError> &errors) {

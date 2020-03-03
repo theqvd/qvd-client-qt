@@ -53,6 +53,9 @@ public:
     bool usb_forwarding() const;
     void setUsb_forwarding(bool usb_forwarding);
 
+    QStringList sharedFolders() const;
+    void setSharedFolders(const QStringList &shared_folders);
+
 private:
     QString m_host;
     quint16 m_port = 8443;
@@ -70,6 +73,8 @@ private:
     bool m_fullscreen = false;
     bool m_printing = false;
     bool m_usb_forwarding = false;
+
+    QStringList m_shared_folders;
 
 };
 

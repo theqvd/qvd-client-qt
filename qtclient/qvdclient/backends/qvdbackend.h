@@ -15,6 +15,20 @@ class QVDBackend : public QObject
 {
     Q_OBJECT
 public:
+    typedef enum {
+        Unknown,
+        X11,
+        X11Aux,
+        CUPS,
+        Multimedia,
+        SMB,
+        HTTP,
+        Font,
+        File,
+        Slave
+    } NXChannel;
+    Q_ENUM(NXChannel)
+
     explicit QVDBackend(QObject *parent = nullptr);
     ~QVDBackend();
 
@@ -65,6 +79,76 @@ signals:
      * @param data Raw data from the backend.
      */
     void standardError(const QByteArray &data);
+
+    /**
+     * @brief forwardingRemoteConnectionsToPort
+     * @param channel NX channel that will be forwarded
+     * @param host Host where the backend will connect
+     * @param port Port on the indicated host
+     *
+     * Backend is forwarding something happening on the VM to the local side.
+     * When a connection is made on the VM side, the backend will forward it to
+     * the indicated host and port on the local side.
+     */
+    void forwardingRemoteConnectionsToTcpPort(NXChannel channel, const QString& host, quint32 port);
+
+    /**
+     * @brief forwardingRemoteConnectionsToUnixSocket
+     * @param channel
+     * @param unix_socket
+     *
+     * Backend is forwarding something happening on the VM to the local side.
+     * When a connection is made on the VM side, the backend will forward it to
+     * the indicated UNIX socket.
+     */
+    void forwardingRemoteConnectionsToUnixSocket(NXChannel channel, const QString& unix_socket);
+
+    /**
+     * @brief forwardingRemoteConnectionsToDisplay
+     * @param channel
+     * @param host
+     * @param display
+     *
+     * The backend is forwarding X11 connections to the specified display
+     */
+    void forwardingRemoteConnectionsToDisplay(NXChannel channel, const QString& host, quint32 display);
+
+
+    /**
+     * @brief listeningOnPort
+     * @param local_port Port where the backend is listening
+     *
+     * Backend has opened a listener on this port and will forward the connection
+     * to the VM side.
+     */
+    void listeningOnTcpPort(NXChannel channel, quint32 local_port);
+
+    /**
+     * @brief listeningOnUnixSocket
+     * @param channel
+     * @param unix_socket
+     *
+     * Backend is listening on the specified UNIX socket, and will forward the connection
+     * to the VM side.
+     *
+     */
+    void listeningOnUnixSocket(NXChannel channel, const QString &unix_socket);
+
+
+    /**
+     * @brief connectionEstablished
+     * Emitted when the initialization process has been completed, and the connection
+     * has been established.
+     */
+    void connectionEstablished();
+
+
+    /**
+     * @brief connectionTerminated
+     * The connection has been terminated.
+     */
+    void connectionTerminated();
+
 
     /**
      * @brief Backend has finished

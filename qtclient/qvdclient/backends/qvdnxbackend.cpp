@@ -1,6 +1,7 @@
 #include "qvdnxbackend.h"
 #include <QProcess>
 #include <QtGlobal>
+#include <QRegularExpression>
 
 
 QVDNXBackend::QVDNXBackend(QObject *parent) : QVDBackend(parent)
@@ -102,14 +103,125 @@ void QVDNXBackend::processError(QProcess::ProcessError error)
 void QVDNXBackend::processStdoutReady()
 {
     QByteArray data = m_process.readAllStandardOutput();
-    qInfo() << "Proxy: " << data;
+    qInfo() << "Proxy OUT: " << data;
     emit standardOutput(data);
 }
 
+
+static QVDBackend::NXChannel str_to_channel(const QString& str) {
+    QVDBackend::NXChannel ret = QVDBackend::NXChannel::Unknown;
+
+    QString tmp = str.toLower().trimmed();
+
+    if ( tmp == "x11" ) { ret = QVDBackend::NXChannel::X11; }
+    else if ( tmp == "auxiliary x11" ) { ret = QVDBackend::NXChannel::X11Aux; }
+    else if ( tmp == "cups")           { ret = QVDBackend::NXChannel::CUPS; }
+    else if ( tmp == "smb")            { ret = QVDBackend::NXChannel::SMB; }
+    else if ( tmp == "http")           { ret = QVDBackend::NXChannel::HTTP; }
+    else if ( tmp == "font")           { ret = QVDBackend::NXChannel::Font; }
+    else if ( tmp == "file")           { ret = QVDBackend::NXChannel::File; }
+    else if ( tmp == "slave")          { ret = QVDBackend::NXChannel::Slave; }
+
+    return ret;
+}
+
+
 void QVDNXBackend::processStderrReady()
 {
+    const QString forwarding_str = "Info: Forwarding ";
+    const QString listening_str  = "Info: Listening to ";
+
+    QRegularExpression forwarding_re("Forwarding (.*?) connections to (port|display) '(.*?)'");
+    QRegularExpression listening_re("Listening to (.*?) connections on port '(.*?)'");
+    QRegularExpression connection_established_re("Established X server connection");
+    QRegularExpression terminated_re("Session: Session terminated");
+
     QByteArray data = m_process.readAllStandardError();
-    qInfo() << "Proxy: " << data;
+    //qInfo() << "Proxy ERR: " << data;
+
+
+    m_buffer += data;
+    int pos = -1;
+
+    while( (pos = m_buffer.indexOf('\n')) >= 0  ) {
+        QString line = m_buffer.left(pos);
+        m_buffer.remove(0, pos+1);
+
+        // Examples:
+        // Info: Forwarding multimedia connections to port 'tcp:localhost:40001'.
+        // Info: Listening to slave connections on port 'tcp:localhost:63330'.
+
+        qInfo() << "Proxy ERR Line: " << line;
+
+        auto forwarding_match  = forwarding_re.match( line );
+        auto listening_match   = listening_re.match( line );
+        auto established_match = connection_established_re.match(line);
+        auto terminated_match  = terminated_re.match(line);
+
+        if ( forwarding_match.hasMatch() ) {
+            auto  channel    = str_to_channel(forwarding_match.captured(1));
+            auto  type       = forwarding_match.captured(2);
+            auto  port_parts = forwarding_match.captured(3).split(':');
+
+            if ( type == "port" ) {
+                if ( port_parts[0] == "tcp" ) {
+                    QString host = port_parts[1];
+                    quint16 port = port_parts[2].toUShort();
+
+                    qInfo() << "Backend is forwarding " << channel << " connections to TCP " << host << ":" << port;
+                    emit forwardingRemoteConnectionsToTcpPort(channel, host, port );
+                } else if ( port_parts[0] == "unix" ) {
+                    QString socket = port_parts[1];
+
+                    qInfo() << "Backend is forwarding " << channel << " connections to UNIX socket " << socket;
+                    emit forwardingRemoteConnectionsToUnixSocket(channel, socket);
+                } else {
+                    qWarning() << "Failed to parse port type: '" << port_parts[0] << "'. Line was: " << line;
+                }
+            } else {
+                QString host = port_parts[0];
+                quint16 display = port_parts[1].toUShort();
+
+                qInfo() << "Backend is forwarding " << channel << " connections to X11 display " << host << ":" << display;
+                emit forwardingRemoteConnectionsToDisplay(channel, host, display);
+            }
+
+
+        }
+
+        if ( listening_match.hasMatch() ) {
+            auto channel    = str_to_channel(listening_match.captured(1));
+            auto port_parts = listening_match.captured(2).split(':');
+
+            if ( port_parts[0] == "tcp" ) {
+                quint16 port = port_parts[2].toUShort();
+
+                qInfo() << "Backend is forwarding " << channel << " connections to TCP port " << port;
+                emit listeningOnTcpPort(channel, port );
+            } else if ( port_parts[0] == "unix" ) {
+                QString socket = port_parts[1];
+
+                qInfo() << "Backend is forwarding " << channel << " connections to UNIX socket " << socket;
+                emit listeningOnUnixSocket(channel, socket);
+            } else {
+                qWarning() << "Failed to parse port type: '" << port_parts[0] << "'. Line was: " << line;
+            }
+        }
+
+        if ( established_match.hasMatch() ) {
+            qInfo() << "Backend has established the connection";
+            emit connectionEstablished();
+        }
+
+        if ( terminated_match.hasMatch() ) {
+            qInfo() << "Connection terminated";
+            emit connectionTerminated();
+        }
+
+    }
+
+
+
     emit standardError(data);
 }
 

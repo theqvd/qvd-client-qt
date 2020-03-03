@@ -115,6 +115,16 @@ void QVDConnectionParameters::setUsb_forwarding(bool usb_forwarding)
     m_usb_forwarding = usb_forwarding;
 }
 
+QStringList QVDConnectionParameters::sharedFolders() const
+{
+    return m_shared_folders;
+}
+
+void QVDConnectionParameters::setSharedFolders(const QStringList &shared_folders)
+{
+    m_shared_folders = shared_folders;
+}
+
 QDebug operator<<(QDebug debug, const QVDConnectionParameters &p)
 {
     QDebugStateSaver saver(debug);
@@ -130,6 +140,7 @@ QDebug operator<<(QDebug debug, const QVDConnectionParameters &p)
                     << "; FullScreen = " << p.fullscreen()
                     << "; Printing = " << p.printing()
                     << "; USBForwarding = " << p.usb_forwarding()
+                    << "; SharedFolders = " << p.sharedFolders()
                     << "}";
     return debug;
 }

@@ -11,6 +11,9 @@
 #include <QSslCertificate>
 #include <QSettings>
 #include <QIcon>
+#include <QFileDialog>
+#include <QStringListModel>
+
 
 MainWindow::MainWindow(QWidget *parent) :
 	QMainWindow(parent),
@@ -32,6 +35,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->connectionTypeComboBox->addItem( "Local", QVDConnectionParameters::ConnectionSpeed::LAN );
     ui->connectionTypeComboBox->addItem( "ADSL", QVDConnectionParameters::ConnectionSpeed::ADSL );
     ui->connectionTypeComboBox->addItem( "Modem", QVDConnectionParameters::ConnectionSpeed::Modem );
+
+    m_shared_folders_model.setStringList(m_shared_folders);
+    ui->sharedFoldersList->setModel(&m_shared_folders_model);
 
     loadSettings();
 }
@@ -84,6 +90,11 @@ void MainWindow::connectToVM() {
 
     settings.beginGroup("Connection");
     QVDConnectionParameters params;
+
+    if ( ui->enableSharedFoldersCheck->isChecked() ) {
+        params.setSharedFolders(m_shared_folders);
+    }
+
     params.setKeyboard( KeyboardDetector::getKeyboardLayout() );
     params.setUsername(ui->username->text());
     params.setPassword(ui->password->text());
@@ -91,7 +102,7 @@ void MainWindow::connectToVM() {
     params.setPort( quint16( settings.value("port", 8443).toInt() ));
     params.setConnectionSpeed(speed);
 
-    qDebug() << "Connecting with parameters " << params;
+    qInfo() << "Connecting with parameters " << params;
 
     m_client->setBackend(nx_backend);
     m_client->setParameters(params);
@@ -253,6 +264,34 @@ void   MainWindow::sslErrors(const QList<QSslError> &errors, const QList<QSslCer
 
 }
 
+void MainWindow::addSharedFolder()
+{
+    QString folder = QFileDialog::getExistingDirectory(this, "Select a folder to share", QDir::home().path());
+    m_shared_folders.append(folder);
+    m_shared_folders.removeDuplicates();
+    m_shared_folders_model.setStringList(m_shared_folders);
+}
+
+void MainWindow::removeSharedFolder()
+{
+    auto selmodel = ui->sharedFoldersList->selectionModel();
+    auto current = selmodel->currentIndex();
+
+    if ( current.isValid() ) {
+        m_shared_folders.removeAt(current.row());
+        m_shared_folders_model.setStringList(m_shared_folders);
+    }
+}
+
+
+void MainWindow::enableSharedFoldersClicked()
+{
+    bool enabled = ui->enableSharedFoldersCheck->checkState() == Qt::CheckState::Checked;
+    ui->sharedFoldersList->setEnabled( enabled );
+    ui->addSharedFolderButton->setEnabled( enabled );
+    ui->removeSharedFolderButton->setEnabled( enabled );
+}
+
 void MainWindow::saveSettings() {
     QSettings settings;
 
@@ -269,6 +308,9 @@ void MainWindow::saveSettings() {
     } else {
         settings.setValue("password", "");
     }
+
+    settings.setValue("enable_file_sharing", ui->enableSharedFoldersCheck->isChecked() );
+    settings.setValue("shared_folders", m_shared_folders);
 }
 
 void MainWindow::loadSettings() {
@@ -289,6 +331,12 @@ void MainWindow::loadSettings() {
     ui->username->setText( settings.value("username").toString());
     ui->rememberPasswordCheck->setChecked( settings.value("remember_password").toBool());
     ui->password->setText(  QString::fromUtf8( QByteArray::fromBase64( settings.value("password").toByteArray() )));
+
+    ui->enableSharedFoldersCheck->setChecked(  settings.value("enable_file_sharing").toBool() );
+    m_shared_folders = settings.value("shared_folders").toStringList();
+    m_shared_folders_model.setStringList(m_shared_folders);
+    enableSharedFoldersClicked();
+
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {

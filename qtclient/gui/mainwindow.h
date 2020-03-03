@@ -8,6 +8,8 @@
 #include "QSettings"
 #include <QSsl>
 #include <QList>
+#include <QStringListModel>
+
 
 
 namespace Ui {
@@ -37,11 +39,16 @@ public slots:
     void connectionTerminated();
     void sslErrors(const QList<QSslError> &errors, const QList<QSslCertificate> &cert_chain, bool &continueConnection);
 
+    void addSharedFolder();
+    void removeSharedFolder();
+    void enableSharedFoldersClicked();
 private:
 	Ui::MainWindow *ui;
     void saveSettings();
     void loadSettings();
 
+    QStringList m_shared_folders;
+    QStringListModel m_shared_folders_model;
 };
 
 #endif // MAINWINDOW_H
