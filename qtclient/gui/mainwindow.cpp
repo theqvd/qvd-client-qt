@@ -13,6 +13,7 @@
 #include <QIcon>
 #include <QFileDialog>
 #include <QStringListModel>
+#include <QStandardItemModel>
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -20,7 +21,6 @@ MainWindow::MainWindow(QWidget *parent) :
 	ui(new Ui::MainWindow)
 {
     m_client = new QVDClient(this);
-
     QObject::connect(m_client, SIGNAL(vmListReceived(QList<QVDClient::VMInfo>)), this, SLOT(vmListReceived(QList<QVDClient::VMInfo>)));
     QObject::connect(m_client, SIGNAL(socketError(QAbstractSocket::SocketError)), this, SLOT(socketError(QAbstractSocket::SocketError)));
     QObject::connect(m_client, SIGNAL(connectionEstablished()), this, SLOT(connectionEstablished()));
@@ -28,6 +28,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QObject::connect(m_client, SIGNAL(sslErrors(const QList<QSslError> &, const QList<QSslCertificate> &, bool &)), this, SLOT(sslErrors(const QList<QSslError> &, const QList<QSslCertificate> &, bool &)));
     QObject::connect(m_client, SIGNAL(connectionTerminated()), this, SLOT(connectionTerminated()));
+
     ui->setupUi(this);
 
     setWindowIcon(QIcon(":/pixmaps/qvd.ico"));
@@ -38,6 +39,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
     m_shared_folders_model.setStringList(m_shared_folders);
     ui->sharedFoldersList->setModel(&m_shared_folders_model);
+
+    m_system_evironments_variables = QProcessEnvironment::systemEnvironment().keys();
+    m_environment_variables_model.setStringList(m_system_evironments_variables);
+    ui->EnvVarList->setModel(&m_environment_variables_model);
+    ui->EnvVarList->setSelectionMode(QAbstractItemView::SingleSelection);
 
     loadSettings();
 }
@@ -79,7 +85,7 @@ void MainWindow::connectToVM() {
 
 #if defined(Q_OS_WIN)
     // TODO: Detect location of nxproxy
-    nx_backend->setNxproxyBinary("C:\\Program Files (x86)\\QVD Client\\bin\\nxproxy.exe");
+    nx_backend->setNxproxyBinary("%TMP%\\nxproxy");
 #elif defined(Q_OS_MACOS)
     nx_backend->setNxproxyBinary("/Applications/Qvd.app/Contents/Resources/usr/lib/qvd/bin/nxproxy");
 #else
@@ -264,6 +270,11 @@ void   MainWindow::sslErrors(const QList<QSslError> &errors, const QList<QSslCer
 
 }
 
+void MainWindow::addEnvironmentVariable()
+{
+    m_environment_variables_model.setStringList(m_environment_variables);
+}
+
 void MainWindow::addSharedFolder()
 {
     QString folder = QFileDialog::getExistingDirectory(this, "Select a folder to share", QDir::home().path());
@@ -336,6 +347,8 @@ void MainWindow::loadSettings() {
     m_shared_folders = settings.value("shared_folders").toStringList();
     m_shared_folders_model.setStringList(m_shared_folders);
     enableSharedFoldersClicked();
+
+
 
 }
 

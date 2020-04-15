@@ -115,6 +115,16 @@ void QVDConnectionParameters::setUsb_forwarding(bool usb_forwarding)
     m_usb_forwarding = usb_forwarding;
 }
 
+QStringList QVDConnectionParameters::EnvironmentVariables() const
+{
+    return m_environment_variables;
+}
+
+void QVDConnectionParameters::setEnvironmentVariables(const QStringList &environment_variables)
+{
+    m_environment_variables = environment_variables;
+}
+
 QStringList QVDConnectionParameters::sharedFolders() const
 {
     return m_shared_folders;
@@ -141,6 +151,7 @@ QDebug operator<<(QDebug debug, const QVDConnectionParameters &p)
                     << "; Printing = " << p.printing()
                     << "; USBForwarding = " << p.usb_forwarding()
                     << "; SharedFolders = " << p.sharedFolders()
+                    << "; EnvironmentVariables = " << p.EnvironmentVariables()
                     << "}";
     return debug;
 }

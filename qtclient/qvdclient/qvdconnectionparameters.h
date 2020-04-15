@@ -53,6 +53,9 @@ public:
     bool usb_forwarding() const;
     void setUsb_forwarding(bool usb_forwarding);
 
+    QStringList EnvironmentVariables() const;
+    void setEnvironmentVariables(const QStringList &environment_variables);
+
     QStringList sharedFolders() const;
     void setSharedFolders(const QStringList &shared_folders);
 
@@ -75,7 +78,7 @@ private:
     bool m_usb_forwarding = false;
 
     QStringList m_shared_folders;
-
+    QStringList m_environment_variables;
 };
 
 QDebug operator<<(QDebug debug, const QVDConnectionParameters &p);

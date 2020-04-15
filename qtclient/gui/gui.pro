@@ -26,7 +26,9 @@ HEADERS  += \
     mainwindow.h \
     sslerrordialog.h
 
-FORMS    += mainwindow.ui \
+FORMS    += \
+    mainwindow.ori.ui \
+    mainwindow.ui \
     sslerrordialog.ui
 
 RESOURCES += \

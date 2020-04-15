@@ -72,10 +72,15 @@ void SlaveShareFolderWithVM::http_finished()
 
     argv[args.count()] = nullptr;
 
+#if defined(Q_OS_WIN)
+    // TODO: Detect location of nxproxy
+    //Shared Folders
+#elif defined(Q_OS_MACOS)
+    //
+#else
+
     m_socket->flush();
     int socket_fd = static_cast<int>(m_socket->socketDescriptor());
-
-
 
     pid_t pid = fork();
     if ( pid == 1 ) {
@@ -108,7 +113,7 @@ void SlaveShareFolderWithVM::http_finished()
         perror("execv failed");
         exit(100);
     }
-
+#endif
     m_socket->close();
     emit commandSuccessful();
 }

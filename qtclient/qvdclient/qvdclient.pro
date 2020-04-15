@@ -17,8 +17,9 @@ QT = core network gui
 
 SOURCES += \
     backends/qvdbackend.cpp \
-    backends/qvdlibnxbackend.cpp \
+#    backends/qvdlibnxbackend.cpp \
     backends/qvdnxbackend.cpp \
+    qvdchecklistview.cpp \
     qvdconnectionparameters.cpp \
     qvdhttpserver.cpp \
     qvdhttp.cpp \
@@ -51,9 +52,10 @@ win32:SOURCES += \
 
 HEADERS  += \
     backends/qvdbackend.h \
-    backends/qvdlibnxbackend.h \
+#    backends/qvdlibnxbackend.h \
     backends/qvdnxbackend.h \
     backends/xserverlauncher.h \
+    qvdchecklistview.h \
     qvdconnectionparameters.h \
     qvdhttpserver.h \
     qvdhttp.h \
@@ -68,5 +70,5 @@ win32:HEADERS +=
 unix:HEADERS +=
 macx:HEADERS +=
 
-LIBS += -lXcomp
+#LIBS += -lXcomp
 win32:LIBS += -lkernel32 -lUser32

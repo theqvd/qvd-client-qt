@@ -51,15 +51,31 @@ QNetworkRequest QVDClient::createRequest(const QUrl &url)
 {
     QNetworkRequest req = QNetworkRequest(url);
 
+
     QString concat = getParameters().username() + ":" + getParameters().password();
-	QByteArray authdata = concat.toLocal8Bit().toBase64();
+    QByteArray authdata = concat.toLocal8Bit().toBase64();
 
 	QString headerdata = "Basic " + authdata;
 	req.setRawHeader("Authorization", headerdata.toLocal8Bit());
 
-	req.setRawHeader("User-Agent", "QVDClient Qt/0.01 (Linux)");
-	return req;
+    req.setRawHeader("User-Agent", "QVDClient Qt/0.01 (Linux)");
 
+    auto env = QProcessEnvironment::systemEnvironment();
+    QSettings settings("Qindel","QVD Client");
+    QString sKey= "envvar";
+    QString sAuth, sText = "";
+    settings.beginGroup("Params");
+    int size = settings.beginReadArray("QVDEnvVar");
+    for (int p = 0; p < size; ++p) {
+        settings.setArrayIndex(p);
+        if ( settings.value(sKey).value<QString>().length() != 0 ){
+          req.setRawHeader("Auth-"+settings.value(sKey).value<QString>().toLatin1().toHex(), env.value(settings.value(sKey).value<QString>()).toUtf8().toBase64());
+        }
+    }
+    settings.endArray();
+    settings.endGroup();
+
+	return req;
 }
 
 QVDConnectionParameters QVDClient::getParameters() const

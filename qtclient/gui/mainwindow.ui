@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>385</width>
+    <width>395</width>
     <height>585</height>
    </rect>
   </property>
@@ -274,22 +274,46 @@
            </spacer>
           </item>
           <item>
-           <widget class="QLabel" name="shareLabel">
-            <property name="font">
-             <font>
-              <weight>75</weight>
-              <bold>true</bold>
-             </font>
+           <widget class="QTabWidget" name="tabWidget_2">
+            <property name="currentIndex">
+             <number>0</number>
             </property>
-            <property name="text">
-             <string>Share</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout">
-            <item>
+            <widget class="QWidget" name="SharedFolders">
+             <attribute name="title">
+              <string>Shared Folders</string>
+             </attribute>
+             <widget class="QListView" name="sharedFoldersList">
+              <property name="geometry">
+               <rect>
+                <x>0</x>
+                <y>40</y>
+                <width>341</width>
+                <height>231</height>
+               </rect>
+              </property>
+             </widget>
+             <widget class="QPushButton" name="removeSharedFolderButton">
+              <property name="geometry">
+               <rect>
+                <x>260</x>
+                <y>10</y>
+                <width>82</width>
+                <height>28</height>
+               </rect>
+              </property>
+              <property name="text">
+               <string>Remove</string>
+              </property>
+             </widget>
              <widget class="QCheckBox" name="enableSharedFoldersCheck">
+              <property name="geometry">
+               <rect>
+                <x>10</x>
+                <y>10</y>
+                <width>151</width>
+                <height>20</height>
+               </rect>
+              </property>
               <property name="text">
                <string>Enable shared folders</string>
               </property>
@@ -297,35 +321,70 @@
                <bool>true</bool>
               </property>
              </widget>
-            </item>
-            <item>
              <widget class="QPushButton" name="addSharedFolderButton">
+              <property name="geometry">
+               <rect>
+                <x>180</x>
+                <y>10</y>
+                <width>81</width>
+                <height>28</height>
+               </rect>
+              </property>
               <property name="text">
                <string>Add</string>
               </property>
              </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="removeSharedFolderButton">
-              <property name="text">
-               <string>Remove</string>
+            </widget>
+            <widget class="QWidget" name="EnvironmentVariables">
+             <attribute name="title">
+              <string>Environment Variables</string>
+             </attribute>
+             <widget class="QListView" name="EnvVarList">
+              <property name="geometry">
+               <rect>
+                <x>0</x>
+                <y>10</y>
+                <width>341</width>
+                <height>261</height>
+               </rect>
+              </property>
+              <property name="frameShadow">
+               <enum>QFrame::Sunken</enum>
+              </property>
+              <property name="resizeMode">
+               <enum>QListView::Adjust</enum>
               </property>
              </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <widget class="QListView" name="sharedFoldersList"/>
-          </item>
-          <item>
-           <widget class="QCheckBox" name="enableUSBRedirectionCheck">
-            <property name="text">
-             <string>Enable USB redirection</string>
-            </property>
+            </widget>
+            <widget class="QWidget" name="USBRedirection">
+             <attribute name="title">
+              <string>USB</string>
+             </attribute>
+             <widget class="QCheckBox" name="enableUSBRedirectionCheck">
+              <property name="geometry">
+               <rect>
+                <x>10</x>
+                <y>10</y>
+                <width>291</width>
+                <height>20</height>
+               </rect>
+              </property>
+              <property name="text">
+               <string>Enable USB redirection</string>
+              </property>
+             </widget>
+             <widget class="QListView" name="sharedDevicesList">
+              <property name="geometry">
+               <rect>
+                <x>0</x>
+                <y>30</y>
+                <width>341</width>
+                <height>241</height>
+               </rect>
+              </property>
+             </widget>
+            </widget>
            </widget>
-          </item>
-          <item>
-           <widget class="QListView" name="sharedDevicesList"/>
           </item>
          </layout>
         </item>
