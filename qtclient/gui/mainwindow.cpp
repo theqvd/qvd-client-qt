@@ -270,11 +270,6 @@ void   MainWindow::sslErrors(const QList<QSslError> &errors, const QList<QSslCer
 
 }
 
-void MainWindow::addEnvironmentVariable()
-{
-    m_environment_variables_model.setStringList(m_environment_variables);
-}
-
 void MainWindow::addSharedFolder()
 {
     QString folder = QFileDialog::getExistingDirectory(this, "Select a folder to share", QDir::home().path());

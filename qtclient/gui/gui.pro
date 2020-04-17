@@ -27,7 +27,6 @@ HEADERS  += \
     sslerrordialog.h
 
 FORMS    += \
-    mainwindow.ori.ui \
     mainwindow.ui \
     sslerrordialog.ui
 

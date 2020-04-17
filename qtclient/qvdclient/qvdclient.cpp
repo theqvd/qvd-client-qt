@@ -63,13 +63,12 @@ QNetworkRequest QVDClient::createRequest(const QUrl &url)
     auto env = QProcessEnvironment::systemEnvironment();
     QSettings settings("Qindel","QVD Client");
     QString sKey= "envvar";
-    QString sAuth, sText = "";
     settings.beginGroup("Params");
     int size = settings.beginReadArray("QVDEnvVar");
     for (int p = 0; p < size; ++p) {
         settings.setArrayIndex(p);
         if ( settings.value(sKey).value<QString>().length() != 0 ){
-          req.setRawHeader("Auth-"+settings.value(sKey).value<QString>().toLatin1().toHex(), env.value(settings.value(sKey).value<QString>()).toUtf8().toBase64());
+          req.setRawHeader("Auth-"+settings.value(sKey).value<QString>().toLatin1().toHex().trimmed(), env.value(settings.value(sKey).value<QString>()).toUtf8().toBase64().trimmed());
         }
     }
     settings.endArray();

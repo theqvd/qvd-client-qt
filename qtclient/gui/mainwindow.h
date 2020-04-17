@@ -39,7 +39,6 @@ public slots:
 	void connectionError(QVDClient::ConnectionError error, QString error_desc);
     void connectionTerminated();
     void sslErrors(const QList<QSslError> &errors, const QList<QSslCertificate> &cert_chain, bool &continueConnection);
-    void addEnvironmentVariable();
     void addSharedFolder();
     void removeSharedFolder();
     void enableSharedFoldersClicked();
