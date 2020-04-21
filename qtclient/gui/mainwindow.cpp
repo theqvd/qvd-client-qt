@@ -6,6 +6,8 @@
 #include "qvdconnectionparameters.h"
 #include "keyboard_detector/keyboarddetector.h"
 
+#include <QCommandLineParser>
+#include <QCommandLineOption>
 #include <QDebug>
 #include <QMessageBox>
 #include <QSslCertificate>
@@ -45,6 +47,66 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
 	delete ui;
+}
+
+MainWindow::CommandLineParseResult parseCommandLine(QCommandLineParser &parser, QString *errorMessage)
+{
+    parser.setSingleDashWordOptionMode(QCommandLineParser::ParseAsLongOptions);
+    const QCommandLineOption username("user", "Login username.", "username");
+    parser.addOption(username);
+    const QCommandLineOption password("password", "Login password.", "password");
+    parser.addOption(password);
+    const QCommandLineOption token("token", "Login bearer token (used instead of password).", "token");
+    parser.addOption(token);
+    const QCommandLineOption host("host", "Server to connect to.", "host");
+    parser.addOption(host);
+    const QCommandLineOption port("port", "Port QVD is running on.", "port");
+    parser.addOption(port);
+    const QCommandLineOption file("file", "Open file in VM.", "file");
+    parser.addOption(file);
+    const QCommandLineOption ssl("ssl", "Enable or disable the use of SSL. Default True.", "ssl");
+    parser.addOption(ssl);
+    const QCommandLineOption sslerrors("ssl-errors", "What to do in case of SSL errors. Valid values are: 'ask', 'continue' and 'abort'.", "ssl-errors");
+    parser.addOption(sslerrors);
+    const QCommandLineOption listvms("list-vms", "List VMs, and exit.", "list-vms");
+    parser.addOption(listvms);
+    const QCommandLineOption listapps("list-apps", "List applications, and exit.", "list-apps");
+    parser.addOption(listapps);
+    const QCommandLineOption noheader("no-header", "Don't show the header for --list-vms and --list-apps.", "no-header");
+    parser.addOption(noheader);
+    const QCommandLineOption json("json", "Use JSON to dump the --list-vms and --list-apps data.", "json");
+    parser.addOption(json);
+
+    const QCommandLineOption helpOption = parser.addHelpOption();
+    const QCommandLineOption versionOption = parser.addVersionOption();
+
+    if (!parser.parse(QCoreApplication::arguments())) {
+        *errorMessage = parser.errorText();
+        return MainWindow::CommandLineParseResult::CommandLineError;
+    }
+
+    if (parser.isSet(versionOption))
+        return MainWindow::CommandLineParseResult::CommandLineVersionRequested;
+
+    if (parser.isSet(helpOption))
+        return MainWindow::CommandLineParseResult::CommandLineHelpRequested;
+
+    if (!(parser.isSet(username) && parser.isSet(host))) {
+        *errorMessage = parser.errorText();
+        return MainWindow::CommandLineParseResult::CommandLineError;
+    }
+
+    if (!(parser.isSet(password) or (parser.isSet(token)))) {
+        *errorMessage = parser.errorText();
+        return MainWindow::CommandLineParseResult::CommandLineError;
+    }
+
+    if (parser.isSet(password) && parser.isSet(token)) {
+        *errorMessage = parser.errorText();
+        return MainWindow::CommandLineParseResult::CommandLineError;
+    }
+
+    return MainWindow::CommandLineParseResult::CommandLineOk;
 }
 
 void MainWindow::setUI(bool enabled)
