@@ -45,6 +45,16 @@ void QVDConnectionParameters::setPassword(const QString &password)
     m_password = password;
 }
 
+QString QVDConnectionParameters::token() const
+{
+    return m_token;
+}
+
+void QVDConnectionParameters::setToken(const QString &token)
+{
+    m_token = token;
+}
+
 QVDConnectionParameters::ConnectionSpeed QVDConnectionParameters::connectionSpeed() const
 {
     return m_connectionSpeed;
