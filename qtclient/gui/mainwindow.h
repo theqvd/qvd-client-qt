@@ -26,6 +26,14 @@ private:
     QVDBackend *m_backend = nullptr;
 
 public:
+    enum CommandLineParseResult {
+        CommandLineOk,
+        CommandLineError,
+        CommandLineVersionRequested,
+        CommandLineHelpRequested
+    };
+
+public:
     explicit MainWindow(QWidget *parent = nullptr);
 	~MainWindow();
 	void setUI(bool enabled);
