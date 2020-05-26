@@ -14,6 +14,8 @@ CONFIG += c++17
 
 
 SOURCES += main.cpp \
+    commandlineparser.cpp \
+    configloader.cpp \
     mainwindow.cpp \
     sslerrordialog.cpp
 
@@ -22,6 +24,8 @@ linux:SOURCES += keyboard_detector/keyboarddetector_linux.cpp
 win32:SOURCES += keyboard_detector/keyboarddetector_windows.cpp
 
 HEADERS  += \
+    commandlineparser.h \
+    configloader.h \
     keyboard_detector/keyboarddetector.h \
     mainwindow.h \
     sslerrordialog.h

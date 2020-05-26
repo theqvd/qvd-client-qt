@@ -19,8 +19,8 @@
 
 
 MainWindow::MainWindow(QWidget *parent) :
-	QMainWindow(parent),
-	ui(new Ui::MainWindow)
+    QMainWindow(parent),
+    ui(new Ui::MainWindow)
 {
     m_client = new QVDClient(this);
     QObject::connect(m_client, SIGNAL(vmListReceived(QList<QVDClient::VMInfo>)), this, SLOT(vmListReceived(QList<QVDClient::VMInfo>)));
@@ -52,76 +52,18 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
-	delete ui;
+    delete ui;
 }
 
-MainWindow::CommandLineParseResult parseCommandLine(QCommandLineParser &parser, QString *errorMessage)
-{
-    parser.setSingleDashWordOptionMode(QCommandLineParser::ParseAsLongOptions);
-    const QCommandLineOption username("user", "Login username.", "username");
-    parser.addOption(username);
-    const QCommandLineOption password("password", "Login password.", "password");
-    parser.addOption(password);
-    const QCommandLineOption token("token", "Login bearer token (used instead of password).", "token");
-    parser.addOption(token);
-    const QCommandLineOption host("host", "Server to connect to.", "host");
-    parser.addOption(host);
-    const QCommandLineOption port("port", "Port QVD is running on.", "port");
-    parser.addOption(port);
-    const QCommandLineOption file("file", "Open file in VM.", "file");
-    parser.addOption(file);
-    const QCommandLineOption ssl("ssl", "Enable or disable the use of SSL. Default True.", "ssl");
-    parser.addOption(ssl);
-    const QCommandLineOption sslerrors("ssl-errors", "What to do in case of SSL errors. Valid values are: 'ask', 'continue' and 'abort'.", "ssl-errors");
-    parser.addOption(sslerrors);
-    const QCommandLineOption listvms("list-vms", "List VMs, and exit.", "list-vms");
-    parser.addOption(listvms);
-    const QCommandLineOption listapps("list-apps", "List applications, and exit.", "list-apps");
-    parser.addOption(listapps);
-    const QCommandLineOption noheader("no-header", "Don't show the header for --list-vms and --list-apps.", "no-header");
-    parser.addOption(noheader);
-    const QCommandLineOption json("json", "Use JSON to dump the --list-vms and --list-apps data.", "json");
-    parser.addOption(json);
 
-    const QCommandLineOption helpOption = parser.addHelpOption();
-    const QCommandLineOption versionOption = parser.addVersionOption();
-
-    if (!parser.parse(QCoreApplication::arguments())) {
-        *errorMessage = parser.errorText();
-        return MainWindow::CommandLineParseResult::CommandLineError;
-    }
-
-    if (parser.isSet(versionOption))
-        return MainWindow::CommandLineParseResult::CommandLineVersionRequested;
-
-    if (parser.isSet(helpOption))
-        return MainWindow::CommandLineParseResult::CommandLineHelpRequested;
-
-    if (!(parser.isSet(username) && parser.isSet(host))) {
-        *errorMessage = parser.errorText();
-        return MainWindow::CommandLineParseResult::CommandLineError;
-    }
-
-    if (!(parser.isSet(password) or (parser.isSet(token)))) {
-        *errorMessage = parser.errorText();
-        return MainWindow::CommandLineParseResult::CommandLineError;
-    }
-
-    if (parser.isSet(password) && parser.isSet(token)) {
-        *errorMessage = parser.errorText();
-        return MainWindow::CommandLineParseResult::CommandLineError;
-    }
-
-    return MainWindow::CommandLineParseResult::CommandLineOk;
-}
 
 void MainWindow::setUI(bool enabled)
 {
-	ui->centralWidget->setEnabled(enabled);
-	if ( enabled ) {
-		ui->progressBar->setMaximum(100);
-		ui->progressBar->setValue(0);
-	}
+    ui->centralWidget->setEnabled(enabled);
+    if ( enabled ) {
+        ui->progressBar->setMaximum(100);
+        ui->progressBar->setValue(0);
+    }
     else
     {
         ui->progressBar->setMaximum(0);
@@ -133,7 +75,7 @@ void MainWindow::setUI(bool enabled)
 void MainWindow::connectToVM() {
     qInfo() << "Connecting to " << ui->serverLineEdit->text();
 
-	setUI(false);
+    setUI(false);
     QSettings settings;
 
     saveSettings();
@@ -186,18 +128,18 @@ void MainWindow::vmListReceived(const QList<QVDClient::VMInfo> &vmlist)
 
     int selected = -1;
 
-	for(auto vm : vmlist ) {
-		qInfo() << "VM id = " << vm.id << "; name = " << vm.name << "; blocked = " << vm.blocked << "; state = " << vm.state;
+    for(auto vm : vmlist ) {
+        qInfo() << "VM id = " << vm.id << "; name = " << vm.name << "; blocked = " << vm.blocked << "; state = " << vm.state;
 
         if ( vm.state == QVDClient::VMState::Running ) {
             selected = vm.id;
         }
-	}
+    }
 
     if ( vmlist.length() >= 1 ) {
         qInfo() << "Connecting to first VM, id " << vmlist.first().id;
         selected = vmlist.first().id;
-	}
+    }
 
     if ( selected >= 0 ) {
         qInfo() << "Connecting to id " << selected;
@@ -224,34 +166,34 @@ void MainWindow::socketError(QAbstractSocket::SocketError error)
 
     QMessageBox::critical(this, "QVD", message);
 
-	setUI(true);
+    setUI(true);
 }
 
 void MainWindow::connectionEstablished()
 {
-	m_client->requestVMList();
+    m_client->requestVMList();
 }
 
 void MainWindow::connectionError(QVDClient::ConnectionError error, QString error_desc)
 {
-	QString errstr;
+    QString errstr;
 
-	switch(error) {
-	case QVDClient::ConnectionError::None: errstr = "Bug: no error"; break;
-	case QVDClient::ConnectionError::AuthenticationError: errstr = "Authentication error"; break;
-	case QVDClient::ProtocolError: errstr = "Protocol error"; break;
-	case QVDClient::Unexpected: errstr = "Internal error"; break;
-	case QVDClient::Timeout: errstr = "Timeout"; break;
-	case QVDClient::VMStartError: errstr = "Error when starting the VM"; break;
-	case QVDClient::ServerBlocked: errstr = "Server blocked"; break;
+    switch(error) {
+    case QVDClient::ConnectionError::None: errstr = "Bug: no error"; break;
+    case QVDClient::ConnectionError::AuthenticationError: errstr = "Authentication error"; break;
+    case QVDClient::ProtocolError: errstr = "Protocol error"; break;
+    case QVDClient::Unexpected: errstr = "Internal error"; break;
+    case QVDClient::Timeout: errstr = "Timeout"; break;
+    case QVDClient::VMStartError: errstr = "Error when starting the VM"; break;
+    case QVDClient::ServerBlocked: errstr = "Server blocked"; break;
     case QVDClient::ServerError: errstr = "Server error"; break;
-	}
+    }
 
     qCritical() << "Connection error " << error << ": " << error_desc;
 
-	QMessageBox::critical(this, "QVD", errstr + "\n" + error_desc);
+    QMessageBox::critical(this, "QVD", errstr + "\n" + error_desc);
 
-	setUI(true);
+    setUI(true);
 
 }
 
@@ -414,7 +356,15 @@ void MainWindow::closeEvent(QCloseEvent *event) {
 //    if (settings_cert.value("Accept").toString() != "0")
 //    {
         event->accept();
-//    }
+        //    }
+}
+
+void MainWindow::setConnectionParms(const QVDConnectionParameters &params)
+{
+    m_params = params;
+    ui->username->setText(m_params.username());
+    ui->password->setText(m_params.password());
+    ui->serverLineEdit->setText(m_params.host());
 }
 
 

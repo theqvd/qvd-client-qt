@@ -7,8 +7,8 @@
 
 class QVDConnectionParameters
 {
-public:
 
+public:
     typedef enum ConnectionSpeed {
         Modem,
         ISDN,
@@ -16,7 +16,6 @@ public:
         WAN,
         LAN
     } ConnectionSpeed;
-
 
     QVDConnectionParameters();
 
