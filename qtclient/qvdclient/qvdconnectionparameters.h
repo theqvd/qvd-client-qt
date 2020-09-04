@@ -5,6 +5,10 @@
 #include <QSize>
 #include <QDebug>
 
+#include "usbip/qvdusbip.h"
+#include "usbip/usbdevice.h"
+
+
 class QVDConnectionParameters
 {
 
@@ -61,6 +65,9 @@ public:
     QStringList sharedFolders() const;
     void setSharedFolders(const QStringList &shared_folders);
 
+    QList<USBDevice> sharedUsbDevices() const;
+    void setSharedUsbDevices(const QList<USBDevice> &shared_usb_devices);
+
 private:
     QString m_host;
     quint16 m_port = 8443;
@@ -82,6 +89,7 @@ private:
 
     QStringList m_shared_folders;
     QStringList m_environment_variables;
+    QList<USBDevice> m_shared_usb_devices;
 };
 
 QDebug operator<<(QDebug debug, const QVDConnectionParameters &p);

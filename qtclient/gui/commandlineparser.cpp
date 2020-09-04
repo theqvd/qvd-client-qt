@@ -34,7 +34,7 @@ CommandLineParser::Result CommandLineParser::parse(QVDConnectionParameters &para
     const auto listapps       = addOption("list-apps"      , _t("List applications, and exit."), "list-apps");
     const auto noheader       = addOption("no-header"      , _t("Don't show the header for --list-vms and --list-apps."), "no-header");
     const auto json           = addOption("json"           , _t("Use JSON to dump the --list-vms and --list-apps data."), "json");
-    const auto connectionType = addOption("connection-type", _t("Type of connection to use. Valid ones are: " + getConnectionTypes(params)));
+    const auto connectionType = addOption("connection-type", _t("Type of connection to use"), "type");
 
     const auto helpOption = m_qparser.addHelpOption();
     const auto versionOption = m_qparser.addVersionOption();
@@ -63,7 +63,7 @@ CommandLineParser::Result CommandLineParser::parse(QVDConnectionParameters &para
         params.setHost(m_qparser.value(host));
 
     if (m_qparser.isSet(port))
-        params.setPort((quint16)m_qparser.value(port).toUInt());
+        params.setPort(m_qparser.value(port).toUInt());
 
     if (m_qparser.isSet(ssl))
         params.setPassword(m_qparser.value(ssl));

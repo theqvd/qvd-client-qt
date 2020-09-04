@@ -1,4 +1,5 @@
 #include "qvdconnectionparameters.h"
+#include <QDebug>
 
 QVDConnectionParameters::QVDConnectionParameters()
 {
@@ -143,6 +144,16 @@ QStringList QVDConnectionParameters::sharedFolders() const
 void QVDConnectionParameters::setSharedFolders(const QStringList &shared_folders)
 {
     m_shared_folders = shared_folders;
+}
+
+QList<USBDevice> QVDConnectionParameters::sharedUsbDevices() const
+{
+    return m_shared_usb_devices;
+}
+
+void QVDConnectionParameters::setSharedUsbDevices(const QList<USBDevice> &shared_usb_devices)
+{
+    m_shared_usb_devices = shared_usb_devices;
 }
 
 QDebug operator<<(QDebug debug, const QVDConnectionParameters &p)

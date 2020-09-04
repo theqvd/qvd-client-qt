@@ -17,7 +17,8 @@ SOURCES += main.cpp \
     commandlineparser.cpp \
     configloader.cpp \
     mainwindow.cpp \
-    sslerrordialog.cpp
+    sslerrordialog.cpp \
+    usbdevicelistmodel.cpp
 
 macx:SOURCES  += keyboard_detector/keyboarddetector_osx.cpp
 linux:SOURCES += keyboard_detector/keyboarddetector_linux.cpp
@@ -28,7 +29,8 @@ HEADERS  += \
     configloader.h \
     keyboard_detector/keyboarddetector.h \
     mainwindow.h \
-    sslerrordialog.h
+    sslerrordialog.h \
+    usbdevicelistmodel.h
 
 FORMS    += \
     mainwindow.ui \

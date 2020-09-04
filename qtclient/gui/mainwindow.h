@@ -5,6 +5,8 @@
 #include <qvdclient.h>
 #include "backends/qvdbackend.h"
 #include "backends/qvdnxbackend.h"
+#include "usbdevicelistmodel.h"
+
 #include <qvdchecklistview.h>
 #include "QSettings"
 #include <QSsl>
@@ -57,6 +59,7 @@ private:
     QStringListModel m_shared_folders_model;
     QStringList m_environment_variables, m_system_evironments_variables;
     QVDListModel m_environment_variables_model;
+    USBDeviceListModel m_usb_device_model;
 
 };
 

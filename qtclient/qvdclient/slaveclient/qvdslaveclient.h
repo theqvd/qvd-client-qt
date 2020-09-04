@@ -5,6 +5,7 @@
 #include <QException>
 
 #include "commands/qvdslavecommand.h"
+#include "usbip/usbdevice.h"
 
 /**
  * @brief The QVDSlaveClient class
@@ -78,13 +79,13 @@ public:
 
     /**
      * @brief shareUsbWithVM
-     * @param device
+     * @param device Device to share
      *
      * Share a local USB device with the VM
      *
      * This function begins the request and returns immediately.
      */
-    void shareUsbWithVM(const QString &device);
+    void shareUsbWithVM(const USBDevice &device);
 
     /**
      * @brief openFileOnVM

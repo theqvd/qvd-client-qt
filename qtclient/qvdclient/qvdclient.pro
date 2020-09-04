@@ -19,16 +19,20 @@ SOURCES += \
     backends/qvdbackend.cpp \
 #    backends/qvdlibnxbackend.cpp \
     backends/qvdnxbackend.cpp \
+    helpers/qvdfilehelpers.cpp \
     qvdchecklistview.cpp \
     qvdconnectionparameters.cpp \
     qvdhttpserver.cpp \
     qvdhttp.cpp \
     qvdnetworkreply.cpp \
     slaveclient/commands/qvdslavecommand.cpp \
+    slaveclient/commands/shareusbdevice.cpp \
     slaveclient/commands/slavesharefolderwithvm.cpp \
     slaveclient/qvdslaveclient.cpp \
     socketforwarder.cpp \
-    qvdclient.cpp
+    qvdclient.cpp \
+    usbip/qvdusbip.cpp \
+    usbip/usbdevice.cpp
 
 # Allow for building against nxlibs source that's
 # checked out in the same directory as ours.
@@ -55,16 +59,20 @@ HEADERS  += \
 #    backends/qvdlibnxbackend.h \
     backends/qvdnxbackend.h \
     backends/xserverlauncher.h \
+    helpers/qvdfilehelpers.h \
     qvdchecklistview.h \
     qvdconnectionparameters.h \
     qvdhttpserver.h \
     qvdhttp.h \
     qvdnetworkreply.h \
     slaveclient/commands/qvdslavecommand.h \
+    slaveclient/commands/shareusbdevice.h \
     slaveclient/commands/slavesharefolderwithvm.h \
     slaveclient/qvdslaveclient.h \
     socketforwarder.h \
-    qvdclient.h
+    qvdclient.h \
+    usbip/qvdusbip.h \
+    usbip/usbdevice.h
 
 win32:HEADERS +=
 unix:HEADERS +=

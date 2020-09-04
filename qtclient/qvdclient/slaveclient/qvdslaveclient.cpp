@@ -5,6 +5,9 @@
 
 
 #include "commands/slavesharefolderwithvm.h"
+#include "commands/shareusbdevice.h"
+
+#include "usbip/usbdevice.h"
 
 
 QVDSlaveClient::QVDSlaveClient(quint16 port, const QString &slave_key) : QObject()
@@ -83,9 +86,15 @@ void QVDSlaveClient::mountVMFolder(const QString &remote_path, const QString &lo
 
 }
 
-void QVDSlaveClient::shareUsbWithVM(const QString &device)
+void QVDSlaveClient::shareUsbWithVM(const USBDevice &device)
 {
+    if ( m_command != nullptr ) {
+        throw BusyException();
+    }
 
+    m_command = new ShareUSBDevice(device);
+    setupSignals(m_command);
+    runCommand();
 }
 
 void QVDSlaveClient::openFileOnVM(const QString &remote_relative_path)

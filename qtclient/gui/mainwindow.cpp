@@ -17,6 +17,9 @@
 #include <QStringListModel>
 #include <QStandardItemModel>
 
+#include "usbip/qvdusbip.h"
+#include "usbip/usbdevice.h"
+
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -47,6 +50,14 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->EnvVarList->setModel(&m_environment_variables_model);
     ui->EnvVarList->setSelectionMode(QAbstractItemView::SingleSelection);
 
+    ui->sharedDevicesList->setModel(&m_usb_device_model);
+    ui->sharedDevicesList->setSelectionMode(QAbstractItemView::SingleSelection);
+    ui->sharedDevicesList->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+
+    auto usb_devices = QVDUSBIP::getInstance().getDevices();
+    for(auto dev : usb_devices) {
+        qWarning() << "DEVICE: " << dev;
+    }
     loadSettings();
 }
 
@@ -111,6 +122,9 @@ void MainWindow::connectToVM() {
     params.setHost((ui->serverLineEdit->text()));
     params.setPort( quint16( settings.value("port", 8443).toInt() ));
     params.setConnectionSpeed(speed);
+
+    params.setUsb_forwarding( ui->enableUSBRedirectionCheck->isChecked() );
+    params.setSharedUsbDevices( m_usb_device_model.getSelectedDevices() );
 
     qInfo() << "Connecting with parameters " << params;
 
@@ -237,6 +251,8 @@ void   MainWindow::sslErrors(const QList<QSslError> &errors, const QList<QSslCer
     settings.endGroup();
 
 
+
+
     if ( nonAcceptedHashes.empty() ) {
         qInfo() << "All certs in the chain have been previously accepted";
         continueConnection = true;
@@ -321,6 +337,24 @@ void MainWindow::saveSettings() {
 
     settings.setValue("enable_file_sharing", ui->enableSharedFoldersCheck->isChecked() );
     settings.setValue("shared_folders", m_shared_folders);
+
+    QStringList shared_devices;
+
+    settings.setValue("enable_usb_redirection", ui->enableUSBRedirectionCheck->isChecked());
+
+
+    settings.beginWriteArray("shared_usb_devices");
+    int pos = 0;
+    for( USBDevice dev : this->m_usb_device_model.getSelectedDevices() ) {
+        settings.setArrayIndex(pos);
+        settings.setValue("vendor", dev.vendorId());
+        settings.setValue("product", dev.productId());
+        settings.setValue("serial", dev.serial());
+        pos++;
+    }
+    settings.endArray();
+
+
 }
 
 void MainWindow::loadSettings() {
@@ -347,6 +381,18 @@ void MainWindow::loadSettings() {
     m_shared_folders_model.setStringList(m_shared_folders);
     enableSharedFoldersClicked();
 
+    ui->enableUSBRedirectionCheck->setCheckState( settings.value("enable_usb_redirection").toBool() ? Qt::Checked : Qt::Unchecked );
+
+    int count = settings.beginReadArray("shared_usb_devices");
+    for( int i = 0;i<count;i++) {
+        settings.setArrayIndex(i);
+        int vendor = settings.value("vendor").toInt();
+        int product = settings.value("product").toInt();
+        QString serial = settings.value("serial").toString();
+
+        m_usb_device_model.selectDevice(vendor, product, serial);
+    }
+    settings.endArray();
 
 
 }
