@@ -26,6 +26,7 @@ class MainWindow : public QMainWindow
 private:
     QVDClient *m_client;
     QVDBackend *m_backend = nullptr;
+    QList<QString> items;
 
 public:
 
@@ -59,6 +60,7 @@ private:
     QStringListModel m_shared_folders_model;
     QStringList m_environment_variables, m_system_evironments_variables;
     QVDListModel m_environment_variables_model;
+
     USBDeviceListModel m_usb_device_model;
 
 };

@@ -1,6 +1,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "sslerrordialog.h"
+#include "listdialog.h"
+#include "ui_listdialog.h"
 #include "ui_sslerrordialog.h"
 #include "backends/qvdnxbackend.h"
 #include "qvdconnectionparameters.h"
@@ -140,30 +142,19 @@ void MainWindow::connectToVM() {
 
 void MainWindow::vmListReceived(const QList<QVDClient::VMInfo> &vmlist)
 {
+     int selected = -1;
+     ListDialog *dlg = new ListDialog(this);
+     dlg->resize(350, 150);
+     dlg->DisplayVMs(vmlist);
+     dlg->exec();
+     selected = dlg->result();
 
-    int selected = -1;
+     if ( selected > 0 ) {
+         m_client->connectToVM( selected );
+     } else {
+         m_client->disconnect();
+     }
 
-    for(auto vm : vmlist ) {
-        qInfo() << "VM id = " << vm.id << "; name = " << vm.name << "; blocked = " << vm.blocked << "; state = " << vm.state;
-
-        if ( vm.state == QVDClient::VMState::Running ) {
-            selected = vm.id;
-        }
-    }
-
-    if ( vmlist.length() >= 1 ) {
-        qInfo() << "Connecting to first VM, id " << vmlist.first().id;
-        selected = vmlist.first().id;
-    }
-
-    if ( selected >= 0 ) {
-        qInfo() << "Connecting to id " << selected;
-        m_client->connectToVM( selected );
-    } else {
-        m_client->disconnect();
-        qCritical() << "No VM to connect to";
-        QMessageBox::critical(this, "QVD", "Couldn't find a VM to connect to");
-    }
 }
 
 void MainWindow::socketError(QAbstractSocket::SocketError error)
