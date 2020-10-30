@@ -11,6 +11,7 @@
 #include "xserverlauncher.h"
 
 #include "helpers/linebuffer.h"
+#include "qvdconnectionparameters.h"
 
 class QVDNXBackend : public QVDBackend
 {
@@ -19,10 +20,11 @@ public:
     QVDNXBackend(QObject *parent = nullptr);
     virtual ~QVDNXBackend() override;
 
-
-
     QString nxproxyBinary() const;
     void setNxproxyBinary(const QString &nxproxy_binary);
+
+    QVDConnectionParameters getParameters() const;
+    void setParameters(const QVDConnectionParameters &parameters);
 
     virtual void start(QTcpSocket *socket) override;
     virtual void stop() override;
@@ -49,8 +51,9 @@ private:
 
     QProcess m_process;
 
-    XServerLauncher m_x_server_launcher;
+    QVDConnectionParameters m_parameters;
 
+    XServerLauncher m_x_server_launcher;
 
     LineBuffer m_buffer;
     //QString m_buffer; // Buffer for nxproxy output, for output parsing

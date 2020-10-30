@@ -114,6 +114,10 @@ void MainWindow::connectToVM() {
     settings.beginGroup("Connection");
     QVDConnectionParameters params;
 
+    //if ( ui->enablePrintingCheck->isChecked() ) {
+    //    params.setPrinting(true);
+    //}
+
     if ( ui->enableSharedFoldersCheck->isChecked() ) {
         params.setSharedFolders(m_shared_folders);
     }
@@ -124,6 +128,8 @@ void MainWindow::connectToVM() {
     params.setHost((ui->serverLineEdit->text()));
     params.setPort( quint16( settings.value("port", 8443).toInt() ));
     params.setConnectionSpeed(speed);
+    params.setPrinting( ui->enablePrintingCheck->isChecked() );
+    params.setFullscreen( ui->fullScreenCheck->isChecked() );
 
     params.setUsb_forwarding( ui->enableUSBRedirectionCheck->isChecked() );
     params.setSharedUsbDevices( m_usb_device_model.getSelectedDevices() );
@@ -131,6 +137,7 @@ void MainWindow::connectToVM() {
 
     qInfo() << "Connecting with parameters " << params;
 
+    nx_backend->setParameters(params);
     m_client->setBackend(nx_backend);
     m_client->setParameters(params);
     m_client->connectToQVD();

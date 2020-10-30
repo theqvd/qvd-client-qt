@@ -178,7 +178,13 @@ void QVDClient::ping()
     connect(ret, SIGNAL(finished()), this, SLOT(qvd_Pong()));
 }
 
+void QVDClient::handle_printer() {
+    QUrl url = QUrl("https://localhost/");
+    url.setPath("/printer");
 
+    QNetworkRequest req = createRequest(url);
+    QVDNetworkReply *ret = m_http->get(req);
+}
 
 void QVDClient::connectToVM(int id)
 {

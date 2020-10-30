@@ -21,6 +21,16 @@ QVDNXBackend::~QVDNXBackend()
 
 }
 
+QVDConnectionParameters QVDNXBackend::getParameters() const
+{
+    return m_parameters;
+}
+
+void QVDNXBackend::setParameters(const QVDConnectionParameters &parameters)
+{
+    m_parameters = parameters;
+}
+
 QString QVDNXBackend::nxproxyBinary() const
 {
     return m_nxproxyBinary;
@@ -246,7 +256,19 @@ void QVDNXBackend::XServerReady()
         nxproxy_args.append(QString("media=%1").arg(audioPort()));
     }
 
+    qInfo() << m_parameters.printing();
 
+    if ( m_parameters.printing() ) {
+        #ifdef Q_OS_WIN
+            nxproxy_args << "smb=443";
+        #else
+            nxproxy_args << "cups=631";
+        #endif
+    }
+
+    if ( m_parameters.fullscreen() ) {
+        nxproxy_args << "fullscreen=1";
+    }
 
     qInfo() << "Starting listener at localhost";
     m_proxy_listener.listen(QHostAddress::LocalHost, 0);

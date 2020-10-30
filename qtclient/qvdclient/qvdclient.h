@@ -91,6 +91,8 @@ public:
 
     void disconnect();
 
+    void handle_printer();
+
 
 
     QVDConnectionParameters getParameters() const;
