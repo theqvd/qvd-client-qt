@@ -5,7 +5,8 @@
 #-------------------------------------------------
 
 TEMPLATE = subdirs
-SUBDIRS += qvdclient gui
+SUBDIRS += qvdclient gui \
+    qvdclient-test
 
 gui.depends = qvdclient
 

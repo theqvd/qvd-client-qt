@@ -51,4 +51,6 @@ protected:
     QString m_slave_key = "";
 };
 
+QDebug operator<< (QDebug d, const QVDSlaveCommand &cmd);
+
 #endif // QVDSLAVECOMMAND_H

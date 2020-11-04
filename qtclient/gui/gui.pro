@@ -53,3 +53,11 @@ else:unix: LIBS += -L$$OUT_PWD/../qvdclient/ -lqvdclient
 
 INCLUDEPATH += $$PWD/../qvdclient
 DEPENDPATH += $$PWD/../qvdclient
+
+#unix:QMAKE_CXXFLAGS += -fsanitize=address -fsanitize=undefined
+#unix:LIBS += -fsanitize=address -fsanitize=undefined
+
+DISTFILES += \
+    config/config.xml \
+    packages/com.qindel.qvd/meta/package.xml
+

@@ -68,6 +68,12 @@ public:
     QList<USBDevice> sharedUsbDevices() const;
     void setSharedUsbDevices(const QList<USBDevice> &shared_usb_devices);
 
+    bool audio() const;
+    void setAudio(bool audio);
+
+    bool audioCompression() const;
+    void setAudioCompression(bool audioCompression);
+
 private:
     QString m_host;
     quint16 m_port = 8443;
@@ -86,6 +92,8 @@ private:
     bool m_fullscreen = false;
     bool m_printing = false;
     bool m_usb_forwarding = false;
+    bool m_audio = false;
+    bool m_audio_compression = true;
 
     QStringList m_shared_folders;
     QStringList m_environment_variables;

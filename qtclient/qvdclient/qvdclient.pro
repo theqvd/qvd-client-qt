@@ -19,12 +19,15 @@ SOURCES += \
     backends/qvdbackend.cpp \
 #    backends/qvdlibnxbackend.cpp \
     backends/qvdnxbackend.cpp \
+    helpers/linebuffer.cpp \
     helpers/qvdfilehelpers.cpp \
+    pulseaudio/pulseaudio.cpp \
     qvdchecklistview.cpp \
     qvdconnectionparameters.cpp \
     qvdhttpserver.cpp \
     qvdhttp.cpp \
     qvdnetworkreply.cpp \
+    slaveclient/commands/connectaudio.cpp \
     slaveclient/commands/qvdslavecommand.cpp \
     slaveclient/commands/shareusbdevice.cpp \
     slaveclient/commands/slavesharefolderwithvm.cpp \
@@ -59,12 +62,15 @@ HEADERS  += \
 #    backends/qvdlibnxbackend.h \
     backends/qvdnxbackend.h \
     backends/xserverlauncher.h \
+    helpers/linebuffer.h \
     helpers/qvdfilehelpers.h \
+    pulseaudio/pulseaudio.h \
     qvdchecklistview.h \
     qvdconnectionparameters.h \
     qvdhttpserver.h \
     qvdhttp.h \
     qvdnetworkreply.h \
+    slaveclient/commands/connectaudio.h \
     slaveclient/commands/qvdslavecommand.h \
     slaveclient/commands/shareusbdevice.h \
     slaveclient/commands/slavesharefolderwithvm.h \
@@ -77,6 +83,10 @@ HEADERS  += \
 win32:HEADERS +=
 unix:HEADERS +=
 macx:HEADERS +=
+
+#unix:QMAKE_CXXFLAGS += -fsanitize=address -fsanitize=undefined
+#unix:LIBS += -fsanitize=address -fsanitize=undefined
+
 
 #LIBS += -lXcomp
 win32:LIBS += -lkernel32 -lUser32

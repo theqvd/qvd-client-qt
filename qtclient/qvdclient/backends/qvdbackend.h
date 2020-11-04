@@ -61,6 +61,15 @@ public:
      */
     virtual int64_t bytesWritten();
 
+    quint16 cupsPort() const;
+    void setCupsPort(const quint16 &cupsPort);
+
+    quint16 slavePort() const;
+    void setSlavePort(const quint16 &slavePort);
+
+    quint16 audioPort() const;
+    void setAudioPort(const quint16 &audioPort);
+
 signals:
 
     /**
@@ -158,6 +167,10 @@ public slots:
 
 private:
     QVDConnectionParameters m_parameters;
+
+    quint16 m_cups_port = 631;
+    quint16 m_slave_port = 63640;
+    quint16 m_audio_port = 4713;
 
 };
 

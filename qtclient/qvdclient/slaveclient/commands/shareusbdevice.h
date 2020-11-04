@@ -33,6 +33,9 @@ public:
 
     Error error() const { return m_error; }
 
+    QString busId() const;
+    void setBusId(const QString &busId);
+
 private slots:
     void processFinished(int exitCode, QProcess::ExitStatus exitStatus);
     void http_finished();
@@ -45,5 +48,7 @@ private:
     Error m_error;
     QProcess m_usbip_process;
 };
+
+QDebug operator<< (QDebug d, const ShareUSBDevice &dev);
 
 #endif // SHAREUSBDEVICE_H

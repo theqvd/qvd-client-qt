@@ -125,6 +125,7 @@ void MainWindow::connectToVM() {
 
     params.setUsb_forwarding( ui->enableUSBRedirectionCheck->isChecked() );
     params.setSharedUsbDevices( m_usb_device_model.getSelectedDevices() );
+    params.setAudio( ui->enableAudioCheck->isChecked() );
 
     qInfo() << "Connecting with parameters " << params;
 
@@ -336,6 +337,8 @@ void MainWindow::saveSettings() {
     }
 
     settings.setValue("enable_file_sharing", ui->enableSharedFoldersCheck->isChecked() );
+    settings.setValue("enable_audio", ui->enableAudioCheck->isChecked() );
+
     settings.setValue("shared_folders", m_shared_folders);
 
     QStringList shared_devices;
@@ -377,6 +380,8 @@ void MainWindow::loadSettings() {
     ui->password->setText(  QString::fromUtf8( QByteArray::fromBase64( settings.value("password").toByteArray() )));
 
     ui->enableSharedFoldersCheck->setChecked(  settings.value("enable_file_sharing").toBool() );
+    ui->enableAudioCheck->setChecked( settings.value("enable_audio").toBool() );
+
     m_shared_folders = settings.value("shared_folders").toStringList();
     m_shared_folders_model.setStringList(m_shared_folders);
     enableSharedFoldersClicked();

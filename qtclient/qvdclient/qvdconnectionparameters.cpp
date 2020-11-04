@@ -156,6 +156,26 @@ void QVDConnectionParameters::setSharedUsbDevices(const QList<USBDevice> &shared
     m_shared_usb_devices = shared_usb_devices;
 }
 
+bool QVDConnectionParameters::audio() const
+{
+    return m_audio;
+}
+
+void QVDConnectionParameters::setAudio(bool audio)
+{
+    m_audio = audio;
+}
+
+bool QVDConnectionParameters::audioCompression() const
+{
+    return m_audio_compression;
+}
+
+void QVDConnectionParameters::setAudioCompression(bool audio_compression)
+{
+    m_audio_compression = audio_compression;
+}
+
 QDebug operator<<(QDebug debug, const QVDConnectionParameters &p)
 {
     QDebugStateSaver saver(debug);
@@ -173,6 +193,7 @@ QDebug operator<<(QDebug debug, const QVDConnectionParameters &p)
                     << "; USBForwarding = " << p.usb_forwarding()
                     << "; SharedFolders = " << p.sharedFolders()
                     << "; EnvironmentVariables = " << p.EnvironmentVariables()
+                    << "; Audio = " << p.audio()
                     << "}";
     return debug;
 }

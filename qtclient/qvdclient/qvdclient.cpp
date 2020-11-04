@@ -124,6 +124,13 @@ void QVDClient::connectToQVD() {
     m_socket = new QSslSocket(this);
     m_socket->setPeerVerifyMode(QSslSocket::QueryPeer);
 
+    m_backend->setParameters(getParameters());
+    if ( m_parameters.audio() && m_parameters.audioCompression() ) {
+        qInfo() << "Setting up compressed audio";
+
+        quint16 temp_audio_port = 63731;  // TODO: generate dynamically
+        m_backend->setAudioPort(temp_audio_port);
+    }
 
 
     m_http = new QVDHTTP(*m_socket, this);
@@ -134,7 +141,7 @@ void QVDClient::connectToQVD() {
     connect(m_socket, SIGNAL(hostFound()), this, SLOT(qvd_hostFound()));
     connect(m_socket, SIGNAL(stateChanged(QAbstractSocket::SocketState)), this, SLOT(qvd_socketStateChanged(QAbstractSocket::SocketState)));
 
-        m_socket->connectToHostEncrypted(getParameters().host(), getParameters().port());
+    m_socket->connectToHostEncrypted(getParameters().host(), getParameters().port());
 
 //	if ( !m_socket->waitForEncrypted( )) {
 //		qCritical() << "Failed to establish an encrypted connection to " << m_host << ":" << m_port << ": " << m_socket->errorString();
@@ -189,6 +196,8 @@ void QVDClient::connectToVM(int id)
     query.addQueryItem("qvd.client.usb.enabled"       , getParameters().usb_forwarding() ? "1" : "0");
     query.addQueryItem("qvd.client.usb.implementation", "usbip");
     query.addQueryItem("qvd.client.link", "local");
+    query.addQueryItem("qvd.client.audio.compression.enable", getParameters().audioCompression() ? "1" : "0");
+
     url.setQuery(query);
 
 
@@ -358,17 +367,27 @@ void QVDClient::backend_listeningOnTcp(QVDBackend::NXChannel channel, quint16 po
                 slave->shareUsbWithVM(dev);
             }
         }
+
+        if ( m_parameters.audio() && m_parameters.audioCompression() ) {
+            qInfo() << "Starting compressed audio";
+            auto slave = createSlaveClient();
+          //  quint16 temp_audio_port = 63731;  // TODO: generate dynamically
+      //      quint16 system_audio_port = 4731; //
+
+            //m_backend->setAudioPort(temp_audio_port);
+            slave->connectCompressedAudio(m_backend->audioPort());
+        }
     }
 }
 
 void QVDClient::slave_success(const QVDSlaveCommand &cmd)
 {
-    qInfo() << "Slave command completed";
+    qInfo() << "Slave command" << cmd << "completed";
 }
 
 void QVDClient::slave_failure(const QVDSlaveCommand &cmd)
 {
-    qInfo() << "Slave command failed";
+    qInfo() << "Slave command" << cmd << "failed";
 }
 
 void QVDClient::slave_done()

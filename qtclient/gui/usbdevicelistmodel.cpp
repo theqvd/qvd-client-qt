@@ -10,12 +10,12 @@ USBDeviceListModel::USBDeviceListModel()
 
 }
 
-int USBDeviceListModel::rowCount(const QModelIndex &parent) const
+int USBDeviceListModel::rowCount(const QModelIndex &parent [[maybe_unused]]) const
 {
     return m_devices.length();
 }
 
-int USBDeviceListModel::columnCount(const QModelIndex &parent) const
+int USBDeviceListModel::columnCount(const QModelIndex &parent [[maybe_unused]]) const
 {
     return 3;
 }
@@ -71,9 +71,11 @@ bool USBDeviceListModel::setData(const QModelIndex &index, const QVariant &value
         m_selected[ index.row() ] = ( value == Qt::Checked );
         return true;
     }
+
+    return false;
 }
 
-Qt::ItemFlags USBDeviceListModel::flags(const QModelIndex &index) const
+Qt::ItemFlags USBDeviceListModel::flags(const QModelIndex &index [[maybe_unused]]) const
 {
     return Qt::ItemIsSelectable | Qt::ItemIsUserCheckable | Qt::ItemIsEnabled;
 }

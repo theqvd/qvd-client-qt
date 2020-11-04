@@ -119,3 +119,9 @@ void SlaveShareFolderWithVM::http_finished()
 }
 
 
+
+QDebug operator<<(QDebug d, const SlaveShareFolderWithVM &folder)
+{
+    d << "SlaveShareFolderWithVM(folder = " << folder.folder() << ")";
+    return d;
+}

@@ -140,12 +140,18 @@ void QVDNXBackend::processStderrReady()
     //qInfo() << "Proxy ERR: " << data;
 
 
-    m_buffer += data;
-    int pos = -1;
+    m_buffer.add(data);
 
-    while( (pos = m_buffer.indexOf('\n')) >= 0  ) {
-        QString line = m_buffer.left(pos);
-        m_buffer.remove(0, pos+1);
+    //m_buffer += data;
+  //  int pos = -1;
+
+    //while( (pos = m_buffer.indexOf('\n')) >= 0  ) {
+    while(m_buffer.hasLine()) {
+        QString line = m_buffer.getLine();
+
+        //qInfo() << "Buffer is " << m_buffer.length() << "chars, line is up to " << pos;
+        //QString line = m_buffer.left(pos);
+        //m_buffer.remove(0, pos+1);
 
         // Examples:
         // Info: Forwarding multimedia connections to port 'tcp:localhost:40001'.
@@ -155,6 +161,7 @@ void QVDNXBackend::processStderrReady()
 
         auto forwarding_match  = forwarding_re.match( line );
         auto listening_match   = listening_re.match( line );
+
         auto established_match = connection_established_re.match(line);
         auto terminated_match  = terminated_re.match(line);
 
@@ -227,12 +234,26 @@ void QVDNXBackend::processStderrReady()
 
 void QVDNXBackend::XServerReady()
 {
-    auto nxproxy_args = QStringList({"-S", "cups=631", "slave=63640", "localhost:40"});
+    auto nxproxy_args = QStringList({"-S"});
+
+    nxproxy_args.append(QString("slave=%1").arg(slavePort()));
+
+    if ( parameters().printing() ) {
+        nxproxy_args.append(QString("cups=%1").arg(cupsPort()));
+    }
+
+    if ( parameters().audio() ) {
+        nxproxy_args.append(QString("media=%1").arg(audioPort()));
+    }
 
 
 
-    qInfo() << "Starting listener at localhost:4040";
-    m_proxy_listener.listen(QHostAddress::LocalHost, 4040);
+    qInfo() << "Starting listener at localhost";
+    m_proxy_listener.listen(QHostAddress::LocalHost, 0);
+
+    qInfo() << "Listening at port " << m_proxy_listener.serverPort();
+
+    nxproxy_args.append(QString("localhost:%1").arg(m_proxy_listener.serverPort() - m_nx_proxy_port_offset));
 
     qInfo() << "Starting process " << nxproxyBinary() << " with arguments " << nxproxy_args << QString(" against display on 127.0.0.1:%1").arg(m_x_server_launcher.display());
 

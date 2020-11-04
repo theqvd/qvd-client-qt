@@ -24,3 +24,9 @@ QNetworkRequest QVDSlaveCommand::createRequest(const QUrl &url)
     req.setRawHeader("User-Agent", "QVDClient Qt/0.01 (Linux)");
     return req;
 }
+
+QDebug operator<<(QDebug d, const QVDSlaveCommand &cmd)
+{
+    d << "QVDSlaveCommand";
+    return d;
+}

@@ -115,3 +115,19 @@ void ShareUSBDevice::http_finished()
     m_socket->close();
     emit commandSuccessful();
 }
+
+QString ShareUSBDevice::busId() const
+{
+    return m_busid;
+}
+
+void ShareUSBDevice::setBusId(const QString &busid)
+{
+    m_busid = busid;
+}
+
+QDebug operator<<(QDebug d, const ShareUSBDevice &dev)
+{
+    d << "ShareUSBDevice(" << dev.busId() << ")";
+    return d;
+}

@@ -10,6 +10,7 @@
 #include "socketforwarder.h"
 #include "xserverlauncher.h"
 
+#include "helpers/linebuffer.h"
 
 class QVDNXBackend : public QVDBackend
 {
@@ -51,7 +52,11 @@ private:
     XServerLauncher m_x_server_launcher;
 
 
-    QString m_buffer; // Buffer for nxproxy output, for output parsing
+    LineBuffer m_buffer;
+    //QString m_buffer; // Buffer for nxproxy output, for output parsing
+
+
+    int m_nx_proxy_port_offset = 4000; // DEFAULT_NX_PROXY_PORT_OFFSET in nx-libs
 
 };
 

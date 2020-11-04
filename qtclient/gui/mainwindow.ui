@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>391</width>
-    <height>486</height>
+    <width>617</width>
+    <height>789</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -417,8 +417,13 @@ Build: N/A</string>
     </item>
     <item>
      <widget class="QLabel" name="copyright">
+      <property name="font">
+       <font>
+        <family>Sans Serif</family>
+       </font>
+      </property>
       <property name="text">
-       <string>&lt;a href=&quot;http://theqvd.com&quot;&gt;© 2019 Qindel Group&lt;/a&gt;</string>
+       <string>&lt;a href=&quot;http://theqvd.com&quot;&gt;© 2020 Qindel Group&lt;/a&gt;</string>
       </property>
       <property name="textFormat">
        <enum>Qt::RichText</enum>

@@ -98,6 +98,8 @@ public:
     void openFileOnVM(const QString &remote_relative_path);
 
 
+    void connectCompressedAudio(quint16 audio_port);
+
 
     quint16 port() const;
     QString slaveKey() const;

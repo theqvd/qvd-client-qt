@@ -37,4 +37,7 @@ private:
     QString m_sftp_server_binary = "/usr/lib/openssh/sftp-server";
 };
 
+
+QDebug operator<< (QDebug d, const SlaveShareFolderWithVM &folder);
+
 #endif // SLAVESHAREFOLDERWITHVM_H

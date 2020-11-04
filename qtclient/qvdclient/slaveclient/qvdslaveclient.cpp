@@ -6,7 +6,7 @@
 
 #include "commands/slavesharefolderwithvm.h"
 #include "commands/shareusbdevice.h"
-
+#include "commands/connectaudio.h"
 #include "usbip/usbdevice.h"
 
 
@@ -100,5 +100,16 @@ void QVDSlaveClient::shareUsbWithVM(const USBDevice &device)
 void QVDSlaveClient::openFileOnVM(const QString &remote_relative_path)
 {
 
+}
+
+void QVDSlaveClient::connectCompressedAudio(quint16 audio_port)
+{
+    if ( m_command != nullptr ) {
+        throw BusyException();
+    }
+
+    m_command = new ConnectAudio(audio_port);
+    setupSignals(m_command);
+    runCommand();
 }
 
