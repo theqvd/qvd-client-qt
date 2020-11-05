@@ -5,10 +5,9 @@
 #-------------------------------------------------
 
 TEMPLATE = subdirs
-SUBDIRS += qvdclient gui \
-    qvdclient-test
+SUBDIRS += libqvdclient gui \
 
-gui.depends = qvdclient
+gui.depends = libqvdclient
 
 DISTFILES += \
     qvdclient.qdocconf
