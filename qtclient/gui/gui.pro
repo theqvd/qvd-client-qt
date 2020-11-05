@@ -16,6 +16,7 @@ CONFIG += c++17
 SOURCES += main.cpp \
     commandlineparser.cpp \
     configloader.cpp \
+    listdialog.cpp \
     mainwindow.cpp \
     sslerrordialog.cpp \
     usbdevicelistmodel.cpp
@@ -28,11 +29,13 @@ HEADERS  += \
     commandlineparser.h \
     configloader.h \
     keyboard_detector/keyboarddetector.h \
+    listdialog.h \
     mainwindow.h \
     sslerrordialog.h \
     usbdevicelistmodel.h
 
 FORMS    += \
+    listdialog.ui \
     mainwindow.ui \
     sslerrordialog.ui
 
@@ -47,12 +50,12 @@ macx {
 unix:LIBS += -lX11
 
 
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../qvdclient/release/ -lqvdclient
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../qvdclient/debug/ -lqvdclient
-else:unix: LIBS += -L$$OUT_PWD/../qvdclient/ -lqvdclient
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../libqvdclient/release/ -lqvdclient
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../libqvdclient/debug/ -lqvdclient
+else:unix: LIBS += -L$$OUT_PWD/../libqvdclient/ -lqvdclient
 
-INCLUDEPATH += $$PWD/../qvdclient
-DEPENDPATH += $$PWD/../qvdclient
+INCLUDEPATH += $$PWD/../libqvdclient
+DEPENDPATH += $$PWD/../libqvdclient
 
 #unix:QMAKE_CXXFLAGS += -fsanitize=address -fsanitize=undefined
 #unix:LIBS += -fsanitize=address -fsanitize=undefined
