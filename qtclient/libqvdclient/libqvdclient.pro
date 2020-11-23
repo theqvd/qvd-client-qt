@@ -9,7 +9,7 @@ TEMPLATE=lib
 #    register KeySym *           /* sym_return */,
 #    ^~~~~~~~~
 
-CONFIG += c++17
+CONFIG += c++17 create_prl
 
 
 
@@ -87,6 +87,10 @@ macx:HEADERS +=
 #unix:QMAKE_CXXFLAGS += -fsanitize=address -fsanitize=undefined
 #unix:LIBS += -fsanitize=address -fsanitize=undefined
 
+QMAKE_CXXFLAGS += -ggdb
 
 #LIBS += -lXcomp
 win32:LIBS += -lkernel32 -lUser32
+
+qvdclient.path = $$[QT_INSTALL_PREFIX]/lib64
+INSTALLS += qvdclient
