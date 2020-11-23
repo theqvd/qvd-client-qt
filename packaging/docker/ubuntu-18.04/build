@@ -1,0 +1,2 @@
+#!/bin/bash
+podman build . -t qvd-build-ubuntu:18.04

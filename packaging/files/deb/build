@@ -1,0 +1,21 @@
+#!/bin/bash
+set -e
+
+[ -d "/tmp/build" ] && rm -rf "/tmp/build"
+mkdir -p /tmp/build
+
+tar=`ls -1 /files/*tar*`
+tar_filename=`basename "$tar"`
+tar_dir=`basename "$tar" .orig.tar.xz | sed 's/qt_/qt-/'`
+
+
+cp -v /files/*tar* /tmp/build/
+cd /tmp/build
+tar -xvf $tar
+cd /tmp/build/$tar_dir
+cp -Rdpv /files/debian .
+
+debuild -us -uc
+
+cp -v /tmp/build/* /out/
+

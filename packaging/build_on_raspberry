@@ -1,0 +1,25 @@
+#!/bin/bash
+pi_host=raspberry
+pi_user=pi
+
+set -e
+
+tar=`../make_tar`
+tar_filename=`basename "$tar"`
+tar_dir=`basename "$tar" .orig.tar.xz | sed 's/qt_/qt-/'`
+
+# Reset build dir
+ssh -l $pi_user $pi_host "[ -d \"/home/$pi_user/build\" ] && rm -rf \"/home/$pi_user/build\" ; mkdir \"/home/$pi_user/build\""
+
+scp "$tar" "${pi_user}@${pi_host}:/home/${pi_user}/build/"
+
+ssh -l $pi_user $pi_host "cd /home/$pi_user/build && tar -xvf \"$tar_filename\""
+
+rsync -a -v --progress --exclude '*ex' --exclude '*EX' --exclude 'debian/tmp' --exclude 'debian/source'  debian "${pi_user}@${pi_host}:/home/${pi_user}/build/$tar_dir/"
+
+ssh -l $pi_user $pi_host "cd /home/$pi_user/build/$tar_dir && debuild -us -uc"
+
+
+mkdir -p output/raspberry
+
+rsync --delete -dlptgoD -v --progress "${pi_user}@${pi_host}:/home/${pi_user}/build/" output/raspberry/

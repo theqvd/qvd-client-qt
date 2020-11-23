@@ -1,0 +1,19 @@
+commit 5ca9a6b1e0f51b3ff65d1b5d8010ec5a71432078
+Author: Mike Gabriel <mike.gabriel@das-netzwerkteam.de>
+Date:   Wed Nov 4 13:51:16 2020 +0100
+
+    NXdixfonts.c: Regression fix for db45683a. Fix typo in libXfont1 function call (FreeFontName -> FreeFontNames). Fixes FTBFS on Ubuntu 14.04 and 16.04.
+
+diff --git a/nx-X11/programs/Xserver/hw/nxagent/NXdixfonts.c b/nx-X11/programs/Xserver/hw/nxagent/NXdixfonts.c
+index 547dac3f..e222842b 100644
+--- a/nx-X11/programs/Xserver/hw/nxagent/NXdixfonts.c
++++ b/nx-X11/programs/Xserver/hw/nxagent/NXdixfonts.c
+@@ -1353,7 +1353,7 @@ finish:
+ #ifdef HAS_XFONT2
+         xfont2_free_font_names(data->names);
+ #else
+-        FreeFontName(data->names);
++        FreeFontNames(data->names);
+ #endif
+         free(data);
+       }

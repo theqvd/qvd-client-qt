@@ -1,0 +1,21 @@
+#!/bin/bash
+pi_host=raspberry
+pi_user=pi
+
+set -e
+
+tar=`../make_tar`
+tar_filename=`basename "$tar"`
+tar_dir=`basename "$tar" .orig.tar.xz | sed 's/qt_/qt-/'`
+curdir=`pwd`
+
+
+[ -d "/tmp/ubuntu-files" ] && rm -rf /tmp/ubuntu-files
+mkdir -p /tmp/ubuntu-files
+
+cp -v "$tar"         /tmp/ubuntu-files/
+cp -Rdpv files/deb/* /tmp/ubuntu-files/
+
+mkdir -p output/ubuntu-20.04
+
+podman run -it -v /tmp/ubuntu-files:/files:Z -v $curdir/output/ubuntu-20.04:/out qvd-build-ubuntu:20.04 /files/build

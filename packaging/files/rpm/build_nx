@@ -1,0 +1,29 @@
+#!/bin/bash
+
+BUILD_CLIENT=1
+set -e
+
+
+if [ -n "$BUILD_NX" ] ; then
+	cp -v /files/nx-libs.spec            /root/rpmbuild/SPECS/
+	cp -v /files/*patch /files/*tar*     /root/rpmbuild/SOURCES/
+
+	rpmbuild -ba /root/rpmbuild/SPECS/nx-libs.spec
+
+	mkdir -p /out/nx
+	cp -Rdpv /root/rpmbuild/RPMS  /out/nx/
+	cp -Rdpv /root/rpmbuild/SRPMS /out/nx/
+fi
+
+if [ -n "$BUILD_CLIENT" ] ; then
+	cp -v /files/qvd-client.spec /root/rpmbuild/SPECS/
+	cp -v /files/qvd-client-qt*  /root/rpmbuild/SOURCES/
+
+	export PATH=/usr/lib64/qt5/bin/:$PATH
+	rpmbuild -ba /root/rpmbuild/SPECS/qvd-client.spec
+
+	mkdir -p /out/client
+	cp -Rdpv /root/rpmbuild/RPMS  /out/client/
+	cp -Rdpv /root/rpmbuild/SRPMS /out/client/
+fi
+
