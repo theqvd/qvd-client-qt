@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Installer>
-    <Name>QVD Client</Name>
-    <Version>4.3</Version>
-    <Title>QVD Client Installer</Title>
-    <Publisher>Qindel Group</Publisher>
-    <StartMenuDir>QVD</StartMenuDir>
-    <TargetDir>@HomeDir@/QVD Client</TargetDir>
-</Installer>
