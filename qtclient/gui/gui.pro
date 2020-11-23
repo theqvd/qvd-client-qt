@@ -60,7 +60,15 @@ DEPENDPATH += $$PWD/../libqvdclient
 #unix:QMAKE_CXXFLAGS += -fsanitize=address -fsanitize=undefined
 #unix:LIBS += -fsanitize=address -fsanitize=undefined
 
+QMAKE_CXXFLAGS += -ggdb -fPIE
+QMAKE_LFLAGS += -pie
+
 DISTFILES += \
     config/config.xml \
     packages/com.qindel.qvd/meta/package.xml
 
+program.path = $$[QT_INSTALL_PREFIX]/bin
+program.files = QVD_Client
+program.config = executable
+
+unix:INSTALLS += program
