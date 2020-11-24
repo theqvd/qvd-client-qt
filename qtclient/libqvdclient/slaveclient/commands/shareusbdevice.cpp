@@ -1,8 +1,12 @@
+#include <QtGlobal>
 #include "shareusbdevice.h"
 #include <QProcess>
 #include <sys/types.h>
+
+#ifndef Q_OS_WIN
 #include <unistd.h>
 #include <fcntl.h>
+#endif
 
 
 ShareUSBDevice::ShareUSBDevice(const USBDevice &device) : QVDSlaveCommand(nullptr)

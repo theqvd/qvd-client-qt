@@ -2,14 +2,13 @@
 
 TARGET=qvdclient
 TEMPLATE=lib
-#CONFIG=dll
 
 # c++17 causes a problem on osx:
 # /opt/X11/include/X11/XKBlib.h:399: error: ISO C++17 does not allow 'register' storage class specifier [-Wregister]
 #    register KeySym *           /* sym_return */,
 #    ^~~~~~~~~
 
-CONFIG += c++17 create_prl
+CONFIG += c++17 create_prl shared staticlib
 
 
 
@@ -87,7 +86,7 @@ macx:HEADERS +=
 #unix:QMAKE_CXXFLAGS += -fsanitize=address -fsanitize=undefined
 #unix:LIBS += -fsanitize=address -fsanitize=undefined
 
-QMAKE_CXXFLAGS += -ggdb
+unix:QMAKE_CXXFLAGS += -ggdb
 
 #LIBS += -lXcomp
 win32:LIBS += -lkernel32 -lUser32

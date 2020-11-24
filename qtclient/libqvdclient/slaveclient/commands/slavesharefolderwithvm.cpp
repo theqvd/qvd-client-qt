@@ -1,11 +1,15 @@
+#include <QtGlobal>
 #include <QFileInfo>
 #include <QDir>
 
 #include "slavesharefolderwithvm.h"
 
 #include <sys/types.h>
+
+#ifndef Q_OS_WIN
 #include <unistd.h>
 #include <fcntl.h>
+#endif
 
 
 

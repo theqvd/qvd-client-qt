@@ -60,8 +60,8 @@ DEPENDPATH += $$PWD/../libqvdclient
 #unix:QMAKE_CXXFLAGS += -fsanitize=address -fsanitize=undefined
 #unix:LIBS += -fsanitize=address -fsanitize=undefined
 
-QMAKE_CXXFLAGS += -ggdb -fPIE
-QMAKE_LFLAGS += -pie
+unix:QMAKE_CXXFLAGS += -ggdb -fPIE
+unix:QMAKE_LFLAGS += -pie
 
 DISTFILES += \
     config/config.xml \
