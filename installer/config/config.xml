@@ -3,7 +3,11 @@
     <Name>QVD Client</Name>
     <Version>4.3</Version>
     <Title>QVD Client Installer</Title>
+	<Logo>pixmaps/qvd-big.png</Logo>
+	<InstallerApplicationIcon>pixmaps/qvd</InstallerApplicationIcon>
     <Publisher>Qindel Group</Publisher>
+	<ProductUrl>https://theqvd.com</ProductUrl>
     <StartMenuDir>QVD</StartMenuDir>
-    <TargetDir>@HomeDir@/QVD Client</TargetDir>
+    <TargetDir>@ApplicationsDirUser@/QVD Client Qt</TargetDir>
+	<AdminTargetDir>@ApplicationsDirX64@/QVD Client Qt</AdminTargetDir>
 </Installer>
