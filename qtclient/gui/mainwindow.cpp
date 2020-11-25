@@ -22,6 +22,8 @@
 #include "usbip/qvdusbip.h"
 #include "usbip/usbdevice.h"
 
+#include "helpers/binaryfinder.h"
+
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -102,7 +104,7 @@ void MainWindow::connectToVM() {
 
 #if defined(Q_OS_WIN)
     // TODO: Detect location of nxproxy
-    nx_backend->setNxproxyBinary("%TMP%\\nxproxy");
+  //  nx_backend->setNxproxyBinary("%TMP%\\nxproxy");
 #elif defined(Q_OS_MACOS)
     nx_backend->setNxproxyBinary("/Applications/Qvd.app/Contents/Resources/usr/lib/qvd/bin/nxproxy");
 #else
