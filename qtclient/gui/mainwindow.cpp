@@ -34,7 +34,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(m_client, SIGNAL(socketError(QAbstractSocket::SocketError)), this, SLOT(socketError(QAbstractSocket::SocketError)));
     QObject::connect(m_client, SIGNAL(connectionEstablished()), this, SLOT(connectionEstablished()));
     QObject::connect(m_client, SIGNAL(connectionError(QVDClient::ConnectionError,QString)), this, SLOT(connectionError(QVDClient::ConnectionError,QString)));
-
+    QObject::connect(m_client, SIGNAL(vmConnected()), this, SLOT(vmConnected()));
     QObject::connect(m_client, SIGNAL(sslErrors(const QList<QSslError> &, const QList<QSslCertificate> &, bool &)), this, SLOT(sslErrors(const QList<QSslError> &, const QList<QSslCertificate> &, bool &)));
     QObject::connect(m_client, SIGNAL(connectionTerminated()), this, SLOT(connectionTerminated()));
 
@@ -192,6 +192,12 @@ void MainWindow::connectionEstablished()
     m_client->requestVMList();
 }
 
+void MainWindow::vmConnected()
+{
+    qInfo() << "Connection to VM established";
+    this->hide();
+}
+
 void MainWindow::connectionError(QVDClient::ConnectionError error, QString error_desc)
 {
     QString errstr;
@@ -219,6 +225,7 @@ void MainWindow::connectionTerminated()
 {
     qInfo() << "Connection terminated";
     setUI(true);
+    show();
 }
 
 void   MainWindow::sslErrors(const QList<QSslError> &errors, const QList<QSslCertificate> &cert_chain, bool &continueConnection)

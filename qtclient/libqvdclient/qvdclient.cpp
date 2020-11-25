@@ -45,6 +45,8 @@ void QVDClient::setBackend(QVDBackend *backend)
     m_backend = backend;
 
     connect(m_backend, &QVDBackend::listeningOnTcpPort, this, &QVDClient::backend_listeningOnTcp);
+    connect(m_backend, &QVDBackend::connectionEstablished, this, &QVDClient::backend_connectionEstablished);
+    connect(m_backend, &QVDBackend::finished, this,  &QVDClient::disconnectFromQVD );
 }
 
 QNetworkRequest QVDClient::createRequest(const QUrl &url)
@@ -94,22 +96,22 @@ bool QVDClient::checkReply(QVDNetworkReply *reply)
     int http_code = reply->attribute(QNetworkRequest::Attribute::HttpStatusCodeAttribute).toInt();
     if ( http_code == 401 ) {
         emit connectionError(ConnectionError::AuthenticationError, "Incorrect username or password");
-        disconnect();
+        disconnectFromQVD();
         return false;
     } else if ( http_code == 404 ) {
         emit connectionError(ConnectionError::ProtocolError, "VM list command unrecognized. This may not be a QVD server.");
-        disconnect();
+        disconnectFromQVD();
         return false;
     } else if ( http_code == 503 ) {
         emit connectionError(ConnectionError::ServerBlocked, "Server blocked");
-        disconnect();
+        disconnectFromQVD();
     } else if ( http_code >= 500 && http_code < 600 ) {
         emit connectionError(ConnectionError::ProtocolError, "Server failure.");
-        disconnect();
+        disconnectFromQVD();
         return false;
     } else if ( http_code != 200 ) {
         emit connectionError(ConnectionError::ProtocolError, "Unexpected HTTP code " + QString::number(http_code));
-        disconnect();
+        disconnectFromQVD();
         return false;
     }
 
@@ -220,7 +222,7 @@ void QVDClient::connectToVM(int id)
 
 }
 
-void QVDClient::disconnect()
+void QVDClient::disconnectFromQVD()
 {
     if ( m_socket ) {
         m_socket->close();
@@ -261,7 +263,7 @@ void QVDClient::qvd_vmListDownloaded()
     QJsonDocument doc = QJsonDocument::fromJson(json_data, &parse_error);
     if ( parse_error.error != QJsonParseError::NoError ) {
         emit connectionError(ConnectionError::ProtocolError, "Failed to parse VM list: " + parse_error.errorString());
-        disconnect();
+        disconnectFromQVD();
         return;
     }
 
@@ -386,6 +388,12 @@ void QVDClient::backend_listeningOnTcp(QVDBackend::NXChannel channel, quint16 po
     }
 }
 
+void QVDClient::backend_connectionEstablished()
+{
+    qInfo() << "Backend established the connection";
+    emit vmConnected();
+}
+
 void QVDClient::slave_success(const QVDSlaveCommand &cmd)
 {
     qInfo() << "Slave command" << cmd << "completed";
@@ -421,7 +429,7 @@ void QVDClient::qvd_sslErrors(const QList<QSslError> &errors) {
         qInfo() << "Continuing, SSL errors accepted by user.";
     } else {
         qInfo() << "Aborting due to SSL errors";
-        disconnect();
+        disconnectFromQVD();
     }
 
 }

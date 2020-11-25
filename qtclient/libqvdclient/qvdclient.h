@@ -89,7 +89,7 @@ public:
     void ping();
     void connectToVM(int id);
 
-    void disconnect();
+
 
     void handle_printer();
 
@@ -106,10 +106,36 @@ public:
 
 
 signals:
+    /**
+     * @brief Connected to the QVD server
+     * This is the first connection stage: a connection was made to the port.
+     */
     void connectionEstablished();
+
+    /**
+     * @brief connectionCompleted
+     * A VM was connected to. The user should be looking at a functional desktop.
+     */
+    void vmConnected();
+
     void connectionError(QVDClient::ConnectionError error, QString error_text);
+
+
+    /**
+     * @brief Connection terminated
+     *
+     * The connection to the QVD server was closed, either due to the user disconnecting,
+     * or an error.
+     */
     void connectionTerminated();
 
+    /**
+     * @brief Virtual Machine list received
+     * @param vm_list List of virtual machines
+     *
+     * If there's more than one machine that can be connected to, this event will be emitted.
+     *
+     */
     void vmListReceived(const QList<QVDClient::VMInfo> &vm_list);
     void socketError(QAbstractSocket::SocketError  error);
     void sslErrors(const QList<QSslError> &errors, const QList<QSslCertificate> &cert_chain, bool &continue_connection);
@@ -132,6 +158,7 @@ private slots:
     void qvd_socketStateChanged(QAbstractSocket::SocketState socketState);
 
     void backend_listeningOnTcp(QVDBackend::NXChannel channel, quint16 port);
+    void backend_connectionEstablished();
 
     void slave_success(const QVDSlaveCommand &cmd);
     void slave_failure(const QVDSlaveCommand &cmd);
@@ -139,6 +166,7 @@ private slots:
 
 public slots:
 
+    void disconnectFromQVD();
 
 
 };

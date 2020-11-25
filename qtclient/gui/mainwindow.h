@@ -44,6 +44,7 @@ public slots:
     void vmListReceived(const QList<QVDClient::VMInfo> &vmlist);
     void socketError(QAbstractSocket::SocketError  error);
     void connectionEstablished();
+    void vmConnected();
     void connectionError(QVDClient::ConnectionError error, QString error_desc);
     void connectionTerminated();
     void sslErrors(const QList<QSslError> &errors, const QList<QSslCertificate> &cert_chain, bool &continueConnection);
