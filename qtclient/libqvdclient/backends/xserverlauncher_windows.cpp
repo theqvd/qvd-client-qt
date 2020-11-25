@@ -13,11 +13,13 @@ XServerLauncher::XServerLauncher()
 
     auto current_path = QDir::currentPath();
     m_search_paths.append(current_path + "\\vcxsrv\\vcxsrv.exe");
+    m_search_paths.append(qgetenv("ProgramFiles") + "\\QVD Client\\vcxsrv\\vcxsrv.exe");
     m_search_paths.append(qgetenv("ProgramFiles(x86)") + "\\QVD Client\\vcxsrv\\vcxsrv.exe");
 
     qDebug() << "Trying to find X server...";
     for( auto path : m_search_paths ) {
         if ( QFile::exists(path ) ) {
+            qDebug() << "X server found in " << path;
             m_xserver_path = path;
             break;
         }

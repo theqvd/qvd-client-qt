@@ -18,6 +18,7 @@ SOURCES += \
     backends/qvdbackend.cpp \
 #    backends/qvdlibnxbackend.cpp \
     backends/qvdnxbackend.cpp \
+    helpers/binaryfinder.cpp \
     helpers/linebuffer.cpp \
     helpers/qvdfilehelpers.cpp \
     pulseaudio/pulseaudio.cpp \
@@ -61,6 +62,7 @@ HEADERS  += \
 #    backends/qvdlibnxbackend.h \
     backends/qvdnxbackend.h \
     backends/xserverlauncher.h \
+    helpers/binaryfinder.h \
     helpers/linebuffer.h \
     helpers/qvdfilehelpers.h \
     pulseaudio/pulseaudio.h \

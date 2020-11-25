@@ -2,6 +2,7 @@
 #include <QProcess>
 #include <QtGlobal>
 #include <QRegularExpression>
+#include "helpers/binaryfinder.h"
 
 
 QVDNXBackend::QVDNXBackend(QObject *parent) : QVDBackend(parent)
@@ -14,6 +15,7 @@ QVDNXBackend::QVDNXBackend(QObject *parent) : QVDBackend(parent)
 
     QObject::connect(&m_x_server_launcher, SIGNAL(running()), this, SLOT(XServerReady()));
 
+    setNxproxyBinary( BinaryFinder::find("nxproxy") );
 }
 
 QVDNXBackend::~QVDNXBackend()
