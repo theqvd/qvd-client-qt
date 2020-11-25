@@ -62,6 +62,9 @@ MainWindow::MainWindow(QWidget *parent) :
     for(auto dev : usb_devices) {
         qWarning() << "DEVICE: " << dev;
     }
+
+    ui->tabWidget->setCurrentWidget(ui->connectTab);
+
     loadSettings();
 }
 
