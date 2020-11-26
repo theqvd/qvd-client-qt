@@ -230,6 +230,12 @@ void QVDClient::disconnectFromQVD()
         m_socket = nullptr;
     }
 
+    for (auto slave : m_active_slave_clients) {
+       slave->deleteLater();
+    }
+
+    m_active_slave_clients.clear();
+
     emit connectionTerminated();
 }
 
