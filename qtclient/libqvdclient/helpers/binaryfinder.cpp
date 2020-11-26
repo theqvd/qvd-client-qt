@@ -83,6 +83,11 @@ QString BinaryFinder::find(const QString &name, const QStringList dirs)
 
     }
 #endif
+#ifdef Q_OS_UNIX
+    search_paths.append(QDir("/usr/lib/qvd/bin"));
+    search_paths.append(QDir("/usr/bin"));
+    search_paths.append(QDir("/bin"));
+#endif
 
     for( QDir path : search_paths ) {
         QString file_path = path.filePath(name);
