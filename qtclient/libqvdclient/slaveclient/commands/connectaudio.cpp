@@ -13,6 +13,7 @@ ConnectAudio::ConnectAudio(quint16 port)
     QObject::connect(&m_system_pulse, &PulseAudio::error  , this, &ConnectAudio::pulseError );
 
 
+    m_pulse.setPulseaudioStatePath("/tmp/qvdpulsestate");
     m_secondary_audio_port = 12345;
     setAudioPort(port);
 }

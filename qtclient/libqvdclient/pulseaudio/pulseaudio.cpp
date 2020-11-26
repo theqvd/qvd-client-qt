@@ -97,6 +97,12 @@ void PulseAudio::start()
     qInfo() << "PULSE_RUNTIME_PATH is " << m_qvd_pulseaudio_home;
 
     env.insert("PULSE_RUNTIME_PATH", m_qvd_pulseaudio_home);
+
+    if (!m_qvd_pulseaudio_state_path.isEmpty()) {
+        qInfo() << "PULSE_STATE_PATH is " << m_qvd_pulseaudio_state_path;
+        env.insert("PULSE_STATE_PATH", m_qvd_pulseaudio_state_path);
+    }
+
     m_process.setProcessEnvironment(env);
 
     QStringList args = QStringList({
@@ -358,6 +364,16 @@ QString PulseAudio::getPulseaudioHome() const
 void PulseAudio::setPulseaudioHome(const QString &pulseaudio_home)
 {
     m_qvd_pulseaudio_home = pulseaudio_home;
+}
+
+QString PulseAudio::getPulseaudioStatePath() const
+{
+    return m_qvd_pulseaudio_state_path;
+}
+
+void PulseAudio::setPulseaudioStatePath(const QString &pulseaudio_state_path)
+{
+    m_qvd_pulseaudio_state_path = pulseaudio_state_path;
 }
 
 void PulseAudio::processError(QProcess::ProcessError err)

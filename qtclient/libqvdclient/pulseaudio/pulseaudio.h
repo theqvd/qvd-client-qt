@@ -87,6 +87,9 @@ public:
     QString getPulseaudioHome() const;
     void setPulseaudioHome(const QString &pulseaudio_home);
 
+    QString getPulseaudioStatePath() const;
+    void setPulseaudioStatePath(const QString &pulseaudio_state_path);
+
     QString getQvdPulseaudioPath() const;
     void setQvdPulseaudioPath(const QString &qvd_pulseaudio_path);
 
@@ -129,6 +132,7 @@ protected:
 
     QString m_qvd_pulseaudio_path = "/usr/lib/qvd/bin/pulseaudio";
     QString m_qvd_pulseaudio_home{""};
+    QString m_qvd_pulseaudio_state_path{""};
     QString m_qvd_pulseaudio_config{""};
 
     QVersionNumber m_version;
