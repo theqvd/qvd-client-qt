@@ -164,7 +164,7 @@ void MainWindow::vmListReceived(const QList<QVDClient::VMInfo> &vmlist)
      if ( selected > 0 ) {
          m_client->connectToVM( selected );
      } else {
-         m_client->disconnect();
+         m_client->disconnectFromQVD();
      }
 
 }
