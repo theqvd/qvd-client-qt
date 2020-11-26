@@ -156,7 +156,7 @@ QString PulseAudio::sendCommand(const QString &command)
     QByteArray buf;
     QString strdata;
 
-    while(1) {
+    while(m_pulse_socket.state() == QLocalSocket::ConnectedState ) {
         m_pulse_socket.waitForReadyRead(100);
         qInfo() << "Reading data";
         QByteArray data = m_pulse_socket.read(4096);
