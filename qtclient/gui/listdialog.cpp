@@ -18,7 +18,7 @@ QTreeWidgetItem *vmlist_item;
 
 
 ListDialog::ListDialog(QWidget *parent) :
-	QDialog(parent),
+    QDialog(parent),
     ui(new Ui::ListDialog)
 {
     ui->setupUi(this);
@@ -29,23 +29,27 @@ ListDialog::ListDialog(QWidget *parent) :
     connect(ui->buttonBox->button(QDialogButtonBox::Ok), SIGNAL(clicked()),this, SLOT(connect_vm()));
     connect(ui->buttonBox->button(QDialogButtonBox::Cancel), SIGNAL(clicked()),this, SLOT(cancel_connect()));
 
-    ui->buttonBox->button(QDialogButtonBox::Ok)->setText(tr("Conectar"));
-    ui->buttonBox->button(QDialogButtonBox::Cancel)->setText("Cancelar");
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setText(tr("Connect"));
+    ui->buttonBox->button(QDialogButtonBox::Cancel)->setText("Cancel");
 
 }
 
 void ListDialog::DisplayVMs(const QList<QVDClient::VMInfo> &vmlist)
 {
     ui->VMList->clear();
+    bool first = true;
+
 
     for(auto vm : vmlist ) {
         QTreeWidgetItem *vmlist_item = new QTreeWidgetItem( ui->VMList );
         vmlist_item->setExpanded(true);
         vmlist_item->setData(0, 0, vm.id);
         vmlist_item->setText(1, vm.name);
-        if ( vm.state == QVDClient::VMState::Running ) {
+        if ( first || vm.state == QVDClient::VMState::Running) {
             VMNumber =vm.id;
             vmlist_item->setSelected(true);
+
+            first = false;
         }
     }
 }
