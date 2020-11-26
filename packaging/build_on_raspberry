@@ -15,7 +15,7 @@ scp "$tar" "${pi_user}@${pi_host}:/home/${pi_user}/build/"
 
 ssh -l $pi_user $pi_host "cd /home/$pi_user/build && tar -xvf \"$tar_filename\""
 
-rsync -a -v --progress --exclude '*ex' --exclude '*EX' --exclude 'debian/tmp' --exclude 'debian/source'  debian "${pi_user}@${pi_host}:/home/${pi_user}/build/$tar_dir/"
+rsync -a -v --progress --exclude '*ex' --exclude '*EX' --exclude 'debian/tmp' --exclude 'debian/source'  files/deb/debian "${pi_user}@${pi_host}:/home/${pi_user}/build/$tar_dir/"
 
 ssh -l $pi_user $pi_host "cd /home/$pi_user/build/$tar_dir && debuild -us -uc"
 
