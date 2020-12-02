@@ -1,0 +1,21 @@
+#!/bin/bash
+VERSION=4.3
+
+FILENAME="qvd-client-qt_${VERSION}"
+DIRNAME="qvd-client-qt-${VERSION}"
+
+rootdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+cd "$rootdir"
+
+tempdir=`mktemp -d`
+
+cp -Rdp qtclient "$tempdir/$DIRNAME"
+cd "$tempdir"
+rm -rf $DIRNAME/libqvdclient/doc $DIRNAME/*user* $DIRNAME/build
+find "$DIRNAME" \( -name '*.o' -or -name '*save*' -or -name '*swp' -or -name '*out' -or -name '*stash' \) -print0 | xargs -0 rm -f
+
+tar -c --xz -f "$rootdir/$FILENAME.orig.tar.xz" "$DIRNAME"
+cd /
+echo $rootdir/$FILENAME.orig.tar.xz
+rm -rf "$tempdir"
+
