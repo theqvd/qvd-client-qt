@@ -1,3 +1,9 @@
+// Default dimensions to use. These ensure the size in the UI file doesn't matter.
+const int MAIN_WINDOW_WIDTH = 500;
+const int MAIN_WINDOW_HEIGHT = 700;
+
+
+
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "sslerrordialog.h"
@@ -63,7 +69,11 @@ MainWindow::MainWindow(QWidget *parent) :
         qWarning() << "DEVICE: " << dev;
     }
 
+    // Ensure the first tab is selected
     ui->tabWidget->setCurrentWidget(ui->connectTab);
+
+    // Ensure the window's size is the smallest possible
+    resize(MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGHT);
 
     loadSettings();
 }
