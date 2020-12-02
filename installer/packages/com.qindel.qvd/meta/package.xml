@@ -14,4 +14,5 @@
         <UserInterface>page.ui</UserInterface>
     </UserInterfaces>
     -->
+	<Script>installscript.qs</Script>
 </Package>
