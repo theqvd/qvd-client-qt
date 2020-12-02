@@ -48,6 +48,7 @@ macx {
 }
 
 unix:LIBS += -lX11
+macx:LIBS += "-L/opt/X11/lib"
 
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../libqvdclient/release/ -lqvdclient

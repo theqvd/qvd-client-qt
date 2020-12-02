@@ -8,9 +8,8 @@ TEMPLATE=lib
 #    register KeySym *           /* sym_return */,
 #    ^~~~~~~~~
 
-CONFIG += c++17 create_prl shared staticlib
-
-
+CONFIG += c++17 create_prl shared
+win32:CONFIG += staticlib
 
 QT = core network gui
 
@@ -46,6 +45,7 @@ SOURCES += \
 unix:INCLUDEPATH += "/usr/include/nx"
 macx:INCLUDEPATH += "/opt/X11/include"
 macx:LIBS += "-L/opt/X11/lib"
+macx:QMAKE_LFLAGS += "-L/opt/X11/lib"
 
 
 macx:SOURCES += \
