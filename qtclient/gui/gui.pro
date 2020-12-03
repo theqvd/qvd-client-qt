@@ -10,7 +10,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = QVD_Client
 TEMPLATE = app
-CONFIG += c++17
+CONFIG += c++17 file_copies
 
 
 SOURCES += main.cpp \
@@ -48,7 +48,7 @@ macx {
 }
 
 unix:LIBS += -lX11
-macx:LIBS += "-L/opt/X11/lib"
+macx:LIBS += -L/opt/X11/lib
 
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../libqvdclient/release/ -lqvdclient
@@ -73,3 +73,10 @@ program.files = QVD_Client
 program.config = executable
 
 unix:INSTALLS += program
+
+win32 {
+    ssl_libs.files = $$files(C:/Qt/Tools/OpenSSL/Win_x64/bin/*.dll)
+    ssl_libs.path = $$OUT_PWD/debug
+    COPIES += ssl_libs
+}
+
