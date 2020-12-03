@@ -29,7 +29,6 @@ SOURCES += \
     slaveclient/commands/connectaudio.cpp \
     slaveclient/commands/qvdslavecommand.cpp \
     slaveclient/commands/shareusbdevice.cpp \
-    slaveclient/commands/slavesharefolderwithvm.cpp \
     slaveclient/qvdslaveclient.cpp \
     socketforwarder.cpp \
     qvdclient.cpp \
@@ -49,13 +48,16 @@ macx:QMAKE_LFLAGS += "-L/opt/X11/lib"
 
 
 macx:SOURCES += \
-    backends/xserverlauncher_osx.cpp
+    backends/xserverlauncher_osx.cpp \
+    slaveclient/commands/slavesharefolderwithvm.cpp
 
 linux:SOURCES += \
-    backends/xserverlauncher_linux.cpp
+    backends/xserverlauncher_linux.cpp \
+    slaveclient/commands/slavesharefolderwithvm.cpp
 
 win32:SOURCES += \
-    backends/xserverlauncher_windows.cpp
+    backends/xserverlauncher_windows.cpp \
+    slaveclient/commands/slavesharefolderwithvm_win.cpp
 
 HEADERS  += \
     backends/qvdbackend.h \

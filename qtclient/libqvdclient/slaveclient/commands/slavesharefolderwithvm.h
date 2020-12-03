@@ -2,6 +2,8 @@
 #define SLAVESHAREFOLDERWITHVM_H
 
 #include <QObject>
+#include <QTemporaryFile>
+
 #include "qvdslavecommand.h"
 
 class SlaveShareFolderWithVM : public QVDSlaveCommand
@@ -15,6 +17,7 @@ public:
     } Error;
 
     SlaveShareFolderWithVM(const QString &folder) : QVDSlaveCommand(nullptr), m_folder(folder) {}
+    ~SlaveShareFolderWithVM();
 
     virtual void run();
 
@@ -35,6 +38,7 @@ private:
 
     QString m_folder;
     QString m_sftp_server_binary = "/usr/lib/openssh/sftp-server";
+    QTemporaryFile m_temp_file;
 };
 
 

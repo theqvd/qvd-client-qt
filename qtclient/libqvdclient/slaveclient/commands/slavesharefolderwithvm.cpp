@@ -5,13 +5,14 @@
 #include "slavesharefolderwithvm.h"
 
 #include <sys/types.h>
-
-#ifndef Q_OS_WIN
 #include <unistd.h>
 #include <fcntl.h>
-#endif
-
 #include "helpers/binaryfinder.h"
+
+SlaveShareFolderWithVM::~SlaveShareFolderWithVM()
+{
+    qWarning() << "Destroying SlaveShareFolderWithVM";
+}
 
 void SlaveShareFolderWithVM::run()
 {
@@ -21,7 +22,6 @@ void SlaveShareFolderWithVM::run()
     QNetworkRequest req = createRequest(url);
     req.setRawHeader("Connection", "Upgrade");
     req.setRawHeader("Upgrade", "qvd:sftp/1.0");
-
 
     m_sftp_server_binary = BinaryFinder::find("sftp-server");
 
@@ -46,7 +46,11 @@ void SlaveShareFolderWithVM::http_finished()
 
     QStringList args;
     args.append(m_sftp_server_binary);
+
+
     args.append("-e");
+
+
 
     qInfo() << "Will run " << m_sftp_server_binary << " with args " << args;
 
@@ -73,17 +77,10 @@ void SlaveShareFolderWithVM::http_finished()
     char **argv = new char*[ static_cast<unsigned long>(args.count() + 1 )];
 
     for(int i=0;i<args.count();i++) {
-        argv[i] = strdup( args[i].toStdString().c_str() );
+        argv[i] = _strdup( args[i].toStdString().c_str() );
     }
 
     argv[args.count()] = nullptr;
-
-#if defined(Q_OS_WIN)
-    // TODO: Detect location of nxproxy
-    //Shared Folders
-#elif defined(Q_OS_MACOS)
-    //
-#else
 
     m_socket->flush();
     int socket_fd = static_cast<int>(m_socket->socketDescriptor());
@@ -119,12 +116,10 @@ void SlaveShareFolderWithVM::http_finished()
         perror("execv failed");
         exit(100);
     }
-#endif
+
     m_socket->close();
     emit commandSuccessful();
 }
-
-
 
 QDebug operator<<(QDebug d, const SlaveShareFolderWithVM &folder)
 {
