@@ -47,6 +47,13 @@ void SlaveShareFolderWithVM::http_finished()
         return;
     }
 
+    QString log_path = qgetenv("LOCALAPPDATA") + "\\Qindel\\QVD Client Qt\\Logs";
+    QDir dir = QDir::root();
+    dir.mkpath(log_path);
+
+
+
+
     int http_code = reply->attribute(QNetworkRequest::Attribute::HttpStatusCodeAttribute).toInt();
     qInfo() << "Reply from the VM: " << http_code;
 
@@ -62,21 +69,27 @@ void SlaveShareFolderWithVM::http_finished()
 
     socket_file.open(QIODevice::ReadWrite);
 
-    //m_temp_file.open();
 
     args.append(m_sftp_server_binary);
 
+    QString log_file = log_path + "\\sftp.log";
 
-    QString log_file = qgetenv("TEMP");
-    log_file += "\\sftp.log";
+    if ( enableDebug() ) {
+        // verbose logging
+        args.append("-v");
+    } else {
+        // remove socket file
+        args.append("-R");
+    }
 
-    args.append("-v");
     args.append("-d");
     args.append(m_folder);
+
     args.append("-L");
     args.append(log_file);
+
     args.append("-F");
-    args.append(random_filename); //m_temp_file.fileName() + "-real");
+    args.append(random_filename);
 
     for( auto arg : args ) {
         QString tmp = arg;

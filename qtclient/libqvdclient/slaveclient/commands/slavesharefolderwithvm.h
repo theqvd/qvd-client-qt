@@ -29,6 +29,9 @@ public:
     QString sftpServerBinary() const { return m_sftp_server_binary; }
     void setSftpServerBinary(const QString &sftp_server_binary) { m_sftp_server_binary = sftp_server_binary; }
 
+    bool enableDebug() const { return m_enable_debug; }
+    void setEnableDebug(bool enable_debug) { m_enable_debug = enable_debug; }
+
 private slots:
     void http_finished();
 
@@ -38,7 +41,7 @@ private:
 
     QString m_folder;
     QString m_sftp_server_binary = "/usr/lib/openssh/sftp-server";
-    QTemporaryFile m_temp_file;
+    bool m_enable_debug = true;
 };
 
 
