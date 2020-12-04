@@ -5,4 +5,4 @@
 #cp -v files/* /tmp/centos-files/
 
 
-docker build --add-host cpan-mirror.qindel.com:172.20.126.55 . -t qvd-build-sles:15sp2
+docker build . -t qvd-build-sles:15sp2
