@@ -1,0 +1,8 @@
+#!/bin/bash
+
+#[ -d "/tmp/centos-files" ] && rm -rf "/tmp/centos-files"
+#mkdir -p /tmp/centos-files
+#cp -v files/* /tmp/centos-files/
+
+
+docker build --add-host cpan-mirror.qindel.com:172.20.126.55 . -t qvd-build-sles:15sp2

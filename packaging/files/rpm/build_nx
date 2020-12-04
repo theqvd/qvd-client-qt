@@ -23,7 +23,7 @@ if [ -n "$BUILD_CLIENT" ] ; then
 	rpmbuild -ba /root/rpmbuild/SPECS/qvd-client.spec
 
 	mkdir -p /out/client
-	cp -Rdpv /root/rpmbuild/RPMS  /out/client/
-	cp -Rdpv /root/rpmbuild/SRPMS /out/client/
+	cp -RdpvL /root/rpmbuild/RPMS  /out/client/
+	cp -RdpvL /root/rpmbuild/SRPMS /out/client/
 fi
 
