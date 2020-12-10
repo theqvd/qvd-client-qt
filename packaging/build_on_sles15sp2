@@ -13,4 +13,9 @@ cp -Rdpv files/rpm/*  /tmp/sles-files/
 cp -Rdpv $tar         /tmp/sles-files/
 
 curdir=`pwd`
+
+if [ -n "$BUILD_NX" ] ; then
+   docker run -it --privileged -v $curdir/output/sles_nx-libs:/out sles_build_nx-libs:15sp2 /build.sh
+fi
+
 docker run -it -v /tmp/sles-files:/files:Z -v $curdir/output/sles:/out qvd-build-sles:15sp2 /files/build_nx

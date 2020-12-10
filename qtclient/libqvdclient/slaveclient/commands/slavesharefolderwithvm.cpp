@@ -77,7 +77,8 @@ void SlaveShareFolderWithVM::http_finished()
     char **argv = new char*[ static_cast<unsigned long>(args.count() + 1 )];
 
     for(int i=0;i<args.count();i++) {
-        argv[i] = _strdup( args[i].toStdString().c_str() );
+        //argv[i] = _strdup( args[i].toStdString().c_str() );
+        argv[i] = qstrdup( args[i].toStdString().c_str() );
     }
 
     argv[args.count()] = nullptr;
