@@ -89,6 +89,7 @@ QString BinaryFinder::find(const QString &name, const QStringList dirs)
     search_paths.append(QDir("/bin"));
     search_paths.append(QDir("/usr/libexec/openssh"));
     search_paths.append(QDir("/usr/lib/openssh"));
+    search_paths.append(QDir("/usr/lib/ssh"));
 #endif
 
     for( QDir path : search_paths ) {
