@@ -14,6 +14,17 @@ PathTools::PathTools()
 
 }
 
+QString PathTools::getLogDir()
+{
+#ifdef Q_OS_UNIX
+    QString home = qgetenv("HOME");
+    return home + "/.local/share/qvd-client-qt/logs";
+#else
+    QString appdata = qgetenv("LOCALAPPDATA");
+    return appdata + "\\QVD Client Qt\\Logs";
+#endif
+}
+
 QString PathTools::findBin(const QString &name, const QStringList dirs)
 {
     QList<QDir> search_paths;

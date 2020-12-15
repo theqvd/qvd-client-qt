@@ -8,6 +8,7 @@ class PathTools
 public:
     PathTools();
 
+    static QString getLogDir();
     static QString findBin(const QString &name, const QStringList dirs = {});
 
 };
