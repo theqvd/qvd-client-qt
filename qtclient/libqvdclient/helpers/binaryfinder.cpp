@@ -9,12 +9,12 @@
 
 #include <QCoreApplication>
 
-BinaryFinder::BinaryFinder()
+PathTools::PathTools()
 {
 
 }
 
-QString BinaryFinder::find(const QString &name, const QStringList dirs)
+QString PathTools::findBin(const QString &name, const QStringList dirs)
 {
     QList<QDir> search_paths;
 

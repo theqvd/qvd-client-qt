@@ -3,12 +3,12 @@
 
 #include <QObject>
 
-class BinaryFinder
+class PathTools
 {
 public:
-    BinaryFinder();
+    PathTools();
 
-    static QString find(const QString &name, const QStringList dirs = {});
+    static QString findBin(const QString &name, const QStringList dirs = {});
 
 };
 

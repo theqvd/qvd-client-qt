@@ -15,7 +15,7 @@ QVDNXBackend::QVDNXBackend(QObject *parent) : QVDBackend(parent)
 
     QObject::connect(&m_x_server_launcher, SIGNAL(running()), this, SLOT(XServerReady()));
 
-    setNxproxyBinary( BinaryFinder::find("nxproxy") );
+    setNxproxyBinary( PathTools::findBin("nxproxy") );
 }
 
 QVDNXBackend::~QVDNXBackend()
