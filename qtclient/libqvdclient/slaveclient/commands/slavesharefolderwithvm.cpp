@@ -5,8 +5,13 @@
 #include "slavesharefolderwithvm.h"
 
 #include <sys/types.h>
+#include <string.h>
+
+#ifndef Q_OS_WIN
 #include <unistd.h>
 #include <fcntl.h>
+#endif
+
 #include "helpers/binaryfinder.h"
 
 SlaveShareFolderWithVM::~SlaveShareFolderWithVM()
@@ -46,11 +51,7 @@ void SlaveShareFolderWithVM::http_finished()
 
     QStringList args;
     args.append(m_sftp_server_binary);
-
-
     args.append("-e");
-
-
 
     qInfo() << "Will run " << m_sftp_server_binary << " with args " << args;
 
