@@ -12,6 +12,8 @@ TARGET = QVD_Client
 TEMPLATE = app
 CONFIG += c++17 file_copies
 
+linux:CONFIG += link_pkgconfig
+linux:PKGCONFIG += libsystemd
 
 SOURCES += main.cpp \
     commandlineparser.cpp \
