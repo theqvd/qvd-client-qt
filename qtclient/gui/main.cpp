@@ -65,8 +65,8 @@ void LogHandler(QtMsgType type, const QMessageLogContext &context, const QString
 
     QDateTime now = QDateTime::currentDateTime();
 
-    log_stream << now.toString(Qt::ISODateWithMs) << level << "[" << context.file << ":" << context.line << "] " << msg << Qt::endl;
-    err_stream << now.toString(Qt::ISODateWithMs) << level << "[" << context.file << ":" << context.line << "] " << msg << Qt::endl;
+    log_stream << now.toString(Qt::ISODateWithMs) << level << " [" << context.file << ":" << context.line << "] " << msg << Qt::endl;
+    err_stream << now.toString(Qt::ISODateWithMs) << level << " [" << context.file << ":" << context.line << "] " << msg << Qt::endl;
 }
 
 int main(int argc, char *argv[])
@@ -77,7 +77,9 @@ int main(int argc, char *argv[])
     QDir log_dir(PathTools::getLogDir());
 
     log_file.setFileName(log_dir.filePath("client.log"));
-    log_file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append);
+    if (!log_file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append)) {
+        err_stream << "Failed to open log file " << log_file.fileName();
+    }
     log_stream.setDevice(&log_file);
 
     qInstallMessageHandler(LogHandler);
