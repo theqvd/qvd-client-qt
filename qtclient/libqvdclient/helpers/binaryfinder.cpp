@@ -61,35 +61,9 @@ QString PathTools::findBin(const QString &name, const QStringList dirs)
                     qDebug() << "Found dir " << root;
                     search_paths.append(root);
                 }
+
             }
         }
-
-        /*
-        QDir pf(qgetenv("PROGRAMFILES"));
-        QDir pfx86(qgetenv("PROGRAMFILES(x86)"));
-        QDir appdir = QCoreApplication::applicationDirPath();
-
-        if ( appdir.cd(dir) ) {
-            search_paths.append(appdir);
-
-            if ( appdir.cd("bin")) {
-                search_paths.append(appdir);
-            }
-        }
-
-        if ( pf.cd(dir) )  {
-            search_paths.append(pf);
-
-            if ( appdir.cd("bin")) {
-                search_paths.append(appdir);
-            }
-        }
-
-        if ( pfx86.cd(dir) )  {
-            search_paths.append(pfx86);
-        }
-*/
-
     }
 #endif
 #ifdef Q_OS_UNIX
