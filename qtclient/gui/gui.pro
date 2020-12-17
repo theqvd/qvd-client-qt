@@ -4,10 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui network
-
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
-
+QT       += core gui network widgets
 TARGET = QVD_Client
 TEMPLATE = app
 CONFIG += c++17 file_copies
