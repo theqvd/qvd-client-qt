@@ -81,7 +81,7 @@ void QVDSlaveClient::shareFolderWithVM(const QString &local_path)
 
 
 
-void QVDSlaveClient::mountVMFolder(const QString &remote_path, const QString &local_mountpoint)
+void QVDSlaveClient::mountVMFolder([[maybe_unused]] const QString &remote_path, [[maybe_unused]] const QString &local_mountpoint)
 {
 
 }
@@ -97,7 +97,7 @@ void QVDSlaveClient::shareUsbWithVM(const USBDevice &device)
     runCommand();
 }
 
-void QVDSlaveClient::openFileOnVM(const QString &remote_relative_path)
+void QVDSlaveClient::openFileOnVM([[maybe_unused]] const QString &remote_relative_path)
 {
 
 }

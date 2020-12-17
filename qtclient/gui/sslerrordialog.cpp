@@ -32,8 +32,6 @@ SSLErrorDialog::SSLErrorDialog(QWidget *parent) :
 
 void SSLErrorDialog::displayErrors(const QList<QSslError> &errors, const QList<QSslCertificate> &cert_chain)
 {
-    qint32 i;
-
     ui->errorTree->clear();
 
 	QMap<QByteArray, QTreeWidgetItem*> cert_list;

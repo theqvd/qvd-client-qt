@@ -32,8 +32,6 @@ QString PathTools::findBin(const QString &name, const QStringList dirs)
     qInfo() << "Searching for " << name << "in" << dirs;
 
 
-    //search_paths.append(QDir::current());
-
     // First, search whenever our binary is
     search_paths.append(QCoreApplication::applicationDirPath());
 

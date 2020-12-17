@@ -50,7 +50,6 @@ public:
 private:
     QString m_xserver_path;
     QProcess m_process;
-    QStringList m_search_paths = {};
     QTimer m_ready_timer;
     QTcpSocket m_test_socket;
     quint16 m_display = 0;

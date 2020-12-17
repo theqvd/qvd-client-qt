@@ -43,6 +43,7 @@ void ShareUSBDevice::run()
 void ShareUSBDevice::processFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
     if ( exitCode != 0) {
+        qWarning() << "Process finished with code " << exitCode << "; status " << exitStatus;
         setError(ShareUSBDevice::BindFailed);
         emit commandFailed();
         return;

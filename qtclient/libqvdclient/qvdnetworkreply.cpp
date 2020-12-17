@@ -9,7 +9,7 @@
 
 
 
-QVDNetworkReply::QVDNetworkReply(QObject *parent, const QNetworkRequest &req, const QNetworkAccessManager::Operation op, QIODevice *data, QTcpSocket &socket)
+QVDNetworkReply::QVDNetworkReply(QObject *parent, const QNetworkRequest &req, const QNetworkAccessManager::Operation op, [[maybe_unused]] QIODevice *data, QTcpSocket &socket)
 	: QNetworkReply(parent), m_socket(socket), m_buffer_pos(0) {
 
 

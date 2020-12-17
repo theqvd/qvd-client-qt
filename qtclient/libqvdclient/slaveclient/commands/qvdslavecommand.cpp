@@ -25,7 +25,7 @@ QNetworkRequest QVDSlaveCommand::createRequest(const QUrl &url)
     return req;
 }
 
-QDebug operator<<(QDebug d, const QVDSlaveCommand &cmd)
+QDebug operator<<(QDebug d, [[maybe_unused]] const QVDSlaveCommand &cmd)
 {
     d << "QVDSlaveCommand";
     return d;
