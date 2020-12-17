@@ -4,6 +4,8 @@
 #include <QString>
 #include <QSize>
 #include <QDebug>
+#include <QMetaEnum>
+
 
 #include "usbip/qvdusbip.h"
 #include "usbip/usbdevice.h"
@@ -99,6 +101,8 @@ private:
     QStringList m_environment_variables;
     QList<USBDevice> m_shared_usb_devices;
 };
+
+Q_DECLARE_METATYPE(QVDConnectionParameters::ConnectionSpeed)
 
 QDebug operator<<(QDebug debug, const QVDConnectionParameters &p);
 

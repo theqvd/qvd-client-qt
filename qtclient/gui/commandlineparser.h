@@ -36,7 +36,9 @@ private:
     QString m_error_message;
     QCommandLineParser m_qparser;
 
-    QString getConnectionTypes(QVDConnectionParameters &params) const;
+    QString getConnectionTypes() const;
+    QVDConnectionParameters::ConnectionSpeed strToConnectionSpeed(QString str, bool &ok);
+
 
 
 

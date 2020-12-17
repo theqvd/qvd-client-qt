@@ -87,6 +87,8 @@ int main(int argc, char *argv[])
     qInfo() << "Debug output disabled at compile time";
 #endif
 
+    qRegisterMetaType<QVDConnectionParameters::ConnectionSpeed>();
+
 
     // Defaults used by QSettings
     QCoreApplication::setOrganizationName("Qindel");

@@ -13,11 +13,30 @@ CommandLineParser::CommandLineParser()
 
 }
 
-QString CommandLineParser::getConnectionTypes(QVDConnectionParameters &params) const
+QString CommandLineParser::getConnectionTypes() const
 {
-    QString list;
+    // TODO: QVDConnectionParameters::ConnectionSpeed could be a Qt enum
+    return "modem, isdn, adsl, wan, lan";
+}
 
-    return list;
+QVDConnectionParameters::ConnectionSpeed CommandLineParser::strToConnectionSpeed(QString str, bool &ok) {
+    str = str.toLower().trimmed();
+
+    ok = true;
+    if ( str == "modem") {
+        return QVDConnectionParameters::ConnectionSpeed::Modem;
+    } else if ( str == "isdn") {
+        return QVDConnectionParameters::ConnectionSpeed::ISDN;
+    } else if ( str == "adsl") {
+        return QVDConnectionParameters::ConnectionSpeed::ADSL;
+    } else if ( str == "wan") {
+        return QVDConnectionParameters::ConnectionSpeed::WAN;
+    } else if ( str == "lan") {
+        return QVDConnectionParameters::ConnectionSpeed::LAN;
+    }
+
+    ok = false;
+    return QVDConnectionParameters::ConnectionSpeed::LAN;
 }
 
 CommandLineParser::Result CommandLineParser::parse(QVDConnectionParameters &params) {
@@ -34,7 +53,7 @@ CommandLineParser::Result CommandLineParser::parse(QVDConnectionParameters &para
     const auto listapps       = addOption("list-apps"      , _t("List applications, and exit."), "list-apps");
     const auto noheader       = addOption("no-header"      , _t("Don't show the header for --list-vms and --list-apps."), "no-header");
     const auto json           = addOption("json"           , _t("Use JSON to dump the --list-vms and --list-apps data."), "json");
-    const auto connectionType = addOption("connection-type", _t("Type of connection to use"), "type");
+    const auto connectionType = addOption("connection-type", _t("Type of connection to use: ") + getConnectionTypes(), "type");
 
     const auto helpOption = m_qparser.addHelpOption();
     const auto versionOption = m_qparser.addVersionOption();
@@ -70,6 +89,18 @@ CommandLineParser::Result CommandLineParser::parse(QVDConnectionParameters &para
 
     if (m_qparser.isSet(sslerrors))
         params.setPassword(m_qparser.value(sslerrors));
+
+    if (m_qparser.isSet(connectionType)) {
+        QVDConnectionParameters::ConnectionSpeed speed;
+        bool ok = false;
+
+        speed = strToConnectionSpeed(m_qparser.value(connectionType), ok);
+        if ( ok ) {
+            params.setConnectionSpeed(speed);
+        } else {
+            return Result::CommandLineError;
+        }
+    }
 
 
     return Result::CommandLineOk;
