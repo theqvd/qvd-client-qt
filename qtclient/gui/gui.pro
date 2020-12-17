@@ -77,5 +77,7 @@ win32 {
     ssl_libs.files = $$files(C:/Qt/Tools/OpenSSL/Win_x64/bin/*.dll)
     ssl_libs.path = $$OUT_PWD/debug
     COPIES += ssl_libs
+
+    RC_ICONS = pixmaps/qvd.ico
 }
 
