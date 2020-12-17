@@ -109,6 +109,7 @@ QString PathTools::findBin(const QString &name, const QStringList dirs)
 #endif
         qDebug() << "Checking for " << file_path;
         if ( QFile::exists(file_path)) {
+            qInfo() << "Found at " << file_path;
             return file_path;
         }
     }

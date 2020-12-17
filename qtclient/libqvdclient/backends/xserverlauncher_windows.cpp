@@ -5,25 +5,15 @@
 #include <QNetworkProxy>
 
 
+#include "helpers/binaryfinder.h"
+
 
 XServerLauncher::XServerLauncher()
 {
 
     m_display = 10;
 
-    auto current_path = QDir::currentPath();
-    m_search_paths.append(current_path + "\\vcxsrv\\vcxsrv.exe");
-    m_search_paths.append(qgetenv("ProgramFiles") + "\\QVD Client\\vcxsrv\\vcxsrv.exe");
-    m_search_paths.append(qgetenv("ProgramFiles(x86)") + "\\QVD Client\\vcxsrv\\vcxsrv.exe");
-
-    qDebug() << "Trying to find X server...";
-    for( auto path : m_search_paths ) {
-        if ( QFile::exists(path ) ) {
-            qDebug() << "X server found in " << path;
-            m_xserver_path = path;
-            break;
-        }
-    }
+    m_xserver_path = PathTools::findBin("vcxsrv", QStringList{"vcxsrv"});
 
     QObject::connect(&m_process, SIGNAL(started()), this, SLOT(processStarted()));
     QObject::connect(&m_process, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(processFinished(int, QProcess::ExitStatus)));
@@ -38,6 +28,8 @@ XServerLauncher::XServerLauncher()
 
 
 void XServerLauncher::start() {
+    QString log_dir = PathTools::getLogDir();
+
     auto opts = QStringList({   QString(":%1").arg(m_display),
                                 "-listen", "inet",
                                 "-nolisten", "inet6",
@@ -46,11 +38,12 @@ void XServerLauncher::start() {
                                 "-nowinkill",
                                 "-clipboard",
                                 "+bs",
-                                "-wm",
+                               // "-wm",
                                 "-listen", "tcp",
                                 "-silent-dup-error",
                                 "-ac",
-                                "-nomultimonitors"
+                                "-nomultimonitors",
+                                "-logfile", log_dir + "\\vcxsrv.log",
                             });
 
     qInfo() << "Launching " << m_xserver_path << " with arguments " << opts;
