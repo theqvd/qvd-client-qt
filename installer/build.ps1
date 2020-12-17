@@ -38,7 +38,7 @@ function New-TemporaryDirectory {
 
 
 $QT_DIR="C:\Qt"
-$QT_VER="5.15.1"
+$QT_VER="5.15.2"
 $use_mingw = 0
 
 if ( $use_mingw ) {
