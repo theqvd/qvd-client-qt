@@ -30,6 +30,7 @@ const int MAIN_WINDOW_HEIGHT = 700;
 
 #include "helpers/binaryfinder.h"
 
+#include "versioninfo.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -75,6 +76,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // Ensure the window's size is the smallest possible
     resize(MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGHT);
 
+    updateVersionInfo();
     loadSettings();
 }
 
@@ -420,6 +422,26 @@ void MainWindow::loadSettings() {
     settings.endArray();
 
 
+}
+
+void MainWindow::updateVersionInfo()
+{
+    QString verText = "";
+    QTextStream verStr(&verText);
+
+    if ( VersionInfo::isRunningFromSource() ) {
+        verStr << "Running from source" << Qt::endl;
+    } else {
+        verStr << "QVD version " << VersionInfo::getVersion().toString() << Qt::endl;
+        verStr << "© Qindel Group 2020" << Qt::endl << Qt::endl;
+        verStr << "Build " << VersionInfo::getBuild() << Qt::endl;
+    }
+
+    if (!VersionInfo::getCommit().isEmpty() ) {
+        verStr << "Git commit " << VersionInfo::getCommit() << Qt::endl;
+    }
+
+    ui->versionInfoEdit->document()->setPlainText(verText);
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {

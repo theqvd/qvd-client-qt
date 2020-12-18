@@ -55,6 +55,7 @@ private:
     Ui::MainWindow *ui;
     void saveSettings();
     void loadSettings();
+    void updateVersionInfo();
 
     QVDConnectionParameters m_params;
     QStringList m_shared_folders;

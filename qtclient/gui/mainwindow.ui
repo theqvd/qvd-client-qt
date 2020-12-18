@@ -395,7 +395,7 @@
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_5">
         <item>
-         <widget class="QPlainTextEdit" name="plainTextEdit">
+         <widget class="QPlainTextEdit" name="versionInfoEdit">
           <property name="font">
            <font>
             <family>Monospace</family>

@@ -18,7 +18,8 @@ SOURCES += main.cpp \
     listdialog.cpp \
     mainwindow.cpp \
     sslerrordialog.cpp \
-    usbdevicelistmodel.cpp
+    usbdevicelistmodel.cpp \
+    versioninfo.cpp
 
 macx:SOURCES  += keyboard_detector/keyboarddetector_osx.cpp
 linux:SOURCES += keyboard_detector/keyboarddetector_linux.cpp
@@ -31,7 +32,8 @@ HEADERS  += \
     listdialog.h \
     mainwindow.h \
     sslerrordialog.h \
-    usbdevicelistmodel.h
+    usbdevicelistmodel.h \
+    versioninfo.h
 
 FORMS    += \
     listdialog.ui \
@@ -80,4 +82,32 @@ win32 {
 
     RC_ICONS = pixmaps/qvd.ico
 }
+
+
+###
+### Version info
+###
+GIT_COMMIT = $$system(git rev-parse HEAD)
+MAJOR = $$(QVD_VERSION_MAJOR)
+MINOR = $$(QVD_VERSION_MINOR)
+REVISION = $$(QVD_VERSION_REVISON)
+BUILD = $$(QVD_BUILD)
+
+!defined(MAJOR) {
+    message("Version number not set")
+    MAJOR = 4
+    MINOR = 3
+    REVISION = 0
+}
+
+!defined(BUILD) {
+    message("Build number not set")
+    BUILD = 0
+}
+
+
+
+
+QMAKE_CXXFLAGS += -DQVD_COMMIT_HASH=\\\"$$GIT_COMMIT\\\" -DQVD_VERSION_MAJOR=$$MAJOR -DQVD_VERSION_MINOR=$$MINOR -DQVD_VERSION_REVISION=$$REVISION -DQVD_BUILD=$$BUILD
+
 
