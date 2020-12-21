@@ -49,7 +49,8 @@ void LogHandler(QtMsgType type, const QMessageLogContext &context, const QString
 
     ret = sd_journal_print_with_location( journald_level, arg_file.constData(), arg_line.constData(), arg_func.constData(), "%s", utf_msg.constData());
     if ( ret != 0 ) {
-        err_stream << "sd_journal_print_with_location failed with error " << ret << Qt::endl;
+        err_stream << "sd_journal_print_with_location failed with error " << ret << "\n";
+        err_stream.flush();
     }
 #endif
 
@@ -65,8 +66,12 @@ void LogHandler(QtMsgType type, const QMessageLogContext &context, const QString
 
     QDateTime now = QDateTime::currentDateTime();
 
-    log_stream << now.toString(Qt::ISODateWithMs) << level << " [" << context.file << ":" << context.line << "] " << msg << Qt::endl;
-    err_stream << now.toString(Qt::ISODateWithMs) << level << " [" << context.file << ":" << context.line << "] " << msg << Qt::endl;
+    log_stream << now.toString(Qt::ISODateWithMs) << level << " [" << context.file << ":" << context.line << "] " << msg << "\n";
+    err_stream << now.toString(Qt::ISODateWithMs) << level << " [" << context.file << ":" << context.line << "] " << msg << "\n";
+
+    // Avoid Qt::endl, which is missing in Qt 5.11 used on the Pi
+    log_stream.flush();
+    err_stream.flush();
 }
 
 int main(int argc, char *argv[])

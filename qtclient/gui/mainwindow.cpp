@@ -430,16 +430,18 @@ void MainWindow::updateVersionInfo()
     QTextStream verStr(&verText);
 
     if ( VersionInfo::isRunningFromSource() ) {
-        verStr << "Running from source" << Qt::endl;
+        verStr << "Running from source\n";
     } else {
-        verStr << "QVD version " << VersionInfo::getVersion().toString() << Qt::endl;
-        verStr << "© Qindel Group 2020" << Qt::endl << Qt::endl;
-        verStr << "Build " << VersionInfo::getBuild() << Qt::endl;
+        verStr << "QVD version " << VersionInfo::getVersion().toString() << "\n";
+        verStr << "© Qindel Group 2020\n\n";
+        verStr << "Build " << VersionInfo::getBuild() << "\n";
     }
 
     if (!VersionInfo::getCommit().isEmpty() ) {
-        verStr << "Git commit " << VersionInfo::getCommit() << Qt::endl;
+        verStr << "Git commit " << VersionInfo::getCommit() << "\n";
     }
+
+    verStr.flush();
 
     ui->versionInfoEdit->document()->setPlainText(verText);
 }
