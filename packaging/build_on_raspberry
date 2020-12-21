@@ -11,11 +11,17 @@ tar_dir=`basename "$tar" .orig.tar.xz | sed 's/qt_/qt-/'`
 # Reset build dir
 ssh -l $pi_user $pi_host "[ -d \"/home/$pi_user/build\" ] && rm -rf \"/home/$pi_user/build\" ; mkdir \"/home/$pi_user/build\""
 
+# install packages
+ssh -l root $pi_host "apt-get install -y devscripts"
+
+
 scp "$tar" "${pi_user}@${pi_host}:/home/${pi_user}/build/"
 
 ssh -l $pi_user $pi_host "cd /home/$pi_user/build && tar -xvf \"$tar_filename\""
 
 rsync -a -v --progress --exclude '*ex' --exclude '*EX' --exclude 'debian/tmp' --exclude 'debian/source'  files/deb/debian "${pi_user}@${pi_host}:/home/${pi_user}/build/$tar_dir/"
+
+ssh -l root $pi_host "cd /home/$pi_user/build/$tar_dir && mk-build-deps -i -r -t 'apt-get -o Debug::pkgProblemResolver=yes --no-install-recommends -y'"
 
 ssh -l $pi_user $pi_host "cd /home/$pi_user/build/$tar_dir && debuild -us -uc"
 
