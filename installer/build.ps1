@@ -2,6 +2,7 @@ $ErrorActionPreference = "Stop"
 $VCVarsAll = "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsall.bat"
 $FilesPath = "C:\Program Files (x86)\QVD Client"
 
+
 function Invoke-BatchFile
 {
    param([string]$Path, [string]$Parameters)  
@@ -37,8 +38,8 @@ function New-TemporaryDirectory {
 
 
 
-$QT_DIR="C:\Qt"
 $QT_VER="5.15.2"
+$QT_DIR="C:\Qt"
 $use_mingw = 0
 
 if ( $use_mingw ) {
@@ -105,6 +106,35 @@ Copy-Item -Path "$SSL_BIN_PATH\libssl*"               -Destination "$data"
 
 windeployqt "$data"
 binarycreator -v -c config\config.xml -p packages qvd-client-installer
+
+$installer_file = "$PSScriptRoot\\qvd-client-installer.exe"
+$installer_hash = (Get-FileHash $installer_file).Hash
+$installer_mb = [math]::round( (Get-Item $installer_file).Length / 1MB, 2 )
+
+Write-Host "*******************************************************************"
+Write-Host "Installer: $installer_file"
+Write-Host "Size     : $installer_mb MiB"
+Write-Host "SHA256   : $installer_hash"
+Write-Host "*******************************************************************"
+
+
+
+### This part can run an uploader script to automatically upload the installer
+### wherever appropriate.
+$docs = [Environment]::GetFolderPath("MyDocuments")
+$uploader_script = "$docs/installer_uploader.ps1"
+
+if ( Test-Path "$uploader_script" ) {
+	Write-Host "Running uploader script"
+	#$parameters = @{
+	#	FilePath = "$uploader_script"
+	#	ArgumentList = $installer_file
+	#}
+	
+	Start-Process powershell -Wait -Argument "$uploader_script $installer_file" -NoNewWindow
+} else {
+	Write-Host "No uploader script found, looked in $uploader_script"
+}
 
 
 
