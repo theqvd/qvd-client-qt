@@ -18,6 +18,30 @@ else
 	OSX=""
 fi
 
+NXPROXY="nxproxy"
+BINARY_QVD_DEPS=($NXPROXY)
+
+error_deps () {
+	echo "$1 is a QVD Client dependency, you can install it using MacPorts like this 'sudo port install $1'. (https://www.macports.org/)"
+        exit 2
+}
+
+find_qvd_client_binary_deps () {
+   for DEP in "${BINARY_QVD_DEPS[@]}" ; do
+       INSTALLED=$(port -q installed $DEP)
+       [ -n "$INSTALLED" ] || error_deps $DEP
+   done
+}
+
+if type -P port > /dev/null 2>&1 ; then 
+   PORT_BIN_PREFIX=$(dirname `type -P port`)
+else
+   echo "You need to install MacPorts for validate some QVD Client Dependencies. (https://www.macports.org/)"
+   exit 1
+fi
+   
+find_qvd_client_binary_deps
+
 export PATH=$QT_BIN_DIR:$QT_INSTALLER_DIR:$PATH
 
 tempdir=`mktemp -d`
@@ -37,8 +61,10 @@ mkdir -p packages/com.qindel.qvd/data
 
 if [ -n "$OSX" ] ; then
 	cp -Rpv $tempdir/gui/QVD_Client.app                   packages/com.qindel.qvd/data/
-        cp -v    $tempdir/libqvdclient/libqvdclient.dylib      packages/com.qindel.qvd/data/QVD_Client.app/Contents/MacOS/libqvdclient.1.dylib
+	cp -v   $tempdir/libqvdclient/libqvdclient.dylib      packages/com.qindel.qvd/data/QVD_Client.app/Contents/MacOS/libqvdclient.1.dylib
+        cp -Rpv $PORT_BIN_PREFIX/$NXPROXY		      packages/com.qindel.qvd/data/QVD_Client.app/Contents/MacOS/$NXPROXY
 	install_name_tool -change "libqvdclient.1.dylib" "@executable_path/libqvdclient.1.dylib"  packages/com.qindel.qvd/data/QVD_Client.app/Contents/MacOS/QVD_Client
+        install_name_tool -change "$NXPROXY" "@executable_path/$NXPROXY" packages/com.qindel.qvd/data/QVD_Client.app/Contents/MacOS/QVD_Client
 	macdeployqt packages/com.qindel.qvd/data/QVD_Client.app
 else
 	cp -v $tempdir/libqvdclient/libqvdclient.${LIB_EXT}*   packages/com.qindel.qvd/data/
