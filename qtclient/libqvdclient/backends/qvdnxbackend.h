@@ -42,6 +42,8 @@ private slots:
     void processStderrReady();
 
     void XServerReady();
+    void XServerFailed(const QString &error);
+
 private:
     QString m_nxproxyBinary = "/usr/bin/nxproxy";
 

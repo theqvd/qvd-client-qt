@@ -67,7 +67,7 @@ private slots:
 signals:
     void running();
     void stopped();
-    void failed(QString error);
+    void failed(const QString &error);
 };
 
 

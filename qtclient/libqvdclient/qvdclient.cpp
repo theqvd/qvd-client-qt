@@ -47,6 +47,7 @@ void QVDClient::setBackend(QVDBackend *backend)
     connect(m_backend, &QVDBackend::listeningOnTcpPort, this, &QVDClient::backend_listeningOnTcp);
     connect(m_backend, &QVDBackend::connectionEstablished, this, &QVDClient::backend_connectionEstablished);
     connect(m_backend, &QVDBackend::finished, this,  &QVDClient::disconnectFromQVD );
+    connect(m_backend, &QVDBackend::failed, this, &QVDClient::backend_failed);
 }
 
 QNetworkRequest QVDClient::createRequest(const QUrl &url)
@@ -398,6 +399,13 @@ void QVDClient::backend_connectionEstablished()
 {
     qInfo() << "Backend established the connection";
     emit vmConnected();
+}
+
+void QVDClient::backend_failed(const QString &error)
+{
+    qCritical() << "Backend failed with error: " << error;
+    disconnectFromQVD();
+    emit connectionError(QVDClient::ConnectionError::XServerError, error);
 }
 
 void QVDClient::slave_success(const QVDSlaveCommand &cmd)

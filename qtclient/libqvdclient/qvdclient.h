@@ -42,6 +42,7 @@ public:
         ProtocolError,        // error in the protocol -- bad JSON for example
         ServerBlocked,        // Server has been blocked by the admin
         ServerError,          // Server returns an error
+        XServerError,         // X server failed to start
         Unexpected            // unforseen error that is not specifically handled
 
     } ConnectionError;
@@ -159,6 +160,7 @@ private slots:
 
     void backend_listeningOnTcp(QVDBackend::NXChannel channel, quint16 port);
     void backend_connectionEstablished();
+    void backend_failed(const QString &error);
 
     void slave_success(const QVDSlaveCommand &cmd);
     void slave_failure(const QVDSlaveCommand &cmd);

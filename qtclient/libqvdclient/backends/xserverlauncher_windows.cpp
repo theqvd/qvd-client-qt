@@ -13,7 +13,7 @@ XServerLauncher::XServerLauncher()
 
     m_display = 10;
 
-    m_xserver_path = PathTools::findBin("vcxsrv", QStringList{"vcxsrv"});
+    m_xserver_path = PathTools::findBin("vcxsrv", QStringList{"vcxsrv.qvd", "vcxsrv"});
 
     QObject::connect(&m_process, SIGNAL(started()), this, SLOT(processStarted()));
     QObject::connect(&m_process, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(processFinished(int, QProcess::ExitStatus)));
@@ -46,7 +46,16 @@ void XServerLauncher::start() {
                                 "-logfile", log_dir + "\\vcxsrv.log",
                             });
 
-    qInfo() << "Launching " << m_xserver_path << " with arguments " << opts;
+    QFileInfo fi(m_xserver_path);
+
+    qInfo() << "Launching " << m_xserver_path << " with arguments " << opts << " in " << fi.path();
+    if ( m_xserver_path.isEmpty() ) {
+        qCritical() << "Can't start X server, no path was set!";
+        emit failed("Failed to start X server, binary wasn't found");
+        return;
+    }
+
+    m_process.setWorkingDirectory(fi.path());
     m_process.start(m_xserver_path, opts);
 
 }

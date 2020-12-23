@@ -158,6 +158,12 @@ signals:
      */
     void connectionTerminated();
 
+    /**
+     * @brief The backend has failed, and the connection has been closed
+     * @param error Description of the error
+     */
+    void failed(const QString &error);
+
 
     /**
      * @brief Backend has finished

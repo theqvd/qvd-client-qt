@@ -14,7 +14,7 @@ QVDNXBackend::QVDNXBackend(QObject *parent) : QVDBackend(parent)
     QObject::connect(&m_process, SIGNAL(readyReadStandardOutput()), this, SLOT(processStdoutReady()));
 
     QObject::connect(&m_x_server_launcher, SIGNAL(running()), this, SLOT(XServerReady()));
-
+    QObject::connect(&m_x_server_launcher, &XServerLauncher::failed, this, &QVDNXBackend::XServerFailed);
     setNxproxyBinary( PathTools::findBin("nxproxy") );
 }
 
@@ -293,6 +293,12 @@ void QVDNXBackend::XServerReady()
 
     //qputenv("DISPLAY", QString("127.0.0.1:%1").arg( m_x_server_launcher.display() ).toUtf8());
     m_process.start( nxproxyBinary(), nxproxy_args );
+}
+
+void QVDNXBackend::XServerFailed(const QString &error)
+{
+    qCritical() << "X server failed: " << error;
+    emit failed(error);
 }
 
 
