@@ -25,6 +25,61 @@ QString PathTools::getLogDir()
 #endif
 }
 
+QString PathTools::getPulseaudioHome()
+{
+#ifdef Q_OS_UNIX
+    QString home = qgetenv("HOME");
+    return home + "/.local/share/qvd-client-qt/pulseaudio";
+#else
+    QString appdata = qgetenv("LOCALAPPDATA");
+    return appdata + "\\QVD Client Qt\\PulseAudio\\Home";
+#endif
+}
+
+QString PathTools::getPulseaudioStateDir()
+{
+#ifdef Q_OS_UNIX
+    QString home = qgetenv("HOME");
+    return home + "/.local/share/qvd-client-qt/pulseaudio-state";
+#else
+    QString appdata = qgetenv("LOCALAPPDATA");
+    return appdata + "\\QVD Client Qt\\PulseAudio\\State";
+#endif
+}
+
+QString PathTools::getPulseaudioBaseConfig()
+{
+#ifdef Q_OS_WIN
+
+    QDir app_dir(QCoreApplication::applicationDirPath());
+    qDebug() << "Trying to find default.pa under " << app_dir;
+
+    if ( app_dir.exists("pulseaudio/default.pa") ) {
+        qDebug() << "default.pa found in " << app_dir;
+        return QDir::toNativeSeparators( app_dir.absoluteFilePath("pulseaudio/default.pa")  );
+    }
+
+    QList<QDir> root_dirs{ QDir(qgetenv("PROGRAMFILES")), QDir(qgetenv("PROGRAMFILES(x86)")), QDir(QCoreApplication::applicationDirPath()) };
+    for(auto dir : root_dirs ) {
+        qDebug() << "Trying to find default.pa under " << dir;
+
+        if ( dir.exists("QVD Client Qt/pulseaudio/default.pa") ) {
+            qDebug() << "default.pa found in " << dir;
+            return QDir::toNativeSeparators( dir.absoluteFilePath("QVD Client Qt/pulseaudio/default.pa"));
+        }
+        if ( dir.exists("QVD Client/pulseaudio/default.pa") ) {
+            qDebug() << "default.pa found in " << dir;
+            return QDir::toNativeSeparators( dir.absoluteFilePath("QVD Client/pulseaudio/default.pa"));
+        }
+
+    }
+
+    qCritical() << "Failed to find default.pa";
+    return "";
+
+#endif
+}
+
 QString PathTools::findBin(const QString &name, const QStringList dirs)
 {
     QList<QDir> search_paths;
@@ -44,7 +99,10 @@ QString PathTools::findBin(const QString &name, const QStringList dirs)
 #ifdef Q_OS_WIN
     QStringList dirs_copy = dirs;
     dirs_copy.append("QVD Client Qt");
+    dirs_copy.append("QVD Client Qt\\pulseaudio");
+
     dirs_copy.append("QVD Client");
+    dirs_copy.append("QVD Client\\pulseaudio");
 
     QList<QDir> root_dirs{ QDir(qgetenv("PROGRAMFILES")), QDir(qgetenv("PROGRAMFILES(x86)")), QDir(QCoreApplication::applicationDirPath()) };
 

@@ -110,12 +110,12 @@ public slots:
     void processReadyReadOutput();
     void processReadyReadError();
 
-
+#ifndef Q_OS_WIN
     void connectionTimerTick();
-
     void socketConnected();
     void socketDisconnected();
     void socketError(QLocalSocket::LocalSocketError err);
+#endif
 
 protected:
     QStringList getLines(QString &buffer, const QString &new_data);

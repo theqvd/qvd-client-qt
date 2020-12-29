@@ -20,7 +20,6 @@ SOURCES += \
     helpers/binaryfinder.cpp \
     helpers/linebuffer.cpp \
     helpers/qvdfilehelpers.cpp \
-    pulseaudio/pulseaudio.cpp \
     qvdchecklistview.cpp \
     qvdconnectionparameters.cpp \
     qvdhttpserver.cpp \
@@ -49,15 +48,18 @@ macx:QMAKE_LFLAGS += "-L/opt/X11/lib"
 
 macx:SOURCES += \
     backends/xserverlauncher_osx.cpp \
-    slaveclient/commands/slavesharefolderwithvm.cpp
+    slaveclient/commands/slavesharefolderwithvm.cpp \
+    pulseaudio/pulseaudio.cpp
 
 linux:SOURCES += \
     backends/xserverlauncher_linux.cpp \
-    slaveclient/commands/slavesharefolderwithvm.cpp
+    slaveclient/commands/slavesharefolderwithvm.cpp \
+    pulseaudio/pulseaudio.cpp
 
 win32:SOURCES += \
     backends/xserverlauncher_windows.cpp \
-    slaveclient/commands/slavesharefolderwithvm_win.cpp
+    slaveclient/commands/slavesharefolderwithvm_win.cpp \
+    pulseaudio/pulseaudio_win.cpp
 
 HEADERS  += \
     backends/qvdbackend.h \

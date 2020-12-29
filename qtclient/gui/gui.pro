@@ -100,7 +100,7 @@ BUILD = $$(QVD_BUILD)
     REVISION = 0
 }
 
-!defined(BUILD) {
+!defined(BUILD ) {
     message("Build number not set")
     BUILD = 0
 }

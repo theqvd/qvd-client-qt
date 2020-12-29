@@ -15,6 +15,25 @@ public:
     static QString getLogDir();
 
     /**
+     * @brief Returns the home directory for pulseaudio
+     * @return Path
+     */
+    static QString getPulseaudioHome();
+
+    /**
+     * @brief Returns the home directory for pulseaudio
+     * @return Path
+     */
+    static QString getPulseaudioStateDir();
+
+    /**
+     * @brief Returns the file that contains the base configuration for Pulseaudio
+     * @return
+     */
+    static QString getPulseaudioBaseConfig();
+
+
+    /**
      * @brief Finds the full path to a binary
      * @param name Name of the binary, without the extension
      * @param dirs List of directories (relative) where to look for the program

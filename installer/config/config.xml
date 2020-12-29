@@ -9,5 +9,5 @@
 	<ProductUrl>https://theqvd.com</ProductUrl>
     <StartMenuDir>QVD</StartMenuDir>
     <TargetDir>@ApplicationsDirUser@/QVD Client Qt</TargetDir>
-	<AdminTargetDir>@ApplicationsDirX64@/QVD Client Qt</AdminTargetDir>
+	<AdminTargetDir>@ApplicationsDir@/QVD Client Qt</AdminTargetDir>
 </Installer>
