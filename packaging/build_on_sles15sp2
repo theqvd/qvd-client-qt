@@ -5,16 +5,18 @@ tar=`../make_tar`
 tar_filename=`basename "$tar"`
 tar_dir=`basename "$tar" .orig.tar.xz | sed 's/qt_/qt-/'`
 
-
-
 [ -d "/tmp/sles-files" ] && rm -rf /tmp/sles-files
 mkdir -p /tmp/sles-files
-cp -Rdpv files/rpm/*  /tmp/sles-files/
-cp -Rdpv $tar         /tmp/sles-files/
+cp -Rpv files/rpm/*  /tmp/sles-files/
+cp -Rpv $tar         /tmp/sles-files/
 
 curdir=`pwd`
 
+BUILD_NX=1
+
 if [ -n "$BUILD_NX" ] ; then
+   [ -d "$curdir/output/sles_nx-libs" ] && rm -rf $curdir/output/sles_nx-libs
+   mkdir -p $curdir/output/sles_nx-libs
    docker run -it --privileged -v $curdir/output/sles_nx-libs:/out sles_build_nx-libs:15sp2 /build.sh
 fi
 

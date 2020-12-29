@@ -19,7 +19,8 @@ else
 fi
 
 NXPROXY="nxproxy"
-BINARY_QVD_DEPS=($NXPROXY)
+PULSEAUDIO="pulseaudio"
+BINARY_QVD_DEPS=($NXPROXY $PULSEAUDIO)
 
 error_deps () {
 	echo "$1 is a QVD Client dependency, you can install it using MacPorts like this 'sudo port install $1'. (https://www.macports.org/)"
@@ -63,8 +64,10 @@ if [ -n "$OSX" ] ; then
 	cp -Rpv $tempdir/gui/QVD_Client.app                   packages/com.qindel.qvd/data/
 	cp -v   $tempdir/libqvdclient/libqvdclient.dylib      packages/com.qindel.qvd/data/QVD_Client.app/Contents/MacOS/libqvdclient.1.dylib
         cp -Rpv $PORT_BIN_PREFIX/$NXPROXY		      packages/com.qindel.qvd/data/QVD_Client.app/Contents/MacOS/$NXPROXY
+        cp -Rpv $PORT_BIN_PREFIX/$PULSEAUDIO                  packages/com.qindel.qvd/data/QVD_Client.app/Contents/MacOS/$PULSEAUDIO
 	install_name_tool -change "libqvdclient.1.dylib" "@executable_path/libqvdclient.1.dylib"  packages/com.qindel.qvd/data/QVD_Client.app/Contents/MacOS/QVD_Client
-        install_name_tool -change "$NXPROXY" "@executable_path/$NXPROXY" packages/com.qindel.qvd/data/QVD_Client.app/Contents/MacOS/QVD_Client
+        install_name_tool -change "$NXPROXY"    "@executable_path/$NXPROXY" packages/com.qindel.qvd/data/QVD_Client.app/Contents/MacOS/QVD_Client
+        install_name_tool -change "$PULSEAUDIO" "@executable_path/$PULSEAUDIO" packages/com.qindel.qvd/data/QVD_Client.app/Contents/MacOS/QVD_Client
 	macdeployqt packages/com.qindel.qvd/data/QVD_Client.app
 else
 	cp -v $tempdir/libqvdclient/libqvdclient.${LIB_EXT}*   packages/com.qindel.qvd/data/

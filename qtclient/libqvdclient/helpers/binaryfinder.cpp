@@ -67,6 +67,7 @@ QString PathTools::findBin(const QString &name, const QStringList dirs)
     }
 #endif
 #ifdef Q_OS_UNIX
+    search_paths.append(QDir::current());
     search_paths.append(QDir("/usr/lib/qvd/bin"));
     search_paths.append(QDir("/usr/bin"));
     search_paths.append(QDir("/bin"));

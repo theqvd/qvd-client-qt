@@ -9,7 +9,7 @@ cd "$rootdir"
 
 tempdir=`mktemp -d`
 
-cp -Rdp qtclient "$tempdir/$DIRNAME"
+cp -Rp qtclient "$tempdir/$DIRNAME"
 cd "$tempdir"
 rm -rf $DIRNAME/libqvdclient/doc $DIRNAME/*user* $DIRNAME/build
 find "$DIRNAME" \( -name '*.o' -or -name '*save*' -or -name '*swp' -or -name '*out' -or -name '*stash' \) -print0 | xargs -0 rm -f

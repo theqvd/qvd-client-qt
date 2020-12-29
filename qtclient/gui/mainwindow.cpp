@@ -116,16 +116,6 @@ void MainWindow::connectToVM() {
 
     QVDNXBackend *nx_backend = new QVDNXBackend(this);
 
-
-#if defined(Q_OS_WIN)
-    // TODO: Detect location of nxproxy
-  //  nx_backend->setNxproxyBinary("%TMP%\\nxproxy");
-#elif defined(Q_OS_MACOS)
-    nx_backend->setNxproxyBinary("/Applications/Qvd.app/Contents/Resources/usr/lib/qvd/bin/nxproxy");
-#else
-    nx_backend->setNxproxyBinary(settings.value("nxproxy", "/usr/bin/nxproxy").toString());
-#endif
-
     settings.endGroup();
 
     settings.beginGroup("Connection");
