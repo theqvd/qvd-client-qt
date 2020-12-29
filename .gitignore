@@ -12,3 +12,6 @@ doc/
 *.deb
 *.ddeb
 nohup.out
+*.exe
+*.dll
+installer/packages/com.qindel.qvd/data/
