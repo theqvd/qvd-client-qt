@@ -48,9 +48,15 @@ macx {
     QMAKE_INFO_PLIST = Info.plist
 }
 
-unix:LIBS += -lX11
-macx:LIBS += -L/opt/X11/lib
+linux:LIBS += -lX11
 
+# Link directly against libX11 on OSX, rather than specifying a library path.
+# If we use -L/opt/X11/lib here, it may use /opt/X11/lib/libGL.dylib instead
+# of /System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib
+#
+# This causes an error of 'dyld: Symbol not found: _gll_noop'.
+
+macx:LIBS += /opt/X11/lib/libX11.dylib
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../libqvdclient/release/ -lqvdclient
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../libqvdclient/debug/ -lqvdclient
