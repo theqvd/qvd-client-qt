@@ -132,6 +132,7 @@ QString PathTools::findBin(const QString &name, const QStringList dirs)
     search_paths.append(QDir("/usr/libexec/openssh"));
     search_paths.append(QDir("/usr/lib/openssh"));
     search_paths.append(QDir("/usr/lib/ssh"));
+    search_paths.append(QDir("/opt/local/bin")); // OSX
 #endif
 
     for( QDir path : search_paths ) {
