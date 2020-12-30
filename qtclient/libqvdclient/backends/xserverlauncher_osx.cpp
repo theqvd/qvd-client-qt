@@ -4,35 +4,13 @@
 #include <QDebug>
 #include <QNetworkProxy>
 #include <QString>
+#include <QFileInfo>
+#include <QRandomGenerator>
 
 
 
 XServerLauncher::XServerLauncher()
 {
-    // On MacOS we need to launch XQuartz as X11 default server.
-
-    qputenv("DISPLAY","127.0.0.1:0.0");
-    auto display = qgetenv("DISPLAY");
-    auto parts = display.split(':');
-    auto disp = QString::fromUtf8( parts[1].split('.')[0] );
-
-    auto XQuartzPath = "/Applications/Utilities/XQuartz.app";
-
-    QDir XQuartz(XQuartzPath);
-    if (XQuartz.exists())
-    {
-        m_xserver_path = XQuartzPath;
-        qDebug() << "XQuartz is installed in " << XQuartzPath;
-    }
-    else
-    {
-        qDebug() << "XQuartz is not installed, QVD client needs XQuartz as X11 Server.";
-    }
-
-    m_display = disp.toUShort();
-
-    qDebug() << "DISPLAY is " << display << "; parsed into " << m_display;
-
     QObject::connect(&m_process, SIGNAL(started()), this, SLOT(processStarted()));
     QObject::connect(&m_process, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(processFinished(int, QProcess::ExitStatus)));
     QObject::connect(&m_process, SIGNAL(readyReadStandardError()), this, SLOT(processStderrReady()));
@@ -47,6 +25,22 @@ XServerLauncher::XServerLauncher()
 
 
 void XServerLauncher::start() {
+    if (! QFileInfo::exists("/opt/X11/bin/Xquartz")) {
+        qCritical() << "XQuartz not found!";
+        emit failed("XQuartz not installed");
+        return;
+    }
+
+    auto display = qgetenv("DISPLAY");
+    if ( QFileInfo::exists(display) ) {
+        qInfo() << "DISPLAY is set to " << display << "; assuming XQuartz will be auto-launched.";
+        emit running();
+        return;
+    }
+
+    QRandomGenerator rnd;
+    m_display = rnd.bounded(0, 59000);
+
     QString XQuartzLauncher = "/opt/X11/libexec/launchd_startx";
     auto opts = QStringList({   "/opt/X11/bin/startx",
                                 "--",
@@ -61,6 +55,7 @@ void XServerLauncher::start() {
 
     qInfo() << "Launching " << m_xserver_path << " with arguments " << opts;
     m_process.start(XQuartzLauncher, opts);
+
 }
 
 void XServerLauncher::stop() {

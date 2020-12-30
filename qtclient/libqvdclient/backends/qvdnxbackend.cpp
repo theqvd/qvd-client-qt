@@ -292,6 +292,7 @@ void QVDNXBackend::XServerReady()
 
 
     //qputenv("DISPLAY", QString("127.0.0.1:%1").arg( m_x_server_launcher.display() ).toUtf8());
+    qInfo() << "DISPLAY = " << env.value("DISPLAY", "[none]");
     m_process.start( nxproxyBinary(), nxproxy_args );
 }
 
