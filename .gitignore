@@ -14,4 +14,6 @@ doc/
 nohup.out
 *.exe
 *.dll
+*.dmg
+*.app
 installer/packages/com.qindel.qvd/data/
