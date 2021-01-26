@@ -1,16 +1,21 @@
 #!/bin/bash
 
-
 tar=`../make_tar`
 tar_filename=`basename "$tar"`
 tar_dir=`basename "$tar" .orig.tar.xz | sed 's/qt_/qt-/'`
 
-
-
 [ -d "/tmp/centos-files" ] && rm -rf /tmp/centos-files
 mkdir -p /tmp/centos-files
-cp -Rdpv files/rpm/*  /tmp/centos-files/
-cp -Rdpv $tar         /tmp/centos-files/
+cp -Rpv files/rpm/*  /tmp/centos-files/
+cp -Rpv $tar         /tmp/centos-files/
+
+BUILD_NX=1
+
+if [ -n "$BUILD_NX" ] ; then
+   [ -d "$curdir/output/centos_nx-libs" ] && rm -rf $curdir/output/centos_nx-libs
+   mkdir -p $curdir/output/centos_nx-libs
+   docker run -it --privileged -u nxbuilder -v $curdir/output/centos_nx-libs:/out nx-libs:centos8 /build.sh
+fi
 
 curdir=`pwd`
-podman run -it -v /tmp/centos-files:/files:Z -v $curdir/output/centos8:/out qvd-build-centos:8 /files/build_nx
+docker run -it -v /tmp/centos-files:/files:Z -v $curdir/output/centos8:/out qvd-build-centos:8 /files/build_nx

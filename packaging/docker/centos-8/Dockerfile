@@ -1,8 +1,8 @@
-FROM centos:8
+FROM centos:latest
 
 # Prepare system
 RUN dnf update -y
-RUN sed -i -r 's/enabled=0/enabled=1/' /etc/yum.repos.d/CentOS-PowerTools.repo
+RUN sed -i 's/enabled=0/enabled=1/' /etc/yum.repos.d/CentOS-Linux-PowerTools.repo
 RUN dnf install -y epel-release
 
 # Base build tools
@@ -22,3 +22,4 @@ RUN mkdir -p /root/rpmbuild/{SOURCES,SPECS,BUILD,BUILDROOT,RPMS,SRPMS}
 
 #PATH=/usr/lib64/qt5/bin:$PATH
 
+RUN mkdir /files
