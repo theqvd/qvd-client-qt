@@ -3,6 +3,7 @@
 
 #include <QCommandLineParser>
 #include "qvdconnectionparameters.h"
+#include "nxerrorcommanddata.h"
 
 
 
@@ -23,7 +24,7 @@ public:
 
     QCommandLineOption addOption(const QString& name, const QString &description, QString valuename = QString());
 
-    Result parse(QVDConnectionParameters &params);
+    Result parse(QVDConnectionParameters &params, NXErrorCommandData &nxerr);
 
     const QString& getError() const { return m_error_message; }
     const QString getHelp() const;

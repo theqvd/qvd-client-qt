@@ -20,6 +20,7 @@ SOURCES += \
     helpers/binaryfinder.cpp \
     helpers/linebuffer.cpp \
     helpers/qvdfilehelpers.cpp \
+    nxerrorcommanddata.cpp \
     qvdchecklistview.cpp \
     qvdconnectionparameters.cpp \
     qvdhttpserver.cpp \
@@ -69,6 +70,7 @@ HEADERS  += \
     helpers/binaryfinder.h \
     helpers/linebuffer.h \
     helpers/qvdfilehelpers.h \
+    nxerrorcommanddata.h \
     pulseaudio/pulseaudio.h \
     qvdchecklistview.h \
     qvdconnectionparameters.h \

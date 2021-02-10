@@ -2,6 +2,8 @@
 #include <QProcess>
 #include <QtGlobal>
 #include <QRegularExpression>
+#include <QCoreApplication>
+
 #include "helpers/binaryfinder.h"
 
 
@@ -282,6 +284,10 @@ void QVDNXBackend::XServerReady()
     qInfo() << "Starting process " << nxproxyBinary() << " with arguments " << nxproxy_args << QString(" against display on 127.0.0.1:%1").arg(m_x_server_launcher.display());
 
     auto env = QProcessEnvironment::systemEnvironment();
+
+    qInfo() << "Passing " << QCoreApplication::applicationFilePath() << " as NX_CLIENT";
+
+    env.insert("NX_CLIENT", QCoreApplication::applicationFilePath());
 
 #ifdef Q_OS_WIN
     env.insert("DISPLAY", QString("127.0.0.1:%1").arg( m_x_server_launcher.display() ));

@@ -7,8 +7,17 @@
 #include <QTextStream>
 #include <QDir>
 #include <QFile>
+#include <QMessageBox>
+#include <QMap>
 
 #include "helpers/binaryfinder.h"
+
+
+#ifdef Q_OS_UNIX
+#include <signal.h>
+#endif
+
+
 
 // TODO: make this come from the build script
 #define HAVE_SYSTEMD
@@ -23,6 +32,11 @@ QTextStream out_stream(stdout, QIODevice::WriteOnly);
 QTextStream err_stream(stderr, QIODevice::WriteOnly);
 
 
+enum Action {
+    None,
+    Disconnect,
+    Terminate
+};
 
 void LogHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg) {
 
@@ -107,9 +121,103 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
     QVDConnectionParameters params = ConfigLoader::loadConnectionParameters();
-    auto &parser = CommandLineParser::getInstance();
-    auto retval = parser.parse(params);
+    NXErrorCommandData nxerr;
 
+    auto &parser = CommandLineParser::getInstance();
+    auto retval = parser.parse(params, nxerr);
+
+    QMap<QMessageBox::Button, Action> button_action_map;
+
+    if ( nxerr.isComplete() ) {
+        qInfo() << "Showing message of type " << nxerr.Type << " with title " << nxerr.Caption << ", content " << nxerr.Message;
+
+        QMessageBox msgBox;
+        msgBox.setText(nxerr.Message);
+
+        // OSX ignores this, not a bug. Required by macOS guidelines.
+        msgBox.setWindowTitle(nxerr.Caption);
+
+        switch(nxerr.Type) {
+            case NXErrorCommandData::DialogType::Unknown:
+            case NXErrorCommandData::DialogType::OK:
+                msgBox.setStandardButtons(QMessageBox::Ok);
+                msgBox.setIcon(QMessageBox::Information);
+
+                button_action_map.insert(QMessageBox::Ok, Action::Terminate);
+                break;
+            case NXErrorCommandData::DialogType::Error:
+                msgBox.setStandardButtons(QMessageBox::Ok);
+                msgBox.setIcon(QMessageBox::Warning);
+
+                button_action_map.insert(QMessageBox::Ok, Action::Terminate);
+                break;
+            case NXErrorCommandData::DialogType::YesNo:
+                msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+                msgBox.setIcon(QMessageBox::Question);
+
+                button_action_map.insert(QMessageBox::Yes, Action::Terminate);
+                break;
+            case NXErrorCommandData::DialogType::YesNoSuspend:
+                msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+                msgBox.addButton("Suspend", QMessageBox::ApplyRole);
+                msgBox.setIcon(QMessageBox::Question);
+
+                button_action_map.insert(QMessageBox::Yes, Action::Terminate);
+                button_action_map.insert(QMessageBox::NoButton, Action::Disconnect);
+                break;
+            case NXErrorCommandData::DialogType::Panic:
+                msgBox.setStandardButtons(QMessageBox::Ok);
+                msgBox.setIcon(QMessageBox::Critical);
+
+                button_action_map.insert(QMessageBox::Ok, Action::Terminate);
+                break;
+            case NXErrorCommandData::DialogType::Pulldown:
+                msgBox.setStandardButtons(QMessageBox::Ok);
+                msgBox.setIcon(QMessageBox::Question);
+
+                button_action_map.insert(QMessageBox::Ok, Action::Terminate);
+                break;
+            case NXErrorCommandData::DialogType::Quit:
+                msgBox.setStandardButtons(QMessageBox::Ok);
+                msgBox.setIcon(QMessageBox::Question);
+
+                button_action_map.insert(QMessageBox::Ok, Action::Terminate);
+                break;
+
+        }
+
+        QMessageBox::StandardButton selection = static_cast<QMessageBox::StandardButton>(msgBox.exec());
+        qDebug() << "Selection made: " << selection;
+
+        if ( button_action_map.contains(selection)) {
+            qDebug() << "Will execute action" << button_action_map[selection] << "on PID" << nxerr.ParentPID;
+
+            if ( nxerr.ParentPID != 0 ) {
+#ifdef Q_OS_UNIX
+                switch(button_action_map[selection]) {
+                case Action::Disconnect:
+                    qInfo() << "Sending SIGHUP to " << nxerr.ParentPID;
+                    kill(nxerr.ParentPID, SIGHUP);
+                    break;
+                case Action::Terminate:
+                    qInfo() << "Sending SIGTERM to " << nxerr.ParentPID;
+                    kill(nxerr.ParentPID, SIGTERM);
+                    break;
+                default:
+                    qWarning() << "No action to perform";
+                    /* nothing */
+                    break;
+                }
+#else
+                QWarning() << "Actions not implemented on this OS";
+#endif
+            } else {
+                qWarning() << "Can't execute action without a PID";
+            }
+        }
+
+        exit(0);
+    }
 
     switch (retval) {
     case CommandLineParser::CommandLineOk:

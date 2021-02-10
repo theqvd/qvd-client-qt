@@ -1,4 +1,6 @@
 #include "commandlineparser.h"
+#include "nxerrorcommanddata.h"
+
 #include <QMetaEnum>
 
 #define _t(s) (QCoreApplication::translate("CommandLineParser", s))
@@ -39,7 +41,7 @@ QVDConnectionParameters::ConnectionSpeed CommandLineParser::strToConnectionSpeed
     return QVDConnectionParameters::ConnectionSpeed::LAN;
 }
 
-CommandLineParser::Result CommandLineParser::parse(QVDConnectionParameters &params) {
+CommandLineParser::Result CommandLineParser::parse(QVDConnectionParameters &params, NXErrorCommandData &nxerr ) {
 
     const auto username       = addOption("user"           , _t("Login username."), "username");
     const auto password       = addOption("password"       , _t("Login password."), "password");
@@ -54,6 +56,17 @@ CommandLineParser::Result CommandLineParser::parse(QVDConnectionParameters &para
     const auto noheader       = addOption("no-header"      , _t("Don't show the header for --list-vms and --list-apps."), "no-header");
     const auto json           = addOption("json"           , _t("Use JSON to dump the --list-vms and --list-apps data."), "json");
     const auto connectionType = addOption("connection-type", _t("Type of connection to use: ") + getConnectionTypes(), "type");
+
+    // These are used by nxproxy to show errors. In standard NX this is an external Python script.
+    // This is basically a specialized xmessage/kdialog/zenity.
+    const auto dialog         = addOption("dialog"          , _t("Dialog - type"), "dialog type");
+    const auto caption        = addOption("caption"         , _t("Dialog - caption"), "caption");
+    const auto window         = addOption("window"          , _t("Dialog - window ID"), "window");
+    const auto message        = addOption("message"         , _t("Dialog - message"), "message");
+    const auto local          = addOption("local"           , _t("Dialog - Proxy mode is used (ignored)"), "0 or 1");
+    const auto parent         = addOption("parent"          , _t("Dialog - nagent's PID"), "pid");
+    const auto display        = addOption("display"         , _t("Dialog - X11 display"), "display");
+
 
     const auto helpOption = m_qparser.addHelpOption();
     const auto versionOption = m_qparser.addVersionOption();
@@ -102,6 +115,35 @@ CommandLineParser::Result CommandLineParser::parse(QVDConnectionParameters &para
         }
     }
 
+    if ( m_qparser.isSet(dialog)) {
+        if (!nxerr.setTypeFromQString(m_qparser.value(dialog))) {
+            return Result::CommandLineError;
+        }
+    }
+
+    if ( m_qparser.isSet(caption)) {
+        nxerr.Caption = m_qparser.value(caption);
+    }
+
+    if ( m_qparser.isSet(window)) {
+        nxerr.Window = m_qparser.value(window);
+    }
+
+    if ( m_qparser.isSet(message)) {
+        nxerr.Message = m_qparser.value(message);
+    }
+
+    if ( m_qparser.isSet(local)) {
+        nxerr.IsLocal =   m_qparser.value(local) == "1";
+    }
+
+    if ( m_qparser.isSet(parent)) {
+        nxerr.ParentPID = m_qparser.value(parent).toInt();
+    }
+
+    if ( m_qparser.isSet(display)) {
+        nxerr.Display = m_qparser.value(display);
+    }
 
     return Result::CommandLineOk;
 }
