@@ -32,7 +32,7 @@ PulseAudio::~PulseAudio()
 
 }
 
-void PulseAudio::connectExisting(const QString &pulseaudio_dir)
+void PulseAudio::connectExisting([[maybe_unused]] const QString &pulseaudio_dir)
 {
     qCritical() << "Connecting to existing PulseAudio not supported on Windows";
 }
