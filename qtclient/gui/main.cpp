@@ -209,7 +209,7 @@ int main(int argc, char *argv[])
                     break;
                 }
 #else
-                QWarning() << "Actions not implemented on this OS";
+                qWarning() << "Actions not implemented on this OS";
 #endif
             } else {
                 qWarning() << "Can't execute action without a PID";
