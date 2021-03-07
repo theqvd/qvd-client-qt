@@ -3,6 +3,7 @@
 #include <QtGlobal>
 #include <QRegularExpression>
 #include <QCoreApplication>
+#include <QRandomGenerator>
 
 #include "helpers/binaryfinder.h"
 
@@ -276,6 +277,29 @@ void QVDNXBackend::XServerReady()
 
     qInfo() << "Starting listener at localhost";
     m_proxy_listener.listen(QHostAddress::LocalHost, 0);
+
+    if ( m_proxy_listener.serverPort() <= m_nx_proxy_port_offset ) {
+        // On Windows Server 2003 and earlier, random listening ports generates numbers from 1025 to 5000.
+        // This is extremely likely to fall below the the minimum port used by NX, which is 4000.
+        // In such a case, we'll obtain an usable port by hand.
+        //
+        // https://docs.microsoft.com/en-us/windows/win32/api/winsock/nf-winsock-bind
+
+        qWarning() << "Tried listening on random port, got port " << m_proxy_listener.serverPort() << ", below for nxproxy offset " << m_nx_proxy_port_offset << ", applying workaround";
+
+        m_proxy_listener.close();
+        auto rng = QRandomGenerator::global();
+
+        while( !m_proxy_listener.isListening() ) {
+            quint16 port = rng->bounded(m_nx_proxy_port_offset + 1, 65535);
+
+            qDebug() << "Trying port " << port;
+            bool ret = m_proxy_listener.listen(QHostAddress::LocalHost, port);
+            qDebug() << "Listening " << (ret ? "successful" : "failed, will try again.");
+        }
+    }
+
+
 
     qInfo() << "Listening at port " << m_proxy_listener.serverPort();
 
