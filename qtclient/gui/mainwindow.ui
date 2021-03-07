@@ -423,7 +423,7 @@ Build: N/A</string>
        </font>
       </property>
       <property name="text">
-       <string>&lt;a href=&quot;http://theqvd.com&quot;&gt;© 2020 Qindel Group&lt;/a&gt;</string>
+       <string>&lt;a href=&quot;http://theqvd.com&quot;&gt;© 2021 Qindel Group&lt;/a&gt;</string>
       </property>
       <property name="textFormat">
        <enum>Qt::RichText</enum>
