@@ -100,6 +100,7 @@ Copy-Item -Path "$FilesPath\pulseaudio"                  -Destination "$data" -R
 Copy-Item -Path "$FilesPath\vcxsrv"                      -Destination "$data" -Recurse
 Copy-Item -Path "$FilesPath\bin"                         -Destination "$data" -Recurse
 Copy-Item -Path "$FilesPath\win-sftp-server.exe"         -Destination "$data"
+Copy-Item -Path "$FilesPath\redist\*.exe"                -Destination "$data"
 Copy-Item -Path "$SSL_BIN_PATH\libcrypto*"               -Destination "$data"
 Copy-Item -Path "$SSL_BIN_PATH\libssl*"               -Destination "$data"
 
