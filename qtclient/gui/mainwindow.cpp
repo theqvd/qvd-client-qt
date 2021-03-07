@@ -49,9 +49,15 @@ MainWindow::MainWindow(QWidget *parent) :
 
     setWindowIcon(QIcon(":/pixmaps/qvd.ico"));
 
-    ui->connectionTypeComboBox->addItem( "Local", QVDConnectionParameters::ConnectionSpeed::LAN );
-    ui->connectionTypeComboBox->addItem( "ADSL", QVDConnectionParameters::ConnectionSpeed::ADSL );
+
+
     ui->connectionTypeComboBox->addItem( "Modem", QVDConnectionParameters::ConnectionSpeed::Modem );
+    ui->connectionTypeComboBox->addItem( "ISDN", QVDConnectionParameters::ConnectionSpeed::ISDN );
+    ui->connectionTypeComboBox->addItem( "ADSL", QVDConnectionParameters::ConnectionSpeed::ADSL );
+    ui->connectionTypeComboBox->addItem( "WAN", QVDConnectionParameters::ConnectionSpeed::WAN );
+    ui->connectionTypeComboBox->addItem( "LAN", QVDConnectionParameters::ConnectionSpeed::LAN );
+    ui->connectionTypeComboBox->addItem( "Local", QVDConnectionParameters::ConnectionSpeed::Local );
+
 
     m_shared_folders_model.setStringList(m_shared_folders);
     ui->sharedFoldersList->setModel(&m_shared_folders_model);

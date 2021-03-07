@@ -24,6 +24,21 @@
  */
 
 
+static QString speedToString(QVDConnectionParameters::ConnectionSpeed s) {
+    switch(s) {
+        case QVDConnectionParameters::ConnectionSpeed::Modem: return "modem";
+        case QVDConnectionParameters::ConnectionSpeed::ISDN: return "isdn";
+        case QVDConnectionParameters::ConnectionSpeed::ADSL: return "adsl";
+        case QVDConnectionParameters::ConnectionSpeed::WAN: return "wan";
+        case QVDConnectionParameters::ConnectionSpeed::LAN: return "lan";
+        case QVDConnectionParameters::ConnectionSpeed::Local: return "local";
+    }
+
+    // Avoid build warning -- this should never be reached.
+    qCritical() << "Can't convert speed " << s << " to string, new constant? Please fix me! Assuming ADSL.";
+    return "adsl";
+}
+
 QVDClient::QVDClient(QObject *parent) : QObject(parent)
 {
 
@@ -204,7 +219,7 @@ void QVDClient::connectToVM(int id)
     query.addQueryItem("qvd.client.printing.enabled"  , getParameters().printing() ? "1" : "0");
     query.addQueryItem("qvd.client.usb.enabled"       , getParameters().usb_forwarding() ? "1" : "0");
     query.addQueryItem("qvd.client.usb.implementation", "usbip");
-    query.addQueryItem("qvd.client.link", "local");
+    query.addQueryItem("qvd.client.link"              , speedToString(getParameters().connectionSpeed()));
     query.addQueryItem("qvd.client.audio.compression.enable", getParameters().audioCompression() ? "1" : "0");
 
     url.setQuery(query);

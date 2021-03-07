@@ -20,7 +20,8 @@ public:
         ISDN,
         ADSL,
         WAN,
-        LAN
+        LAN,
+        Local
     } ConnectionSpeed;
 
     QVDConnectionParameters();
