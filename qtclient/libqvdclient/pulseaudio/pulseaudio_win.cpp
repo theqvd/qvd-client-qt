@@ -60,6 +60,7 @@ void PulseAudio::start()
                                        "-n",                           /* don't load the default config */
                                        "-v",                           /* verbose output */
                                        "-F",  m_qvd_pulseaudio_config, /* use our config file */
+                                       "--use-pid-file=0",             /* allow multiple instances */
                                        "--exit-idle-time=-1",          /* never exit automatically */
                                    });
                                       // QString("--log-target=file:%1/pa.log").arg(m_qvd_pulseaudio_home)});
