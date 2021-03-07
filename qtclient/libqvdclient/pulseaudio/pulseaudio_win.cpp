@@ -122,17 +122,38 @@ void PulseAudio::processStarted()
 
 void PulseAudio::processReadyReadOutput()
 {
-    auto data = QString(m_process.readAllStandardOutput());
+    auto data = m_process.readAllStandardOutput();
+    m_pulse_out_buf.add(data);
 
+    while(m_pulse_out_buf.hasLine()) {
+        auto line = m_pulse_out_buf.getLine();
+        qDebug() << "PA out: " << line;
+    }
 
-    qInfo() << "Pulse: " << data;
 }
 
 void PulseAudio::processReadyReadError()
 {
     auto data = m_process.readAllStandardError();
+    m_pulse_err_buf.add(data);
 
-    qCritical() << "Pulse error: " << data;
+    while(m_pulse_err_buf.hasLine()) {
+        auto line = m_pulse_err_buf.getLine();
+
+        if ( line.startsWith("I: ")) {
+            qInfo() << "PA: " << line;
+        } else if ( line.startsWith("W: ")) {
+            qWarning() << "PA: " << line;
+        } else if ( line.startsWith("E: ")) {
+            qCritical() << "PA: " << line;
+        } else {
+            qDebug() << "PA: " << line;
+        }
+
+        // for keeping track of bandwidth stats
+        // "I: [(null)] pulsecore/protocol-native.c: transcode: decoded frame (framesize: 2880 total length: 11520)\r\n"
+
+    }
 }
 
 QString PulseAudio::getQvdPulseaudioConfig() const
