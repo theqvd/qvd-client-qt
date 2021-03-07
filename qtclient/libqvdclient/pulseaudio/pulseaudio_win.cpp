@@ -75,7 +75,7 @@ void PulseAudio::activateSocket() {
     qCritical() << "Activating the socket is supported on Windows";
 }
 
-QString PulseAudio::sendCommand(const QString &cmd) {
+QString PulseAudio::sendCommand([[maybe_unused]] const QString &cmd) {
     qCritical() << "Sending PulseAudio commands is not supported on Windows";
     return "";
 }
