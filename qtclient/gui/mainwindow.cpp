@@ -163,17 +163,23 @@ void MainWindow::connectToVM() {
 void MainWindow::vmListReceived(const QList<QVDClient::VMInfo> &vmlist)
 {
      int selected = -1;
-     ListDialog *dlg = new ListDialog(this);
-     dlg->resize(350, 150);
-     dlg->DisplayVMs(vmlist);
-     dlg->exec();
-     selected = dlg->result();
 
-     if ( selected > 0 ) {
-         m_client->connectToVM( selected );
+     if ( vmlist.length() == 1 ) {
+         selected = vmlist[0].id;
+         qDebug() << "Only one VM available, auto-connecting to VM id " << selected;
      } else {
-         m_client->disconnectFromQVD();
-     }
+         ListDialog *dlg = new ListDialog(this);
+         dlg->resize(350, 150);
+         dlg->DisplayVMs(vmlist);
+         dlg->exec();
+         selected = dlg->result();
+    }
+
+    if ( selected > 0 ) {
+        m_client->connectToVM( selected );
+    } else {
+        m_client->disconnectFromQVD();
+    }
 
 }
 
