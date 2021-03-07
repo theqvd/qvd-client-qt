@@ -40,6 +40,8 @@ public:
      */
     virtual void run() = 0;
 
+    virtual void stop() { };
+
 signals:
     void commandSuccessful();
     void commandFailed();

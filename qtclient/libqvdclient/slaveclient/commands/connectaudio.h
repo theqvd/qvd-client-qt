@@ -16,9 +16,10 @@ public:
      */
     ConnectAudio(quint16 audio_port);
 
-    virtual ~ConnectAudio() = default;
+    virtual ~ConnectAudio();
 
     virtual void run();
+    virtual void stop();
     quint16 audioPort() const;
     void setAudioPort(const quint16 &audio_port);
 
@@ -32,6 +33,7 @@ public slots:
 private:
     PulseAudio m_system_pulse;
     PulseAudio m_pulse;
+    QList<QString> m_temp_files;
 
     quint16 m_audio_port = 4731;
     quint16 m_secondary_audio_port = 0;

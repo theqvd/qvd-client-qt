@@ -17,9 +17,15 @@ ConnectAudio::ConnectAudio(quint16 port)
 
     m_pulse.setPulseaudioStatePath("/tmp/qvdpulsestate");
     m_secondary_audio_port = 12345;
-    setAudioPort(port);
 #endif
 
+    setAudioPort(port);
+
+}
+
+ConnectAudio::~ConnectAudio()
+{
+    stop();
 }
 
 void ConnectAudio::run()
@@ -48,7 +54,15 @@ void ConnectAudio::run()
     m_pulse.setQvdPulseaudioConfig(random_filename);
     m_temp_files.append(random_filename);
 #endif
+    //m_pulse.set
     m_pulse.start();
+}
+
+void ConnectAudio::stop()
+{
+    qInfo() << "Stopping";
+    m_system_pulse.stop();
+    m_pulse.stop();
 }
 
 void ConnectAudio::pulseStarted()

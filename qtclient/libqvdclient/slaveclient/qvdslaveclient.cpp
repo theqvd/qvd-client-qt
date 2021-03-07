@@ -21,6 +21,14 @@ QVDSlaveClient::QVDSlaveClient(quint16 port, const QString &slave_key) : QObject
     m_socket.connectToHost("localhost", m_port);
 }
 
+QVDSlaveClient::~QVDSlaveClient()
+{
+    if ( m_command != nullptr ) {
+        m_command->stop();
+        m_command->deleteLater();
+    }
+}
+
 
 quint16 QVDSlaveClient::port() const
 {
@@ -63,6 +71,13 @@ void QVDSlaveClient::runCommand()
 
         m_command->init(&m_socket, m_slave_key);
         m_command->run();
+    }
+}
+
+void QVDSlaveClient::stopCommand()
+{
+    if ( m_command != nullptr ) {
+        m_command->stop();
     }
 }
 

@@ -29,7 +29,8 @@ PulseAudio::PulseAudio()
 
 PulseAudio::~PulseAudio()
 {
-
+    qInfo() << "Destructor called";
+    m_process.kill();
 }
 
 void PulseAudio::connectExisting([[maybe_unused]] const QString &pulseaudio_dir)
@@ -82,6 +83,7 @@ QString PulseAudio::sendCommand([[maybe_unused]] const QString &cmd) {
 
 void PulseAudio::stop()
 {
+    qInfo() << "Terminating";
     m_process.terminate();
 }
 

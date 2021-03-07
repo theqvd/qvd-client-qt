@@ -247,11 +247,14 @@ void QVDClient::disconnectFromQVD()
     }
 
     for (auto slave : m_active_slave_clients) {
-       slave->deleteLater();
+        qDebug() << "Stopping slave " << slave;
+      //  slave->stopCommand();
+        slave->deleteLater();
     }
 
     m_active_slave_clients.clear();
 
+    qInfo() << "Disconnected from QVD";
     emit connectionTerminated();
 }
 

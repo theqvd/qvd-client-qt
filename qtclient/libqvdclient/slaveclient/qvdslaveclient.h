@@ -52,6 +52,8 @@ public:
      */
     QVDSlaveClient(quint16 port, const QString &slave_key);
 
+    ~QVDSlaveClient();
+
     /**
      * @brief shareFolderWithVM
      * @param local_path
@@ -137,6 +139,8 @@ private:
     void setupSignals(QVDSlaveCommand *cmd);
 
     void runCommand();
+
+    void stopCommand();
 
     quint16 m_port = 12040;
     QString m_slave_key = "";
