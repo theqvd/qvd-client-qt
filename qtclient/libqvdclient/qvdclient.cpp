@@ -196,6 +196,7 @@ void QVDClient::ping()
     connect(ret, SIGNAL(finished()), this, SLOT(qvd_Pong()));
 }
 
+
 void QVDClient::handle_printer() {
     QUrl url = QUrl("https://localhost/");
     url.setPath("/printer");
@@ -203,6 +204,35 @@ void QVDClient::handle_printer() {
     QNetworkRequest req = createRequest(url);
     QVDNetworkReply *ret = m_http->get(req);
 }
+
+
+void QVDClient::stopVM(int id)
+{
+    QUrl url = QUrl("https://localhost/qvd/stop_vm");
+    QUrlQuery query;
+
+    query.addQueryItem("id", QString::number(id));
+    url.setQuery(query);
+
+
+    QNetworkRequest req =  createRequest(url);
+    req.setRawHeader(QByteArray("Connection"), QByteArray("Upgrade"));
+    req.setRawHeader(QByteArray("Upgrade"), QByteArray("QVD/1.0"));
+
+
+    qInfo() << "Making request, url " << url;
+
+    QVDNetworkReply *ret = m_http->get(req);
+    connect(ret, &QVDNetworkReply::processing, this, &QVDClient::qvd_vmProcessing);
+    connect(ret, &QVDNetworkReply::finished, this, [this,id,ret](){
+        qInfo() << "Powerdown completed";
+        ret->disconnect();
+        ret->deleteLater();
+        emit vmPoweredDown(id);
+    });
+
+}
+
 
 void QVDClient::connectToVM(int id)
 {
@@ -325,6 +355,12 @@ void QVDClient::qvd_vmProcessing()
     qInfo() << "Processing...";
 }
 
+void QVDClient::qvd_vmPoweredDown()
+{
+    qInfo() << "VM powered down";
+
+}
+
 void QVDClient::qvd_vmConnected()
 {
     QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
@@ -416,7 +452,7 @@ void QVDClient::backend_listeningOnTcp(QVDBackend::NXChannel channel, quint16 po
 void QVDClient::backend_connectionEstablished()
 {
     qInfo() << "Backend established the connection";
-    emit vmConnected();
+    emit vmConnected(0);
 }
 
 void QVDClient::backend_failed(const QString &error)

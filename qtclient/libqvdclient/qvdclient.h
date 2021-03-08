@@ -88,6 +88,7 @@ public:
     void connectToQVD();
     void requestVMList();
     void ping();
+    void stopVM(int id);
     void connectToVM(int id);
 
 
@@ -114,10 +115,17 @@ signals:
     void connectionEstablished();
 
     /**
+     * @brief vmPoweredDown
+     * @param id
+     * A VM was powered down
+     */
+    void vmPoweredDown(int id);
+
+    /**
      * @brief connectionCompleted
      * A VM was connected to. The user should be looking at a functional desktop.
      */
-    void vmConnected();
+    void vmConnected(int id);
 
     void connectionError(QVDClient::ConnectionError error, QString error_text);
 
@@ -150,6 +158,7 @@ private slots:
     void qvd_connectionEstablished();
     void qvd_vmListDownloaded();
     void qvd_vmProcessing();
+    void qvd_vmPoweredDown();
     void qvd_vmConnected();
     void qvd_pong();
 

@@ -41,9 +41,11 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(m_client, SIGNAL(socketError(QAbstractSocket::SocketError)), this, SLOT(socketError(QAbstractSocket::SocketError)));
     QObject::connect(m_client, SIGNAL(connectionEstablished()), this, SLOT(connectionEstablished()));
     QObject::connect(m_client, SIGNAL(connectionError(QVDClient::ConnectionError,QString)), this, SLOT(connectionError(QVDClient::ConnectionError,QString)));
-    QObject::connect(m_client, SIGNAL(vmConnected()), this, SLOT(vmConnected()));
     QObject::connect(m_client, SIGNAL(sslErrors(const QList<QSslError> &, const QList<QSslCertificate> &, bool &)), this, SLOT(sslErrors(const QList<QSslError> &, const QList<QSslCertificate> &, bool &)));
     QObject::connect(m_client, SIGNAL(connectionTerminated()), this, SLOT(connectionTerminated()));
+
+    QObject::connect(m_client, &QVDClient::vmConnected, this, &MainWindow::vmConnected);
+    QObject::connect(m_client, &QVDClient::vmPoweredDown, this, &MainWindow::vmPoweredDown);
 
     ui->setupUi(this);
 
@@ -176,7 +178,12 @@ void MainWindow::vmListReceived(const QList<QVDClient::VMInfo> &vmlist)
     }
 
     if ( selected > 0 ) {
-        m_client->connectToVM( selected );
+        if ( ui->restartSession->isChecked() ) {
+            ui->restartSession->setChecked(false);
+            m_client->stopVM( selected );
+        } else {
+            m_client->connectToVM( selected );
+        }
     } else {
         m_client->disconnectFromQVD();
     }
@@ -206,10 +213,16 @@ void MainWindow::connectionEstablished()
     m_client->requestVMList();
 }
 
-void MainWindow::vmConnected()
+void MainWindow::vmConnected(int id)
 {
-    qInfo() << "Connection to VM established";
+    qInfo() << "Connection to VM " << id << "established";
     this->hide();
+}
+
+void MainWindow::vmPoweredDown(int id)
+{
+    qInfo() << "VM " << id << "was powered down";
+    m_client->connectToVM(id);
 }
 
 void MainWindow::connectionError(QVDClient::ConnectionError error, QString error_desc)

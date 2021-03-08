@@ -77,6 +77,7 @@ public:
     bool audioCompression() const;
     void setAudioCompression(bool audioCompression);
 
+
 private:
     QString m_host;
     quint16 m_port = 8443;
