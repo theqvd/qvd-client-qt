@@ -225,6 +225,7 @@ void MainWindow::connectionError(QVDClient::ConnectionError error, QString error
     case QVDClient::VMStartError: errstr = "Error when starting the VM"; break;
     case QVDClient::ServerBlocked: errstr = "Server blocked"; break;
     case QVDClient::ServerError: errstr = "Server error"; break;
+    case QVDClient::XServerError: errstr = "X Server error"; break;
     }
 
     qCritical() << "Connection error " << error << ": " << error_desc;
