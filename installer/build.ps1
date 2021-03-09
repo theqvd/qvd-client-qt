@@ -54,8 +54,10 @@ if ( $use_mingw ) {
 	$MAKETOOL="jom"
 }
 
-Invoke-BatchFile "$VCVarsAll" "x64"
-
+if ( ! $Env:VCINSTALLDIR ) {
+	# Import VC vars if not already done.
+	Invoke-BatchFile "$VCVarsAll" "x64"
+}
 
 $QT_BIN_PATH="$QT_DIR\$QT_VER\$QT_COMPILER\bin"
 $COMPILER_BIN_PATH="$QT_DIR\Qt\Tools\COMPILER\bin"
@@ -64,6 +66,50 @@ $SSL_BIN_PATH="$QT_DIR\Tools\OpenSSL\Win_x64\bin"
 
 
 $env:PATH="$QT_BIN_PATH;$COMPILER_BIN_PATH;$QT_INSTALLER_BIN_PATH;$QT_DIR\Tools\QtCreator\bin;$env:PATH"
+
+
+$git_ver = git describe HEAD --tags
+$git_commit = git rev-parse HEAD
+
+$git_ver = $git_ver -replace '[a-zA-Z]'
+
+$ver_parts = $git_ver.Split(".")
+$Env:QVD_VERSION_MAJOR    = $ver_parts[0]
+$Env:QVD_VERSION_MINOR    = $ver_parts[1]
+$Env:QVD_VERSION_REVISION = $ver_parts[2]
+
+if ( ! $Env:BUILD_NUMBER ) {
+	Write-Host "QVD_BUILD variable not set, using build counter"
+
+	$build_file = "${PSScriptRoot}/build-num.txt"
+
+	if ( ! (Test-Path "$build_file") ) {
+		Write-Host "No build counter found, creating"
+		Set-Content -Path "$build_file" -Value '1'
+	}
+
+	$build = [int](Get-Content -Path "$build_file")
+	Write-Host "Read $build"
+	$build++
+	Write-Host "inc: $build"
+
+	Set-Content -Path "$build_file" -Value "$build"
+
+	$Env:QVD_BUILD = $build
+} else {
+	# Get the build number from Hudson
+	$Env:QVD_BUILD = $Env:BUILD_NUMBER
+}
+
+Write-Host ""
+Write-Host "*******************************************************************"
+Write-Host "                           Starting build"
+Write-Host "Version  : $git_ver ($Env:QVD_VERSION_MAJOR, $Env:QVD_VERSION_MINOR, $Env:QVD_VERSION_REVISION)"
+Write-Host "Commit   : $git_commit"
+Write-Host "Build    : $Env:QVD_BUILD"
+Write-Host "*******************************************************************"
+Write-Host ""
+
 
 
 
@@ -106,17 +152,18 @@ Copy-Item -Path "$SSL_BIN_PATH\libssl*"               -Destination "$data"
 
 
 windeployqt "$data"
-binarycreator -v -c config\config.xml -p packages qvd-client-installer
+binarycreator -v -c config\config.xml -p packages qvd-client-installer-${git_ver}-${Env:QVD_BUILD}
 
-$installer_file = "$PSScriptRoot\\qvd-client-installer.exe"
+$installer_file = "$PSScriptRoot\qvd-client-installer-${git_ver}-${Env:QVD_BUILD}.exe"
 $installer_hash = (Get-FileHash $installer_file).Hash
 $installer_mb = [math]::round( (Get-Item $installer_file).Length / 1MB, 2 )
 
-Write-Host "*******************************************************************"
+Write-Host ""
+Write-Host "*************************************************************************"
 Write-Host "Installer: $installer_file"
 Write-Host "Size     : $installer_mb MiB"
 Write-Host "SHA256   : $installer_hash"
-Write-Host "*******************************************************************"
+Write-Host "*************************************************************************"
 
 
 
@@ -127,10 +174,6 @@ $uploader_script = "$docs/installer_uploader.ps1"
 
 if ( Test-Path "$uploader_script" ) {
 	Write-Host "Running uploader script"
-	#$parameters = @{
-	#	FilePath = "$uploader_script"
-	#	ArgumentList = $installer_file
-	#}
 	
 	Start-Process powershell -Wait -Argument "$uploader_script $installer_file" -NoNewWindow
 } else {
