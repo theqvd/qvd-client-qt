@@ -79,7 +79,7 @@ $Env:QVD_VERSION_MINOR    = $ver_parts[1]
 $Env:QVD_VERSION_REVISION = $ver_parts[2]
 
 if ( ! $Env:BUILD_NUMBER ) {
-	Write-Host "QVD_BUILD variable not set, using build counter"
+	Write-Host "BUILD_NUMBER variable not set, using build counter"
 
 	$build_file = "${PSScriptRoot}/build-num.txt"
 
@@ -89,9 +89,7 @@ if ( ! $Env:BUILD_NUMBER ) {
 	}
 
 	$build = [int](Get-Content -Path "$build_file")
-	Write-Host "Read $build"
 	$build++
-	Write-Host "inc: $build"
 
 	Set-Content -Path "$build_file" -Value "$build"
 
