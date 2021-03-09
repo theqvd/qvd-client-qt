@@ -6,6 +6,7 @@
 #include <QRandomGenerator>
 
 #include "helpers/binaryfinder.h"
+#include "helpers/portallocator.h"
 
 
 QVDNXBackend::QVDNXBackend(QObject *parent) : QVDBackend(parent)
@@ -19,6 +20,8 @@ QVDNXBackend::QVDNXBackend(QObject *parent) : QVDBackend(parent)
     QObject::connect(&m_x_server_launcher, SIGNAL(running()), this, SLOT(XServerReady()));
     QObject::connect(&m_x_server_launcher, &XServerLauncher::failed, this, &QVDNXBackend::XServerFailed);
     setNxproxyBinary( PathTools::findBin("nxproxy") );
+
+    setSlavePort( PortAllocator::findAvailablePort() );
 }
 
 QVDNXBackend::~QVDNXBackend()

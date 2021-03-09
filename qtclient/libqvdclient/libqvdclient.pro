@@ -19,6 +19,7 @@ SOURCES += \
     backends/qvdnxbackend.cpp \
     helpers/binaryfinder.cpp \
     helpers/linebuffer.cpp \
+    helpers/portallocator.cpp \
     helpers/qvdfilehelpers.cpp \
     nxerrorcommanddata.cpp \
     qvdchecklistview.cpp \
@@ -69,6 +70,7 @@ HEADERS  += \
     backends/xserverlauncher.h \
     helpers/binaryfinder.h \
     helpers/linebuffer.h \
+    helpers/portallocator.h \
     helpers/qvdfilehelpers.h \
     nxerrorcommanddata.h \
     pulseaudio/pulseaudio.h \
