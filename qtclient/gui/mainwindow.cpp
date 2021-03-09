@@ -37,13 +37,13 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     m_client = new QVDClient(this);
-    QObject::connect(m_client, SIGNAL(vmListReceived(QList<QVDClient::VMInfo>)), this, SLOT(vmListReceived(QList<QVDClient::VMInfo>)));
-    QObject::connect(m_client, SIGNAL(socketError(QAbstractSocket::SocketError)), this, SLOT(socketError(QAbstractSocket::SocketError)));
-    QObject::connect(m_client, SIGNAL(connectionEstablished()), this, SLOT(connectionEstablished()));
-    QObject::connect(m_client, SIGNAL(connectionError(QVDClient::ConnectionError,QString)), this, SLOT(connectionError(QVDClient::ConnectionError,QString)));
-    QObject::connect(m_client, SIGNAL(sslErrors(const QList<QSslError> &, const QList<QSslCertificate> &, bool &)), this, SLOT(sslErrors(const QList<QSslError> &, const QList<QSslCertificate> &, bool &)));
-    QObject::connect(m_client, SIGNAL(connectionTerminated()), this, SLOT(connectionTerminated()));
 
+    QObject::connect(m_client, &QVDClient::socketError, this, &MainWindow::socketError);
+    QObject::connect(m_client, &QVDClient::connectionEstablished, this, &MainWindow::connectionEstablished);
+    QObject::connect(m_client, &QVDClient::vmListReceived, this, &MainWindow::vmListReceived);
+    QObject::connect(m_client, &QVDClient::connectionError, this, &MainWindow::connectionError);
+    QObject::connect(m_client, &QVDClient::connectionTerminated, this, &MainWindow::connectionTerminated);
+    QObject::connect(m_client, &QVDClient::sslErrors, this, &MainWindow::sslErrors);
     QObject::connect(m_client, &QVDClient::vmConnected, this, &MainWindow::vmConnected);
     QObject::connect(m_client, &QVDClient::vmPoweredDown, this, &MainWindow::vmPoweredDown);
 
@@ -74,7 +74,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->sharedDevicesList->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
     auto usb_devices = QVDUSBIP::getInstance().getDevices();
-    for(auto dev : usb_devices) {
+    for(auto& dev : usb_devices) {
         qWarning() << "DEVICE: " << dev;
     }
 
@@ -264,7 +264,7 @@ void   MainWindow::sslErrors(const QList<QSslError> &errors, const QList<QSslCer
 
     qInfo() << "In sslErrors";
 
-    for(auto cert : cert_chain ) {
+    for(auto& cert : cert_chain ) {
         QString hash = cert.digest(QCryptographicHash::Sha256 ).toHex();
 
         qInfo() << "Hash: " << hash;
@@ -312,12 +312,12 @@ void   MainWindow::sslErrors(const QList<QSslError> &errors, const QList<QSslCer
             settings.beginWriteArray("AcceptedCertificates");
             int i=0;
 
-            for( auto hash : certList ) {
+            for( auto& hash : certList ) {
                 settings.setArrayIndex(i++);
                 settings.setValue("hash", hash);
             }
 
-            for( auto hash : nonAcceptedHashes ) {
+            for( auto& hash : nonAcceptedHashes ) {
                 settings.setArrayIndex(i++);
                 settings.setValue("hash", hash);
             }
@@ -386,7 +386,7 @@ void MainWindow::saveSettings() {
 
     settings.beginWriteArray("shared_usb_devices");
     int pos = 0;
-    for( USBDevice dev : this->m_usb_device_model.getSelectedDevices() ) {
+    for( USBDevice &dev : this->m_usb_device_model.getSelectedDevices() ) {
         settings.setArrayIndex(pos);
         settings.setValue("vendor", dev.vendorId());
         settings.setValue("product", dev.productId());

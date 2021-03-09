@@ -203,6 +203,7 @@ void QVDClient::handle_printer() {
 
     QNetworkRequest req = createRequest(url);
     QVDNetworkReply *ret = m_http->get(req);
+    connect(ret, &QVDNetworkReply::finished, this, [ret]() { ret->deleteLater(); });
 }
 
 

@@ -4,7 +4,7 @@ USBDeviceListModel::USBDeviceListModel()
 {
     m_devices = QVDUSBIP::getInstance().getDevices();
 
-    for(auto d : m_devices ) {
+    for([[maybe_unused]] auto &d : m_devices ) {
         m_selected.append(false);
     }
 

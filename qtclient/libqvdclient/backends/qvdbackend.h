@@ -99,7 +99,7 @@ signals:
      * When a connection is made on the VM side, the backend will forward it to
      * the indicated host and port on the local side.
      */
-    void forwardingRemoteConnectionsToTcpPort(NXChannel channel, const QString& host, quint32 port);
+    void forwardingRemoteConnectionsToTcpPort(QVDBackend::NXChannel channel, const QString& host, quint32 port);
 
     /**
      * @brief forwardingRemoteConnectionsToUnixSocket
@@ -110,7 +110,7 @@ signals:
      * When a connection is made on the VM side, the backend will forward it to
      * the indicated UNIX socket.
      */
-    void forwardingRemoteConnectionsToUnixSocket(NXChannel channel, const QString& unix_socket);
+    void forwardingRemoteConnectionsToUnixSocket(QVDBackend::NXChannel channel, const QString& unix_socket);
 
     /**
      * @brief forwardingRemoteConnectionsToDisplay
@@ -120,7 +120,7 @@ signals:
      *
      * The backend is forwarding X11 connections to the specified display
      */
-    void forwardingRemoteConnectionsToDisplay(NXChannel channel, const QString& host, quint32 display);
+    void forwardingRemoteConnectionsToDisplay(QVDBackend::NXChannel channel, const QString& host, quint32 display);
 
 
     /**
@@ -130,7 +130,7 @@ signals:
      * Backend has opened a listener on this port and will forward the connection
      * to the VM side.
      */
-    void listeningOnTcpPort(NXChannel channel, quint32 local_port);
+    void listeningOnTcpPort(QVDBackend::NXChannel channel, quint32 local_port);
 
     /**
      * @brief listeningOnUnixSocket
@@ -141,7 +141,7 @@ signals:
      * to the VM side.
      *
      */
-    void listeningOnUnixSocket(NXChannel channel, const QString &unix_socket);
+    void listeningOnUnixSocket(QVDBackend::NXChannel channel, const QString &unix_socket);
 
 
     /**
