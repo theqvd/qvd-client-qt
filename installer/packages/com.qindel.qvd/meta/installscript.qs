@@ -47,9 +47,14 @@ installVCRedist = function(name, arch, major_version, build, exe_file) {
         var dir = installer.value("TargetDir");
 		var inst_exe = dir + "\\" + exe_file;
 
+		// return value 1638 is unknown, but seems to mean a newer version is installed?
+		// return value 3010 means a reboot is needed.
+		// return value 5100 means a newer version is installed.
 		console.log("Will run VC " + name + " redistributable install: " + inst_exe);
-		component.addElevatedOperation("Execute", inst_exe, "/norestart", "/passive");
+		component.addElevatedOperation("Execute", "{0,1638,3010,5100}", inst_exe, "/norestart", "/passive");
 
+		// Remove the redist after the install, not needed anymore.
+		component.addOperation("Delete", inst_exe);
     }
 }
 
