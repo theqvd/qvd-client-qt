@@ -71,12 +71,23 @@ $env:PATH="$QT_BIN_PATH;$COMPILER_BIN_PATH;$QT_INSTALLER_BIN_PATH;$QT_DIR\Tools\
 $git_ver = git describe HEAD --tags
 $git_commit = git rev-parse HEAD
 
-$git_ver = $git_ver -replace '[a-zA-Z]'
+if ( $git_ver[0] -eq "v" ) {
+	$git_ver = $git_ver.substring(1)
+}
+
+# git describe generates stuff like:
+# 4.3.0-2-g4efb2d5
+#
+# 4.3.0 comes from the tag, v4.3.0
+# 2 is the number of commits since the v4.3.0 tag
+# g4efb2d5 is the git commit 4efb2d5
 
 $ver_parts = $git_ver.Split(".")
+$rev_parts = $ver_parts[2].Split("-")
+
 $Env:QVD_VERSION_MAJOR    = $ver_parts[0]
 $Env:QVD_VERSION_MINOR    = $ver_parts[1]
-$Env:QVD_VERSION_REVISION = $ver_parts[2]
+$Env:QVD_VERSION_REVISION = $rev_parts[0]
 
 if ( ! $Env:BUILD_NUMBER ) {
 	Write-Host "BUILD_NUMBER variable not set, using build counter"
