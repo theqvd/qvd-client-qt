@@ -111,16 +111,18 @@ if ( ! $Env:BUILD_NUMBER ) {
 }
 
 Write-Host ""
-Write-Host "*******************************************************************"
-Write-Host "                           Starting build"
-Write-Host "Version  : $git_ver ($Env:QVD_VERSION_MAJOR, $Env:QVD_VERSION_MINOR, $Env:QVD_VERSION_REVISION)"
-Write-Host "Commit   : $git_commit"
-Write-Host "Build    : $Env:QVD_BUILD"
-Write-Host "*******************************************************************"
+Write-Host -ForegroundColor white "*********************************************************************************"
+Write-Host -ForegroundColor blue  "                               Starting build"
+Write-Host -ForegroundColor blue -NoNewLine "Version  : "
+Write-Host "$git_ver ($Env:QVD_VERSION_MAJOR, $Env:QVD_VERSION_MINOR, $Env:QVD_VERSION_REVISION)"
+
+Write-Host -ForegroundColor blue -NoNewLine "Commit   : "
+Write-Host "$git_commit"
+
+Write-Host -ForegroundColor blue -NoNewLine "Build    : "
+Write-Host "$Env:QVD_BUILD"
+Write-Host -ForegroundColor white "*********************************************************************************"
 Write-Host ""
-
-
-
 
 $build_dir = New-TemporaryDirectory
 Set-Location -Path "$build_dir"
@@ -161,33 +163,46 @@ Copy-Item -Path "$SSL_BIN_PATH\libssl*"               -Destination "$data"
 
 
 windeployqt "$data"
+if ( $LastExitCode -gt 0 ) {
+	throw "$windeployqt failed with status $LastExitCode !"
+}
+
 binarycreator -v -c config\config.xml -p packages qvd-client-installer-${git_ver}-${Env:QVD_BUILD}
+if ( $LastExitCode -gt 0 ) {
+	throw "binarycreator failed with status $LastExitCode !"
+}
 
 $installer_file = "$PSScriptRoot\qvd-client-installer-${git_ver}-${Env:QVD_BUILD}.exe"
 $installer_hash = (Get-FileHash $installer_file).Hash
 $installer_mb = [math]::round( (Get-Item $installer_file).Length / 1MB, 2 )
 
-Write-Host ""
-Write-Host "*************************************************************************"
-Write-Host "Installer: $installer_file"
-Write-Host "Size     : $installer_mb MiB"
-Write-Host "SHA256   : $installer_hash"
-Write-Host "*************************************************************************"
-
-
-
 ### This part can run an uploader script to automatically upload the installer
 ### wherever appropriate.
 $docs = [Environment]::GetFolderPath("MyDocuments")
 $uploader_script = "$docs/installer_uploader.ps1"
+$urls = @( )
 
 if ( Test-Path "$uploader_script" ) {
 	Write-Host "Running uploader script"
 	
-	Start-Process powershell -Wait -Argument "$uploader_script $installer_file" -NoNewWindow
+	$urls = &"$uploader_script" "$installer_file"
 } else {
 	Write-Host "No uploader script found, looked in $uploader_script"
 }
 
+Write-Host -ForegroundColor white "*********************************************************************************"
+Write-Host -ForegroundColor blue  "                               Build completed"
+Write-Host -ForegroundColor blue -NoNewLine "Installer: "
+Write-Host "$installer_file"
 
+Write-Host -ForegroundColor blue -NoNewLine "Size     : "
+Write-Host "$installer_mb MiB"
 
+Write-Host -ForegroundColor blue -NoNewLine "SHA256   : "
+Write-Host "$installer_hash"
+
+Foreach ($url in $urls) {
+	Write-Host -ForegroundColor blue -NoNewLine "URL      : "
+	Write-Host "$url"
+}
+Write-Host -ForegroundColor white "*********************************************************************************"
