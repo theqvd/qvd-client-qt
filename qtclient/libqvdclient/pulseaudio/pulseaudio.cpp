@@ -134,7 +134,7 @@ void PulseAudio::activateSocket()
     if ( m_using_existing_process ) {
         pid = m_pid;
     } else {
-        pid = static_cast<pid_t>(m_process.pid());
+        pid = static_cast<pid_t>(m_process.processId());
     }
 
     qDebug() << "Sending SIGUSR2 to PID " << pid;

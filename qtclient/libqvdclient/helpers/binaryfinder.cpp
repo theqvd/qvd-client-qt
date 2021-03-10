@@ -76,7 +76,9 @@ QString PathTools::getPulseaudioBaseConfig()
 
     qCritical() << "Failed to find default.pa";
     return "";
-
+#else
+    qCritical() << "Not implemented on this OS";
+    return "";
 #endif
 }
 
