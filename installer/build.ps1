@@ -177,8 +177,13 @@ $installer_file = "$PSScriptRoot\qvd-client-installer-${git_ver}-${Env:QVD_BUILD
 $installer_hash = (Get-FileHash $installer_file).Hash
 $installer_mb = [math]::round( (Get-Item $installer_file).Length / 1MB, 2 )
 
-### This part can run an uploader script to automatically upload the installer
-### wherever appropriate.
+# This part can run an uploader script to automatically upload the installer
+# wherever appropriate.
+#
+# The script must be a PowerShell script.
+# It takes the path to the generated installer as an argument.
+# It returns an array of URLs to where the uploaded installers are.
+#
 $docs = [Environment]::GetFolderPath("MyDocuments")
 $uploader_script = "$docs/installer_uploader.ps1"
 $urls = @( )
