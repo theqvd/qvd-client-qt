@@ -46,6 +46,10 @@ private:
     QString m_busid = "";
     QString m_usbip_command = "/usr/lib/qvd/bin/qvd-client-slaveclient-usbip";
     Error m_error;
+
+    // QProcess may emit events during destruction, such as handling the last messages emitted by the process.
+    // The last declared member will be the first to be destroyed, so QProcess has to be last here, ensuring
+    // the rest of the class is still there to deal with any last-time events.
     QProcess m_usbip_process;
 };
 

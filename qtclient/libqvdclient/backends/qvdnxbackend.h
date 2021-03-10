@@ -51,7 +51,7 @@ private:
     SocketForwarder *m_forwarder = nullptr;
     QTcpServer m_proxy_listener;
 
-    QProcess m_process;
+
 
     QVDConnectionParameters m_parameters;
 
@@ -63,6 +63,10 @@ private:
 
     int m_nx_proxy_port_offset = 4000; // DEFAULT_NX_PROXY_PORT_OFFSET in nx-libs
 
+    // QProcess may emit events during destruction, such as handling the last messages emitted by the process.
+    // The last declared member will be the first to be destroyed, so QProcess has to be last here, ensuring
+    // the rest of the class is still there to deal with any last-time events.
+    QProcess m_process;
 };
 
 #endif // QVDNXBACKEND_H

@@ -49,10 +49,14 @@ public:
 
 private:
     QString m_xserver_path;
-    QProcess m_process;
     QTimer m_ready_timer;
     QTcpSocket m_test_socket;
     quint16 m_display = 0;
+
+    // QProcess may emit events during destruction, such as handling the last messages emitted by the process.
+    // The last declared member will be the first to be destroyed, so QProcess has to be last here, ensuring
+    // the rest of the class is still there to deal with any last-time events.
+    QProcess m_process;
 
 private slots:
     void processStarted();

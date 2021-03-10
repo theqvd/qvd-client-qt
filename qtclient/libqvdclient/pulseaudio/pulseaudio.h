@@ -123,8 +123,6 @@ protected:
     const QString PULSEAUDIO_PROMPT{">>> "};
 
     bool m_using_existing_process = false;
-    QProcess     m_process;
-
     int m_pid = 0;
 
     QTimer       m_connection_timer;
@@ -139,6 +137,11 @@ protected:
 
     LineBuffer m_pulse_out_buf;
     LineBuffer m_pulse_err_buf;
+
+    // QProcess may emit events during destruction, such as handling the last messages emitted by the process.
+    // The last declared member will be the first to be destroyed, so QProcess has to be last here, ensuring
+    // the rest of the class is still there to deal with any last-time events.
+    QProcess     m_process;
 };
 
 #endif // PULSEAUDIOBASE_H
