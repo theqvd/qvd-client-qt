@@ -1,7 +1,7 @@
 $ErrorActionPreference = "Stop"
 $VCVarsAll = "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsall.bat"
 $FilesPath = "C:\Program Files (x86)\QVD Client"
-
+$ExtFiles  = "${PSScriptRoot}\..\external"
 
 function Invoke-BatchFile
 {
@@ -147,6 +147,7 @@ if ( Test-Path "packages\com.qindel.qvd\data" ) {
 
 
 mkdir packages\com.qindel.qvd\data
+mkdir packages\com.qindel.qvd\data\bin
 
 $data = "packages\com.qindel.qvd\data"
 
@@ -155,7 +156,7 @@ Copy-Item -Path "$build_dir\gui\release\*.exe"           -Destination "$data"
 Copy-Item -Path "$build_dir\libqvdclient\release\*.dll"  -Destination "$data"
 Copy-Item -Path "$FilesPath\pulseaudio"                  -Destination "$data" -Recurse
 Copy-Item -Path "$FilesPath\vcxsrv"                      -Destination "$data" -Recurse
-Copy-Item -Path "$FilesPath\bin"                         -Destination "$data" -Recurse
+Copy-Item -Path "$ExtFiles\nx\*"                         -Destination "$data\bin\" -Recurse
 Copy-Item -Path "$FilesPath\win-sftp-server.exe"         -Destination "$data"
 Copy-Item -Path "$FilesPath\redist\*.exe"                -Destination "$data"
 Copy-Item -Path "$SSL_BIN_PATH\libcrypto*"               -Destination "$data"
