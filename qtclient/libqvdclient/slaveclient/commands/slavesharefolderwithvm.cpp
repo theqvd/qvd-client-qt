@@ -29,6 +29,7 @@ void SlaveShareFolderWithVM::run()
     req.setRawHeader("Upgrade", "qvd:sftp/1.0");
 
     m_sftp_server_binary = PathTools::findBin("sftp-server");
+    qInfo() << "My sftp_server is in " << m_sftp_server_binary;
 
     QVDNetworkReply *ret = m_http->put(req, nullptr);
     connect(ret, &QVDNetworkReply::finished, this, &SlaveShareFolderWithVM::http_finished);
