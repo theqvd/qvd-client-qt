@@ -4,5 +4,4 @@
 #mkdir -p /tmp/centos-files
 #cp -v files/* /tmp/centos-files/
 
-
-podman build . -t qvd-build-centos:8
+docker build . -t qvd-build-centos:8
