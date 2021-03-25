@@ -12,9 +12,17 @@ cp -Rpv "$tar"       /tmp/centos-files/
 BUILD_NX=1
 
 if [ -n "$BUILD_NX" ] ; then
+
    [ -d "$curdir/output/centos_nx-libs" ] && rm -rf $curdir/output/centos_nx-libs
    mkdir -p $curdir/output/centos_nx-libs
-   docker run -i --privileged -u nxbuilder -v $curdir/output/centos_nx-libs:/out nx-libs:centos8 /build.sh
+   docker_image=`docker images -q nx-libs:centos8`
+
+   if [ "$docker_image" -eq " " ] ; then
+      cd docker/centos-8/nx-libs
+      docker build . -t nx-libs:centos8 
+      docker run -i --privileged -u nxbuilder -v $curdir/output/centos_nx-libs:/out nx-libs:centos8 /build.sh
+   fi
+
 fi
 
 curdir=`pwd`
