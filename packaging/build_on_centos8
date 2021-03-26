@@ -9,7 +9,7 @@ mkdir -p /tmp/centos-files
 cp -Rpv files/rpm/*  /tmp/centos-files/
 cp -Rpv "$tar"       /tmp/centos-files/
 
-BUILD_NX=1
+BUILD_NX=$1
 
 if [ -n "$BUILD_NX" ] ; then
 
