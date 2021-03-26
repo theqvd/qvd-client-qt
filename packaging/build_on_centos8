@@ -21,9 +21,9 @@ if [ "$BUILD_NX" == "{true}" ] ; then
       cd docker/centos-8/nx-libs
       docker build . -t nx-libs:centos8 
       cd $curdir
-      docker run -i --privileged -u nxbuilder -v $curdir/output/centos8_nx-libs:/builddir nx-libs:centos8 /build.sh
+      docker run -i --privileged -u nxbuilder -v $curdir/output/centos8_nx-libs:/home/nxbuilder/result nx-libs:centos8 /build.sh
    else
-      docker run -i --privileged -u nxbuilder -v $curdir/output/centos8_nx-libs:/builddir nx-libs:centos8 /build.sh
+      docker run -i --privileged -u nxbuilder -v $curdir/output/centos8_nx-libs:/home/nxbuilder/result nx-libs:centos8 /build.sh
    fi
 
 fi
