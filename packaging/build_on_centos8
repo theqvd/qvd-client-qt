@@ -11,7 +11,7 @@ cp -Rpv "$tar"       /tmp/centos-files/
 
 BUILD_NX=$1
 
-if [ -n "$BUILD_NX" ] ; then
+if [ "$BUILD_NX" -eq "{true}" ] ; then
 
    [ -d "$curdir/output/centos_nx-libs" ] && rm -rf $curdir/output/centos_nx-libs
    mkdir -p $curdir/output/centos_nx-libs
