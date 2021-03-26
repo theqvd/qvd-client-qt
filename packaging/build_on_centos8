@@ -13,17 +13,17 @@ BUILD_NX=$1
 
 if [ "$BUILD_NX" == "{true}" ] ; then
 
-   [ -d "$curdir/output/centos_nx-libs" ] && rm -rf $curdir/output/centos_nx-libs
-   mkdir -p $curdir/output/centos_nx-libs
+   [ -d "$curdir/output/centos8_nx-libs" ] && rm -rf $curdir/output/centos8_nx-libs
+   mkdir -p $curdir/output/centos8_nx-libs
    docker_image=`docker images -q nx-libs:centos8`
 
    if [ -z "$docker_image" ] ; then
       cd docker/centos-8/nx-libs
       docker build . -t nx-libs:centos8 
       cd $curdir
-      docker run -i --privileged -u nxbuilder -v $curdir/output/centos_nx-libs:/out nx-libs:centos8 /build.sh
+      docker run -i --privileged -u nxbuilder -v $curdir/output/centos8_nx-libs:/builddir nx-libs:centos8 /build.sh
    else
-     docker run -i --privileged -u nxbuilder -v $curdir/output/centos_nx-libs:/out nx-libs:centos8 /build.sh
+      docker run -i --privileged -u nxbuilder -v $curdir/output/centos8_nx-libs:/builddir nx-libs:centos8 /build.sh
    fi
 
 fi
