@@ -9,6 +9,8 @@ mkdir -p /tmp/centos-files
 cp -Rpv files/rpm/*  /tmp/centos-files/
 cp -Rpv "$tar"       /tmp/centos-files/
 
+curdir=`pwd`
+
 BUILD_NX=$1
 
 if [ "$BUILD_NX" == "{true}" ] ; then
@@ -27,8 +29,6 @@ if [ "$BUILD_NX" == "{true}" ] ; then
    fi
 
 fi
-
-curdir=`pwd`
 
 docker_image=`docker images -q qvd-build-centos:8`
 
