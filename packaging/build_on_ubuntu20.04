@@ -18,4 +18,4 @@ cp -Rdpv files/deb/* /tmp/ubuntu-files/
 
 mkdir -p output/ubuntu-20.04
 
-podman run -it -v /tmp/ubuntu-files:/files:Z -v $curdir/output/ubuntu-20.04:/out qvd-build-ubuntu:20.04 /files/build
+docker run -i -v /tmp/ubuntu-files:/files:Z -v $curdir/output/ubuntu-20.04:/out qvd-build-ubuntu:20.04 /files/build
