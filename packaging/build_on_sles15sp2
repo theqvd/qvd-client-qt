@@ -23,9 +23,9 @@ if [ "$BUILD_NX" == "{true}" ] ; then
       cd docker/sles-15sp2/nx-libs
       docker build . -t nx-libs:sles15sp2
       cd $curdir
-      docker run -i --privileged -u root -v $curdir/output/sles15sp2_nx-libs:/builddir nx-libs:sles15sp2 /build.sh
+      docker run -i --privileged -u root -v $curdir/output/sles15sp2_nx-libs:/out nx-libs:sles15sp2 /build.sh
    else
-      docker run -i --privileged -u root -v $curdir/output/sles15sp2_nx-libs:/builddir nx-libs:sles15sp2 /build.sh
+      docker run -i --privileged -u root -v $curdir/output/sles15sp2_nx-libs:/out nx-libs:sles15sp2 /build.sh
    fi
 
 fi
