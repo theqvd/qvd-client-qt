@@ -14,7 +14,7 @@ curdir=`pwd`
 mkdir -p /tmp/ubuntu-files
 
 cp -v "$tar"         /tmp/ubuntu-files/
-cp -Rdpv files/deb/* /tmp/ubuntu-files/
+cp -av files/deb/* /tmp/ubuntu-files/
 
 docker_image=`docker images -q qvd-build-ubuntu:20.04`
 

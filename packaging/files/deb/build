@@ -15,7 +15,7 @@ tar -xvf $tar
 cd /tmp/build/$tar_dir
 cp -Rdpv /files/debian .
 
-debuild -us -uc
+dpkg-buildpackage -us -uc
 
-cp -v /tmp/build/* /out/
+cp -av /tmp/build/*.deb /out/
 
