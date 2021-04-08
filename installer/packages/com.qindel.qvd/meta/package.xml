@@ -15,4 +15,7 @@
     </UserInterfaces>
     -->
 	<Script>installscript.qs</Script>
+	<UserInterfaces>
+		<UserInterface>targetwidget.ui</UserInterface>
+	</UserInterfaces>
 </Package>

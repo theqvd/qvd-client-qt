@@ -160,6 +160,7 @@ if ( Test-Path "packages\com.qindel.qvd\data" ) {
 
 mkdir packages\com.qindel.qvd\data
 mkdir packages\com.qindel.qvd\data\bin
+mkdir packages\com.qindel.qvd\data\scripts
 
 $data = "packages\com.qindel.qvd\data"
 
@@ -172,8 +173,8 @@ Copy-Item -Path "$ExtFiles\nx\*"                         -Destination "$data\bin
 Copy-Item -Path "$FilesPath\win-sftp-server.exe"         -Destination "$data"
 Copy-Item -Path "$FilesPath\redist\*.exe"                -Destination "$data"
 Copy-Item -Path "$SSL_BIN_PATH\libcrypto*"               -Destination "$data"
-Copy-Item -Path "$SSL_BIN_PATH\libssl*"               -Destination "$data"
-
+Copy-Item -Path "$SSL_BIN_PATH\libssl*"                  -Destination "$data"
+Copy-Item -Path "install_scripts\*"                      -Destination "$data\scripts\"
 
 windeployqt "$data"
 if ( $LastExitCode -gt 0 ) {
