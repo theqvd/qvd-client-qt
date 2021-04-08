@@ -1,3 +1,10 @@
+
+param (
+	[switch]$Verbose=$false,
+	[switch]$NoUpload=$false
+)
+
+
 $ErrorActionPreference = "Stop"
 $VCVarsAll = "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsall.bat"
 $FilesPath = "C:\Program Files (x86)\QVD Client"
@@ -41,6 +48,7 @@ function New-TemporaryDirectory {
 $QT_VER="5.15.2"
 $QT_DIR="C:\Qt"
 $use_mingw = 0
+$MAKETOOL_ARGS = ""
 
 if ( $use_mingw ) {
 	$QT_COMPILER="mingw81_64"
@@ -52,6 +60,10 @@ if ( $use_mingw ) {
 	$COMPILER="mingw810_64"
 	$SPEC="win32-msvc"
 	$MAKETOOL="jom"
+	
+	if ( !$Verbose ) {
+		$MAKETOOL_ARGS="/S"
+	}
 }
 
 if ( ! $Env:VCINSTALLDIR ) {
@@ -133,7 +145,7 @@ if ( $LastExitCode -gt 0 ) {
 	throw "qmake failed with status $LastExitCode !"
 }
 
-iex $MAKETOOL
+iex "$MAKETOOL $MAKETOOL_ARGS"
 if ( $LastExitCode -gt 0 ) {
 	throw "$MAKETOOL failed with status $LastExitCode !"
 }
@@ -184,16 +196,18 @@ $installer_mb = [math]::round( (Get-Item $installer_file).Length / 1MB, 2 )
 # It takes the path to the generated installer as an argument.
 # It returns an array of URLs to where the uploaded installers are.
 #
-$docs = [Environment]::GetFolderPath("MyDocuments")
-$uploader_script = "$docs/installer_uploader.ps1"
-$urls = @( )
+if (! $NoUpload ) {
+	$docs = [Environment]::GetFolderPath("MyDocuments")
+	$uploader_script = "$docs/installer_uploader.ps1"
+	$urls = @( )
 
-if ( Test-Path "$uploader_script" ) {
-	Write-Host "Running uploader script"
-	
-	$urls = &"$uploader_script" "$installer_file"
-} else {
-	Write-Host "No uploader script found, looked in $uploader_script"
+	if ( Test-Path "$uploader_script" ) {
+		Write-Host "Running uploader script"
+		
+		$urls = &"$uploader_script" "$installer_file"
+	} else {
+		Write-Host "No uploader script found, looked in $uploader_script"
+	}
 }
 
 Write-Host -ForegroundColor white "*********************************************************************************"
