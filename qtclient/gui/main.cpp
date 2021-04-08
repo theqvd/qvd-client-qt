@@ -216,6 +216,7 @@ int main(int argc, char *argv[])
             }
         }
 
+        qDebug() << "Exit: NX message done";
         exit(0);
     }
 
@@ -227,15 +228,18 @@ int main(int argc, char *argv[])
         out_stream << parser.getError();
         out_stream << parser.getHelp();
         out_stream.flush();
+        qDebug() << "Exit: command line parse error";
         exit(1);
         break;
     case CommandLineParser::CommandLineHelpRequested:
         out_stream << parser.getHelp();
         out_stream.flush();
+        qDebug() << "Exit: help command";
         exit(0);
         break;
     case CommandLineParser::CommandLineVersionRequested:
         out_stream << "0.1";
+        qDebug() << "Exit: version command";
         exit(0);
     }
 
