@@ -203,6 +203,7 @@ void MainWindow::socketError(QAbstractSocket::SocketError error)
                             .arg(m_client->getParameters().port())
                             .arg(m_client->getSocket()->errorString());
 
+    this->show();
     QMessageBox::critical(this, "QVD", message);
 
     setUI(true);

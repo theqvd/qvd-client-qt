@@ -33,6 +33,16 @@ SocketForwarder::SocketForwarder(QObject *parent, QIODevice &a, QIODevice &b)
 
 }
 
+SocketForwarder::~SocketForwarder()
+{
+
+    disconnect(&m_socket_a, SIGNAL(readyRead()), this, SLOT(socketA_readyRead()));
+    disconnect(&m_socket_a, SIGNAL(readChannelFinished()), this, SLOT(socketA_finished()));
+
+    disconnect(&m_socket_b, SIGNAL(readyRead()), this, SLOT(socketB_readyRead()));
+    disconnect(&m_socket_b, SIGNAL(readChannelFinished()), this, SLOT(socketB_finished()));
+}
+
 void SocketForwarder::socketA_readyRead()
 {
 	QByteArray data = m_socket_a.readAll();

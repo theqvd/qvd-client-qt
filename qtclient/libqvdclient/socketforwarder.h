@@ -17,7 +17,7 @@ private:
 
 public:
     SocketForwarder(QObject *parent, QIODevice &a, QIODevice &b);
-
+    ~SocketForwarder();
 
 	int64_t getBytesAtoB() const;
 	int64_t getBytesBtoA() const;

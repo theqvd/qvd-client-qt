@@ -271,6 +271,8 @@ void QVDClient::connectToVM(int id)
 
 void QVDClient::disconnectFromQVD()
 {
+    qDebug() << "Disconnecting from QVD";
+
     if ( m_socket ) {
         m_socket->close();
         m_socket->deleteLater();

@@ -110,6 +110,7 @@ void QVDNXBackend::processStarted()
 void QVDNXBackend::processFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
     qInfo() << "NXproxy exited with code " << exitCode << ", status " << exitStatus;
+    stop();
     emit finished();
 }
 
