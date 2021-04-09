@@ -3,7 +3,7 @@ FROM centos:latest
 RUN yum update -y && yum install -y epel-release git glibc-headers
 RUN yum install -y mock
 RUN useradd -m -G mock nxbuilder
-RUN mkdir -p /builddir/build/RPMS && chmod 777 /builddir/build/RPMS 
+RUN mkdir -p /builddir && chmod 777 /builddir 
 
 USER nxbuilder
 RUN cd $HOME && git clone https://github.com/ArcticaProject/nx-libs.git

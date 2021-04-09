@@ -20,7 +20,7 @@
 
 
 // TODO: make this come from the build script
-#define HAVE_SYSTEMD
+//#define HAVE_SYSTEMD
 
 #if defined(Q_OS_LINUX) && defined(HAVE_SYSTEMD)
 #include <systemd/sd-journal.h>

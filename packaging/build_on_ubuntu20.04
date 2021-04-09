@@ -14,8 +14,18 @@ curdir=`pwd`
 mkdir -p /tmp/ubuntu-files
 
 cp -v "$tar"         /tmp/ubuntu-files/
-cp -Rdpv files/deb/* /tmp/ubuntu-files/
+cp -av files/deb/* /tmp/ubuntu-files/
 
-mkdir -p output/ubuntu-20.04
+docker_image=`docker images -q qvd-build-ubuntu:20.04`
 
-podman run -it -v /tmp/ubuntu-files:/files:Z -v $curdir/output/ubuntu-20.04:/out qvd-build-ubuntu:20.04 /files/build
+if [ -z "$docker_image" ] ; then
+   cd docker/ubuntu-20.04
+   bash -x build
+   cd "$curdir"
+   mkdir -p output/ubuntu20.04
+   docker run -i -v /tmp/ubuntu-files:/files:Z -v $curdir/output/ubuntu20.04:/out qvd-build-ubuntu:20.04 /files/build
+else
+   cd "$curdir"
+   mkdir -p output/ubuntu20.04
+   docker run -i -v /tmp/ubuntu-files:/files:Z -v $curdir/output/ubuntu20.04:/out qvd-build-ubuntu:20.04 /files/build
+fi

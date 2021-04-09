@@ -1,3 +1,3 @@
 #!/bin/bash
 
-docker build . -t sles_build_nx-libs:15sp2
+docker build . -t nx-libs:sles15sp2

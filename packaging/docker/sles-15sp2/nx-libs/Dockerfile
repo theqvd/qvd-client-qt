@@ -12,7 +12,7 @@ RUN zypper ref && zypper update -y
 RUN zypper in -y build git make bzip2 gzip perl-XML-Parser perl-LWP-Protocol-https awk python2 hostname
 RUN git clone https://github.com/ArcticaProject/nx-libs.git
 RUN mkdir -p /home/abuild && mkdir -p /home/abuild/rpmbuild/SOURCES /home/abuild/rpmbuild/RPMS /home/abuild/rpmbuild/SRPMS /home/abuild/rpmbuild/OTHER /home/abuild/rpmbuild/BUILD
-RUN cd /nx-libs && git archive -o /home/abuild/rpmbuild/SOURCES/nx-libs-3.5.99.25.tar.gz --prefix=nx-libs-3.5.99.25/ 3.6.x
+RUN cd /nx-libs && git archive -o /home/abuild/rpmbuild/SOURCES/nx-libs-3.5.99.26.tar.gz --prefix=nx-libs-3.5.99.26/ 3.6.x
 RUN cp --preserve=time /nx-libs/nx-libs.spec /home/abuild/rpmbuild/SOURCES
 COPY files/build.sh /
 
