@@ -43,7 +43,12 @@ function New-TemporaryDirectory {
   return $Item.FullName
 }
 
+function sign {
+	param([string]$Path)
 
+	Write-Host "Signing $Path..."
+	Set-AuthenticodeSignature $Path -Certificate (Get-ChildItem cert:\CurrentUser\My -CodeSigningCert)
+}
 
 $QT_VER="5.15.2"
 $QT_DIR="C:\Qt"
@@ -176,6 +181,16 @@ Copy-Item -Path "$SSL_BIN_PATH\libcrypto*"               -Destination "$data"
 Copy-Item -Path "$SSL_BIN_PATH\libssl*"                  -Destination "$data"
 Copy-Item -Path "install_scripts\*"                      -Destination "$data\scripts\"
 
+
+Write-Host "Signing..."
+sign "$data\bin\nxproxy.exe"
+sign "$data\pulseaudio\pacat.exe"
+sign "$data\pulseaudio\pactl.exe"
+sign "$data\pulseaudio\pulseaudio.exe"
+sign "$data\QVD_Client.exe"
+sign "$data\win-sftp-server.exe"
+
+
 windeployqt "$data"
 if ( $LastExitCode -gt 0 ) {
 	throw "$windeployqt failed with status $LastExitCode !"
@@ -187,6 +202,9 @@ if ( $LastExitCode -gt 0 ) {
 }
 
 $installer_file = "$PSScriptRoot\qvd-client-installer-${git_ver}-${Env:QVD_BUILD}.exe"
+
+sign $installer_file
+
 $installer_hash = (Get-FileHash $installer_file).Hash
 $installer_mb = [math]::round( (Get-Item $installer_file).Length / 1MB, 2 )
 
