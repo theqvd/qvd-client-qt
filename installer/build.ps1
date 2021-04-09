@@ -9,27 +9,28 @@ $ErrorActionPreference = "Stop"
 $VCVarsAll = "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsall.bat"
 $FilesPath = "C:\Program Files (x86)\QVD Client"
 $ExtFiles  = "${PSScriptRoot}\..\external"
+$TimestampServer = "http://timestamp.sectigo.com"
 
 function Invoke-BatchFile
 {
-   param([string]$Path, [string]$Parameters)  
+   param([string]$Path, [string]$Parameters)
 
-   $tempFile = [IO.Path]::GetTempFileName()  
+   $tempFile = [IO.Path]::GetTempFileName()
 
 	Write-Host "Path is $Path"
-	
-   ## Store the output of cmd.exe.  We also ask cmd.exe to output   
-   ## the environment table after the batch file completes  
-   cmd.exe /c " `"$Path`" $Parameters && set > `"$tempFile`" " 
 
-   ## Go through the environment variables in the temp file.  
-   ## For each of them, set the variable in our local environment.  
-   Get-Content $tempFile | Foreach-Object {   
-       if ($_ -match "^(.*?)=(.*)$")  
-       { 
-           Set-Content "env:\$($matches[1])" $matches[2]  
-       } 
-   }  
+   ## Store the output of cmd.exe.  We also ask cmd.exe to output
+   ## the environment table after the batch file completes
+   cmd.exe /c " `"$Path`" $Parameters && set > `"$tempFile`" "
+
+   ## Go through the environment variables in the temp file.
+   ## For each of them, set the variable in our local environment.
+   Get-Content $tempFile | Foreach-Object {
+       if ($_ -match "^(.*?)=(.*)$")
+       {
+           Set-Content "env:\$($matches[1])" $matches[2]
+       }
+   }
 
    Remove-Item $tempFile
 }
@@ -43,11 +44,25 @@ function New-TemporaryDirectory {
   return $Item.FullName
 }
 
-function sign {
+function Sign {
 	param([string]$Path)
 
-	Write-Host "Signing $Path..."
-	Set-AuthenticodeSignature $Path -Certificate (Get-ChildItem cert:\CurrentUser\My -CodeSigningCert)
+	$relpath = Get-Item $Path | Resolve-Path -Relative
+
+	Write-Host -NoNewLine "Signing $relpath... "
+	$sign_info = Get-AuthenticodeSignature $Path
+
+	if ( $sign_info.Status -ne "Valid" ) {
+		$auth_data = Set-AuthenticodeSignature $Path -Certificate (Get-ChildItem cert:\CurrentUser\My -CodeSigningCert) -HashAlgorithm SHA256 -TimestampServer $TimestampServer
+
+		if ( $auth_data.Status -eq "Valid" ) {
+			Write-Host -ForegroundColor green "Done."
+		} else {
+			Write-Host -ForegroundColor red "Error! Signature status is $auth_data.Status"
+		}
+	} else {
+		Write-Host -ForegroundColor cyan "Already signed."
+	}
 }
 
 $QT_VER="5.15.2"
@@ -65,7 +80,7 @@ if ( $use_mingw ) {
 	$COMPILER="mingw810_64"
 	$SPEC="win32-msvc"
 	$MAKETOOL="jom"
-	
+
 	if ( !$Verbose ) {
 		$MAKETOOL_ARGS="/S"
 	}
@@ -145,7 +160,7 @@ $build_dir = New-TemporaryDirectory
 Set-Location -Path "$build_dir"
 
 
-qmake "${PSScriptRoot}\..\qtclient\QVD_Client.pro" -spec $SPEC 
+qmake "${PSScriptRoot}\..\qtclient\QVD_Client.pro" -spec $SPEC
 if ( $LastExitCode -gt 0 ) {
 	throw "qmake failed with status $LastExitCode !"
 }
@@ -155,6 +170,11 @@ if ( $LastExitCode -gt 0 ) {
 	throw "$MAKETOOL failed with status $LastExitCode !"
 }
 
+Write-Host " "
+Write-Host -ForegroundColor white "*********************************************************************************"
+Write-Host -ForegroundColor blue  "                                 Copying data"
+Write-Host -ForegroundColor white "*********************************************************************************"
+
 
 Set-Location -Path "$PSScriptRoot"
 
@@ -163,15 +183,19 @@ if ( Test-Path "packages\com.qindel.qvd\data" ) {
 }
 
 
-mkdir packages\com.qindel.qvd\data
-mkdir packages\com.qindel.qvd\data\bin
-mkdir packages\com.qindel.qvd\data\scripts
+$junk = New-Item -Path "packages\com.qindel.qvd"      -Name "data"    -ItemType Directory
+$junk = New-Item -Path "packages\com.qindel.qvd\data" -Name "bin"     -ItemType Directory
+$junk = New-Item -Path "packages\com.qindel.qvd\data" -Name "scripts" -ItemType Directory
+
 
 $data = "packages\com.qindel.qvd\data"
 
+Write-Host "Copying build files..."
 Copy-Item -Path "..\LICENSE"                             -Destination "$data\LICENSE.txt"
 Copy-Item -Path "$build_dir\gui\release\*.exe"           -Destination "$data"
 Copy-Item -Path "$build_dir\libqvdclient\release\*.dll"  -Destination "$data"
+
+Write-Host "Copying dependencies..."
 Copy-Item -Path "$FilesPath\pulseaudio"                  -Destination "$data" -Recurse
 Copy-Item -Path "$FilesPath\vcxsrv"                      -Destination "$data" -Recurse
 Copy-Item -Path "$ExtFiles\nx\*"                         -Destination "$data\bin\" -Recurse
@@ -181,22 +205,43 @@ Copy-Item -Path "$SSL_BIN_PATH\libcrypto*"               -Destination "$data"
 Copy-Item -Path "$SSL_BIN_PATH\libssl*"                  -Destination "$data"
 Copy-Item -Path "install_scripts\*"                      -Destination "$data\scripts\"
 
+$deploy_args = "--verbose=0"
+if ( $Verbose ) {
+	$deploy_args = "--verbose=2"
+}
 
-Write-Host "Signing..."
-sign "$data\bin\nxproxy.exe"
-sign "$data\pulseaudio\pacat.exe"
-sign "$data\pulseaudio\pactl.exe"
-sign "$data\pulseaudio\pulseaudio.exe"
-sign "$data\QVD_Client.exe"
-sign "$data\win-sftp-server.exe"
-
-
-windeployqt "$data"
+Write-Host "Deploying Qt..."
+windeployqt $deploy_args "$data"
 if ( $LastExitCode -gt 0 ) {
 	throw "$windeployqt failed with status $LastExitCode !"
 }
 
-binarycreator -v -c config\config.xml -p packages qvd-client-installer-${git_ver}-${Env:QVD_BUILD}
+
+Write-Host ""
+Write-Host -ForegroundColor white "*********************************************************************************"
+Write-Host -ForegroundColor blue  "                                 Signing"
+Write-Host -ForegroundColor white "*********************************************************************************"
+
+$binaries = Get-ChildItem -Path $data -Filter '*.exe' -Recurse -ErrorAction SilentlyContinue -Force
+foreach ($bin in $binaries) {
+	Sign $bin.FullName
+}
+
+
+
+Write-Host ""
+Write-Host -ForegroundColor white "*********************************************************************************"
+Write-Host -ForegroundColor blue  "                            Generating installer"
+Write-Host -ForegroundColor white "*********************************************************************************"
+
+
+$creator_args = ""
+if ($Verbose) {
+	$creator_args = "-v"
+}
+
+Write-Host "Generating installer..."
+binarycreator $creator_args -c config\config.xml -p packages qvd-client-installer-${git_ver}-${Env:QVD_BUILD}
 if ( $LastExitCode -gt 0 ) {
 	throw "binarycreator failed with status $LastExitCode !"
 }
@@ -222,13 +267,14 @@ if (! $NoUpload ) {
 
 	if ( Test-Path "$uploader_script" ) {
 		Write-Host "Running uploader script"
-		
+
 		$urls = &"$uploader_script" "$installer_file"
 	} else {
 		Write-Host "No uploader script found, looked in $uploader_script"
 	}
 }
 
+Write-Host ""
 Write-Host -ForegroundColor white "*********************************************************************************"
 Write-Host -ForegroundColor blue  "                               Build completed"
 Write-Host -ForegroundColor blue -NoNewLine "Installer: "
