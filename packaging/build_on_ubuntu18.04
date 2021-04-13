@@ -1,0 +1,28 @@
+#!/bin/bash
+set -e
+
+tar=`../make_tar`
+tar_filename=`basename "$tar"`
+tar_dir=`basename "$tar" .orig.tar.xz | sed 's/qt_/qt-/'`
+curdir=`pwd`
+
+
+[ -d "/tmp/ubuntu-files" ] && rm -rf /tmp/ubuntu-files
+mkdir -p /tmp/ubuntu-files
+
+cp -v "$tar"         /tmp/ubuntu-files/
+cp -av files/deb/* /tmp/ubuntu-files/
+
+docker_image=`docker images -q qvd-build-ubuntu:18.04`
+
+if [ -z "$docker_image" ] ; then
+   cd docker/ubuntu-18.04
+   bash -x build
+   cd "$curdir"
+   mkdir -p output/ubuntu18.04
+   docker run -i -v /tmp/ubuntu-files:/files:Z -v $curdir/output/ubuntu18.04:/out qvd-build-ubuntu:18.04 /files/build
+else
+   cd "$curdir"
+   mkdir -p output/ubuntu18.04
+   docker run -i -v /tmp/ubuntu-files:/files:Z -v $curdir/output/ubuntu18.04:/out qvd-build-ubuntu:18.04 /files/build
+fi
