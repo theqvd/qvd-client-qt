@@ -53,17 +53,37 @@ function Sign {
 	$sign_info = Get-AuthenticodeSignature $Path
 
 	if ( $sign_info.Status -ne "Valid" ) {
-		$auth_data = Set-AuthenticodeSignature $Path -Certificate (Get-ChildItem cert:\CurrentUser\My -CodeSigningCert) -HashAlgorithm SHA256 -TimestampServer $TimestampServer
+		$sign_info = Set-AuthenticodeSignature $Path -Certificate (Get-ChildItem cert:\CurrentUser\My -CodeSigningCert) -HashAlgorithm SHA256 -TimestampServer $TimestampServer
 
-		if ( $auth_data.Status -eq "Valid" ) {
+		if ( $sign_info.Status -eq "Valid" ) {
 			Write-Host -ForegroundColor green "Done."
 		} else {
-			Write-Host -ForegroundColor red "Error! Signature status is $auth_data.Status"
+			Write-Host -ForegroundColor red "Error! Signature status is $sign_info.Status"
 		}
 	} else {
 		Write-Host -ForegroundColor cyan "Already signed."
 	}
+
+	return $sign_info
 }
+
+function Header {
+	param([string]$Label)
+
+	$W = (Get-Host).UI.RawUI.WindowSize.Width
+	$HDR = " " * $W
+	$Padding = " " * ($W/2 - $Label.length / 2)
+	$Padding2 = " " * ($W - $Padding.length - $Label.length)
+
+	Write-Host ""
+	Write-Host -ForegroundColor white -BackgroundColor blue $HDR
+	Write-Host -ForegroundColor white -BackgroundColor blue "${Padding}${Label}${Padding2}"
+	Write-Host -ForegroundColor white -BackgroundColor blue $HDR
+
+	# Sometimes (randomly) the next line gets the background color. Clear it.
+	Write-Host -NoNewLine "$HDR`r"
+}
+
 
 $QT_VER="5.15.2"
 $QT_DIR="C:\Qt"
@@ -142,9 +162,8 @@ if ( ! $Env:BUILD_NUMBER ) {
 	$Env:QVD_BUILD = $Env:BUILD_NUMBER
 }
 
-Write-Host ""
-Write-Host -ForegroundColor white "*********************************************************************************"
-Write-Host -ForegroundColor blue  "                               Starting build"
+Header "Starting build"
+
 Write-Host -ForegroundColor blue -NoNewLine "Version  : "
 Write-Host "$git_ver ($Env:QVD_VERSION_MAJOR, $Env:QVD_VERSION_MINOR, $Env:QVD_VERSION_REVISION)"
 
@@ -153,12 +172,11 @@ Write-Host "$git_commit"
 
 Write-Host -ForegroundColor blue -NoNewLine "Build    : "
 Write-Host "$Env:QVD_BUILD"
-Write-Host -ForegroundColor white "*********************************************************************************"
 Write-Host ""
+
 
 $build_dir = New-TemporaryDirectory
 Set-Location -Path "$build_dir"
-
 
 qmake "${PSScriptRoot}\..\qtclient\QVD_Client.pro" -spec $SPEC
 if ( $LastExitCode -gt 0 ) {
@@ -170,11 +188,8 @@ if ( $LastExitCode -gt 0 ) {
 	throw "$MAKETOOL failed with status $LastExitCode !"
 }
 
-Write-Host " "
-Write-Host -ForegroundColor white "*********************************************************************************"
-Write-Host -ForegroundColor blue  "                                 Copying data"
-Write-Host -ForegroundColor white "*********************************************************************************"
 
+Header "Copying data"
 
 Set-Location -Path "$PSScriptRoot"
 
@@ -217,23 +232,16 @@ if ( $LastExitCode -gt 0 ) {
 }
 
 
-Write-Host ""
-Write-Host -ForegroundColor white "*********************************************************************************"
-Write-Host -ForegroundColor blue  "                                 Signing"
-Write-Host -ForegroundColor white "*********************************************************************************"
+Header "Signing"
 
 $binaries = Get-ChildItem -Path $data -Filter '*.exe' -Recurse -ErrorAction SilentlyContinue -Force
 foreach ($bin in $binaries) {
-	Sign $bin.FullName
+	$signature = Sign $bin.FullName
 }
 
 
 
-Write-Host ""
-Write-Host -ForegroundColor white "*********************************************************************************"
-Write-Host -ForegroundColor blue  "                            Generating installer"
-Write-Host -ForegroundColor white "*********************************************************************************"
-
+Header "Generating installer"
 
 $creator_args = ""
 if ($Verbose) {
@@ -248,7 +256,7 @@ if ( $LastExitCode -gt 0 ) {
 
 $installer_file = "$PSScriptRoot\qvd-client-installer-${git_ver}-${Env:QVD_BUILD}.exe"
 
-sign $installer_file
+$installer_signature = Sign $installer_file
 
 $installer_hash = (Get-FileHash $installer_file).Hash
 $installer_mb = [math]::round( (Get-Item $installer_file).Length / 1MB, 2 )
@@ -266,7 +274,7 @@ if (! $NoUpload ) {
 	$urls = @( )
 
 	if ( Test-Path "$uploader_script" ) {
-		Write-Host "Running uploader script"
+		Header "Uploading"
 
 		$urls = &"$uploader_script" "$installer_file"
 	} else {
@@ -274,9 +282,10 @@ if (! $NoUpload ) {
 	}
 }
 
-Write-Host ""
-Write-Host -ForegroundColor white "*********************************************************************************"
-Write-Host -ForegroundColor blue  "                               Build completed"
+Header "Build completed"
+#Write-Host ""
+#Write-Host -ForegroundColor white "*********************************************************************************"
+#Write-Host -ForegroundColor blue  "                               Build completed"
 Write-Host -ForegroundColor blue -NoNewLine "Installer: "
 Write-Host "$installer_file"
 
@@ -286,8 +295,24 @@ Write-Host "$installer_mb MiB"
 Write-Host -ForegroundColor blue -NoNewLine "SHA256   : "
 Write-Host "$installer_hash"
 
+Write-Host -ForegroundColor blue -NoNewLine "Signed by: "
+Write-Host -NoNewLine $installer_signature.SignerCertificate.Issuer
+
+if ( $installer_signature.SignerCertificate.Issuer -eq $installer_signature.SignerCertificate.Subject ) {
+	Write-Host -ForegroundColor red " [SELF-SIGNED]"
+} else {
+	Write-Host -ForegroundColor green " [Official]"
+}
+
+Write-Host -ForegroundColor blue -NoNewLine "Signature: "
+Write-Host $installer_signature.Status
+
+
+
 Foreach ($url in $urls) {
 	Write-Host -ForegroundColor blue -NoNewLine "URL      : "
 	Write-Host "$url"
 }
-Write-Host -ForegroundColor white "*********************************************************************************"
+
+Write-Host ""
+
