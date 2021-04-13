@@ -3,7 +3,7 @@
 #include <QtGlobal>
 #include <QRegularExpression>
 #include <QCoreApplication>
-#include <QRandomGenerator>
+#include <random>
 
 #include "helpers/binaryfinder.h"
 #include "helpers/portallocator.h"
@@ -292,10 +292,11 @@ void QVDNXBackend::XServerReady()
         qWarning() << "Tried listening on random port, got port " << m_proxy_listener.serverPort() << ", below for nxproxy offset " << m_nx_proxy_port_offset << ", applying workaround";
 
         m_proxy_listener.close();
-        auto rng = QRandomGenerator::global();
+        std::default_random_engine rng;
+        std::uniform_int_distribution<quint16> rnd_port(m_nx_proxy_port_offset+1, 65535);
 
         while( !m_proxy_listener.isListening() ) {
-            quint16 port = rng->bounded(m_nx_proxy_port_offset + 1, 65535);
+            quint16 port = rnd_port(rng);
 
             qDebug() << "Trying port " << port;
             bool ret = m_proxy_listener.listen(QHostAddress::LocalHost, port);

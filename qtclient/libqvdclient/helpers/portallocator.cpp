@@ -1,6 +1,8 @@
 #include "portallocator.h"
 #include <QTcpServer>
-#include <QRandomGenerator>
+#include <random>
+
+
 
 PortAllocator::PortAllocator()
 {
@@ -25,11 +27,14 @@ quint16 PortAllocator::findAvailablePort()
 quint16 PortAllocator::findAvailablePort(quint16 min, quint16 max)
 {
     QTcpServer tcpserver;
-    auto rng = QRandomGenerator::global();
+
+    std::default_random_engine rng;
+    std::uniform_int_distribution<quint16> rnd_port(min, max);
+
     quint16 port = 0;
 
     while( !tcpserver.isListening() ) {
-        port = rng->bounded(min, max);
+        port = rnd_port(rng);
 
         qDebug() << "Trying port " << port;
         bool ret = tcpserver.listen(QHostAddress::LocalHost, port);

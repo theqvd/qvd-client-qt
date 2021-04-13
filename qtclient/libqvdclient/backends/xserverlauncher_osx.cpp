@@ -5,9 +5,7 @@
 #include <QNetworkProxy>
 #include <QString>
 #include <QFileInfo>
-#include <QRandomGenerator>
-
-
+#include <random>
 
 XServerLauncher::XServerLauncher()
 {
@@ -38,8 +36,9 @@ void XServerLauncher::start() {
         return;
     }
 
-    QRandomGenerator rnd;
-    m_display = rnd.bounded(0, 59000);
+    std::default_random_engine rng;
+    std::uniform_int_distribution<quint16> rnd_port(0, 59000);
+    m_display = rnd_port(rng);
 
     QString XQuartzLauncher = "/opt/X11/libexec/launchd_startx";
     auto opts = QStringList({   "/opt/X11/bin/startx",
