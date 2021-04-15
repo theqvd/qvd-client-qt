@@ -8,6 +8,6 @@
     <Publisher>Qindel Group</Publisher>
 	<ProductUrl>https://theqvd.com</ProductUrl>
     <StartMenuDir>QVD</StartMenuDir>
-    <TargetDir>@ApplicationsDirUser@/QVD Client Qt</TargetDir>
-	<AdminTargetDir>@ApplicationsDir@/QVD Client Qt</AdminTargetDir>
+    <TargetDir>@ApplicationsDirUser@\QVD Client Qt</TargetDir>
+	<AdminTargetDir>@ApplicationsDir@\QVD Client Qt</AdminTargetDir>
 </Installer>

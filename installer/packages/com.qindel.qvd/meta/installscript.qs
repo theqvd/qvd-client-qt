@@ -3,6 +3,40 @@ var targetDirectoryPage = null;
 
 
 
+setupFirewall = function() {
+
+	netsh = "netsh.exe"
+	vcxsrv = "@TargetDir@\\VcxSrv\\VcxSrv.exe"
+
+	console.log("Setting up firewall rules");
+
+	// QVD doesn't require any remote access to VcxSrv, but it doesn't seem to have an option
+	// to just listen on localhost. So to avoid it asking the user, we just block it.
+
+	component.addElevatedOperation("Execute", "{0}", netsh, "advfirewall", "firewall", "add", "rule",
+                                   "name=QVD VcxSrv - No TCP",
+								   "dir=in",
+								   "protocol=tcp",
+								   "action=block",
+								   "program=" + vcxsrv,
+								   "description=QVD only requires local access",
+								   "UNDOEXECUTE",
+								   netsh, "advfirewall", "firewall", "delete", "rule", "name=QVD VcxSrv - No TCP");
+
+	component.addElevatedOperation("Execute", "{0}", netsh, "advfirewall", "firewall", "add", "rule",
+                                   "name=QVD VcxSrv - No UDP",
+								   "dir=in",
+								   "protocol=udp",
+								   "action=block",
+								   "program=" + vcxsrv,
+								   "description=QVD only requires local access",
+								   "UNDOEXECUTE",
+								   netsh, "advfirewall", "firewall", "delete", "rule", "name=QVD VcxSrv - No UDP"
+								   );
+
+
+
+}
 
 installVCRedist = function(name, arch, major_version, build, exe_file) {
 	// name         : user friendly name for logs
@@ -88,6 +122,9 @@ Component.prototype.createOperations = function() {
 
 		// This is needed for our code.
 		installVCRedist("2019", "x64", "14.0", 29325, "VC_redist.x64.exe");
+
+		// Configure the firewall
+		setupFirewall();
 	}
 }
 
