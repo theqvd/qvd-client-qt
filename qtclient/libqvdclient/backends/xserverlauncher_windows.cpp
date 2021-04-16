@@ -31,7 +31,7 @@ void XServerLauncher::start() {
     QString log_dir = PathTools::getLogDir();
 
     auto opts = QStringList({   QString(":%1").arg(m_display),
-                                "-listen", "inet",
+                                "-listen", "local",
                                 "-nolisten", "inet6",
                                 "-multiwindow",
                                 "-notrayicon",
@@ -39,7 +39,7 @@ void XServerLauncher::start() {
                                 "-clipboard",
                                 "+bs",
                                // "-wm",
-                                "-listen", "tcp",
+                                //"-listen", "tcp",
                                 "-silent-dup-error",
                                 "-ac",
                                 "-nomultimonitors",
