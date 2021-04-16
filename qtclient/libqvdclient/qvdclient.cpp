@@ -241,16 +241,19 @@ void QVDClient::connectToVM(int id)
     QUrlQuery query;
     auto geometry = getParameters().geometry();
 
-    query.addQueryItem("id"                           , QString::number(id));
-    query.addQueryItem("qvd.client.keyboard"          , getParameters().keyboard());
-    query.addQueryItem("qvd.client.os"                , QSysInfo::kernelType() );
-    query.addQueryItem("qvd.client.nxagent.extra_args", getParameters().nxagent_extra_args());
-    query.addQueryItem("qvd.client.geometry"          , QString("%1x%2").arg(geometry.width()).arg(geometry.height()));
-    query.addQueryItem("qvd.client.fullscreen"        , getParameters().fullscreen() ? "1" : "0");
-    query.addQueryItem("qvd.client.printing.enabled"  , getParameters().printing() ? "1" : "0");
-    query.addQueryItem("qvd.client.usb.enabled"       , getParameters().usb_forwarding() ? "1" : "0");
-    query.addQueryItem("qvd.client.usb.implementation", "usbip");
-    query.addQueryItem("qvd.client.link"              , speedToString(getParameters().connectionSpeed()));
+    query.addQueryItem("id"                                 , QString::number(id));
+    query.addQueryItem("qvd.client.type"                    , "qt"); // Identify ourselves
+    query.addQueryItem("qvd.client.keyboard"                , getParameters().keyboard());
+    query.addQueryItem("qvd.client.os"                      , QSysInfo::kernelType() );
+    query.addQueryItem("qvd.client.nxagent.extra_args"      , getParameters().nxagent_extra_args());
+    query.addQueryItem("qvd.client.geometry"                , QString("%1x%2").arg(geometry.width()).arg(geometry.height()));
+    query.addQueryItem("qvd.client.fullscreen"              , getParameters().fullscreen() ? "1" : "0");
+    query.addQueryItem("qvd.client.printing.enabled"        , getParameters().printing() ? "1" : "0");
+    query.addQueryItem("qvd.client.usb.enabled"             , getParameters().usb_forwarding() ? "1" : "0");
+    query.addQueryItem("qvd.client.usb.implementation"      , "usbip");
+    query.addQueryItem("qvd.client.link"                    , speedToString(getParameters().connectionSpeed()));
+    query.addQueryItem("qvd.client.audio.sound.enable"      , getParameters().audio() ? "1" : "0");
+    query.addQueryItem("qvd.client.audio.microphone.enable" , getParameters().microphone() ? "1" : "0");
     query.addQueryItem("qvd.client.audio.compression.enable", getParameters().audioCompression() ? "1" : "0");
 
     url.setQuery(query);

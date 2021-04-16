@@ -149,6 +149,7 @@ void MainWindow::connectToVM() {
     params.setUsb_forwarding( ui->enableUSBRedirectionCheck->isChecked() );
     params.setSharedUsbDevices( m_usb_device_model.getSelectedDevices() );
     params.setAudio( ui->enableAudioCheck->isChecked() );
+    params.setMicrophone( ui->enableMicrophoneCheck->isChecked() );
 
     qInfo() << "Connecting with parameters " << params;
 
@@ -218,6 +219,7 @@ void MainWindow::vmConnected(int id)
 {
     qInfo() << "Connection to VM " << id << "established";
     this->hide();
+    m_systray->showMessage("QVD", "Connected to QVD");
 }
 
 void MainWindow::vmPoweredDown(int id)
@@ -377,6 +379,7 @@ void MainWindow::saveSettings() {
 
     settings.setValue("enable_file_sharing", ui->enableSharedFoldersCheck->isChecked() );
     settings.setValue("enable_audio", ui->enableAudioCheck->isChecked() );
+    settings.setValue("enable_microphone", ui->enableMicrophoneCheck->isChecked() );
 
     settings.setValue("shared_folders", m_shared_folders);
 
@@ -420,6 +423,7 @@ void MainWindow::loadSettings() {
 
     ui->enableSharedFoldersCheck->setChecked(  settings.value("enable_file_sharing").toBool() );
     ui->enableAudioCheck->setChecked( settings.value("enable_audio").toBool() );
+    ui->enableMicrophoneCheck->setChecked( settings.value("enable_microphone").toBool());
 
     m_shared_folders = settings.value("shared_folders").toStringList();
     m_shared_folders_model.setStringList(m_shared_folders);

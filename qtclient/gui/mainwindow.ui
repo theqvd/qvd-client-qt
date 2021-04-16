@@ -18,7 +18,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="connectTab">
        <attribute name="title">
@@ -184,6 +184,13 @@
            </widget>
           </item>
           <item>
+           <widget class="QCheckBox" name="enableMicrophoneCheck">
+            <property name="text">
+             <string>Enable microphone</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QCheckBox" name="enablePrintingCheck">
             <property name="text">
              <string>Enable printing</string>
@@ -208,7 +215,7 @@
             <property name="sizeHint" stdset="0">
              <size>
               <width>20</width>
-              <height>10</height>
+              <height>13</height>
              </size>
             </property>
            </spacer>
@@ -268,7 +275,7 @@
             <property name="sizeHint" stdset="0">
              <size>
               <width>20</width>
-              <height>10</height>
+              <height>13</height>
              </size>
             </property>
            </spacer>

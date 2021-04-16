@@ -166,6 +166,16 @@ void QVDConnectionParameters::setAudio(bool audio)
     m_audio = audio;
 }
 
+bool QVDConnectionParameters::microphone() const
+{
+    return m_microphone;
+}
+
+void QVDConnectionParameters::setMicrophone(bool microphone)
+{
+    m_microphone = microphone;
+}
+
 bool QVDConnectionParameters::audioCompression() const
 {
     return m_audio_compression;
@@ -194,6 +204,8 @@ QDebug operator<<(QDebug debug, const QVDConnectionParameters &p)
                     << "; SharedFolders = " << p.sharedFolders()
                     << "; EnvironmentVariables = " << p.EnvironmentVariables()
                     << "; Audio = " << p.audio()
+                    << "; Microphone = " << p.microphone()
+                    << "; Audio compression = " << p.audioCompression()
                     << "}";
     return debug;
 }

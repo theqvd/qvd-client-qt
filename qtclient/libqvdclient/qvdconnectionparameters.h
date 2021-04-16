@@ -74,6 +74,9 @@ public:
     bool audio() const;
     void setAudio(bool audio);
 
+    bool microphone() const;
+    void setMicrophone(bool microphone);
+
     bool audioCompression() const;
     void setAudioCompression(bool audioCompression);
 
@@ -97,6 +100,7 @@ private:
     bool m_printing = false;
     bool m_usb_forwarding = false;
     bool m_audio = false;
+    bool m_microphone = false;
     bool m_audio_compression = true;
 
     QStringList m_shared_folders;

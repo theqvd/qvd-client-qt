@@ -26,6 +26,9 @@ public:
     quint16 secondaryAudioPort() const;
     void setSecondaryAudioPort(const quint16 &secondary_audio_port);
 
+    bool microphone() const { return m_microphone; }
+    void setMicrophone(bool microphone) { m_microphone = microphone; }
+
 public slots:
     void pulseStarted();
     void pulseStopped();
@@ -37,6 +40,7 @@ private:
 
     quint16 m_audio_port = 4731;
     quint16 m_secondary_audio_port = 0;
+    bool m_microphone = false;
 
 };
 
