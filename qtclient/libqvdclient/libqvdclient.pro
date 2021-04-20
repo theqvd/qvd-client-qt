@@ -96,7 +96,12 @@ macx:HEADERS +=
 #unix:QMAKE_CXXFLAGS += -fsanitize=address -fsanitize=undefined
 #unix:LIBS += -fsanitize=address -fsanitize=undefined
 
-unix:QMAKE_CXXFLAGS += -ggdb
+contains(QVD_BUILD_FLAGS, SANITIZE) {
+    unix:QMAKE_CXXFLAGS += -fsanitize=address -fsanitize=undefined -fsanitize=pointer-compare -fsanitize=builtin  -fsanitize=pointer-overflow -fsanitize=pointer-subtract -fsanitize=null -fsanitize=bounds-strict -fsanitize=object-size -fsanitize=bool -fsanitize=enum
+    unix:LIBS           += -fsanitize=address -fsanitize=undefined -fsanitize=pointer-compare -fsanitize=builtin  -fsanitize=pointer-overflow -fsanitize=pointer-subtract -fsanitize=null -fsanitize=bounds-strict -fsanitize=object-size -fsanitize=bool -fsanitize=enum
+}
+
+unix:QMAKE_CXXFLAGS += -ggdb3
 
 #LIBS += -lXcomp
 win32:LIBS += -lkernel32 -lUser32
