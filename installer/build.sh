@@ -83,7 +83,7 @@ echo
 binarycreator -v -c config/config.xml -p packages qvd-client-installer
 
 if [ -n "$OSX" ] ; then
-	for format in UDZO UDBZ ULFO ULMO ; do
+	for format in UDBZ ; do # UDZO UDBZ ULFO ULMO ; do
 		hdiutil create -volname "QVD Client" -srcfolder packages/com.qindel.qvd/data/QVD_Client.app -ov -format $format qvd-client-installer-$format.dmg
 	done
 fi
