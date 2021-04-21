@@ -50,6 +50,12 @@ void SlaveShareFolderWithVM::http_finished()
     int http_code = reply->attribute(QNetworkRequest::Attribute::HttpStatusCodeAttribute).toInt();
     qInfo() << "Reply from the VM: " << http_code;
 
+    if ( http_code < 200 || http_code > 299) {
+        qWarning() << "Non-successful result: " << http_code;
+        emit commandFailed();
+        return;
+    }
+
     QStringList args;
     args.append(m_sftp_server_binary);
     args.append("-e");
