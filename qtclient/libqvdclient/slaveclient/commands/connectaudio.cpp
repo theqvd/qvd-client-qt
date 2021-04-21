@@ -31,7 +31,7 @@ ConnectAudio::~ConnectAudio()
 void ConnectAudio::run()
 {
     qInfo() << "Starting pulseaudio";
-#ifndef Q_OS_WIN
+#ifdef Q_OS_LINUX
     m_system_pulse.connectExisting();
 #else
     QUuid random_id = QUuid::createUuid();
