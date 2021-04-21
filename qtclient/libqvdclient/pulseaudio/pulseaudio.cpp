@@ -5,6 +5,7 @@
 #include <QDebug>
 #include <QRegularExpression>
 #include <QVersionNumber>
+#include <helpers/binaryfinder.h>
 
 #ifdef Q_OS_UNIX
 #include <signal.h>
@@ -14,9 +15,9 @@
 PulseAudio::PulseAudio()
 {
 
-    m_qvd_pulseaudio_path = "/usr/lib/qvd/bin/pulseaudio";
-    m_qvd_pulseaudio_home = "/tmp/qvdpulse";
-    m_qvd_pulseaudio_config = "/usr/lib/qvd/etc/pulse/default.pa";
+    m_qvd_pulseaudio_path = PathTools::findBin("pulseaudio");
+    m_qvd_pulseaudio_home = PathTools::getPulseaudioHome();
+    m_qvd_pulseaudio_config = PathTools::getPulseaudioBaseConfig();
 
 
     QObject::connect(&m_process, &QProcess::started, this, &PulseAudio::processStarted);
