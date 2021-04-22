@@ -16,7 +16,7 @@ Pre-Depends: ${misc:Pre-Depends}
 Description: QVD Client library
  Library for interacting with the QVD Virtual Desktop system
 
-Package: qvd-client
+Package: qvd-client-qt
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, libqt5core5a, libqvdclient
 Description: Client for the QVD Virtual Desktop system
