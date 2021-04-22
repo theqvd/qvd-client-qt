@@ -25,11 +25,7 @@ find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets LinguistTools Network REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets LinguistTools Network REQUIRED)
 find_package(X11 REQUIRED)
 
-
 #set(TS_FILES QVD_Client_en_US.ts)
-
-file(GLOB_RECURSE COMMON_SOURCES *cpp)
-list(FILTER COMMON_SOURCES EXCLUDE REGEX "(windows|osx|linux)")
 
 set(COMMON_SOURCES
     commandlineparser.cpp
