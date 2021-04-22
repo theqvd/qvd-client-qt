@@ -32,4 +32,4 @@ gpg --import /files/qvd-pub.gpg
 gpg --import /files/qvd-secret.gpg
 echo "%_gpg_name Quality Virtual Desktop <qvd@qindel.com>" > /root/.rpmmacros
 
-find /out -name *.rpm | xargs stfu-and-sign.ex
+find /out -name *.rpm | xargs /files/stfu-and-sign.exp
