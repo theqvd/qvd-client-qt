@@ -26,8 +26,42 @@ if (SANITIZE)
 endif()
 
 
+if (NOT QVD_VERSION_MAJOR)
+    set (QVD_VERSION_MAJOR 4)
+endif()
 
-# When done tweaking common stuff, configure the components (subprojects).
+if (NOT QVD_VERSION_MINOR)
+    set (QVD_VERSION_MINOR 2)
+endif()
+
+if (NOT QVD_VERSION_REVISION)
+    set (QVD_VERSION_REVISION 0)
+endif()
+
+if (NOT QVD_BUILD)
+    set (QVD_BUILD 0)
+endif()
+
+set (QVD_VERSION "${QVD_VERSION_MAJOR}.${QVD_VERSION_MINOR}.${QVD_VERSION_REVISION}")
+
+execute_process(
+    COMMAND git rev-parse --short HEAD
+    RESULT_VARIABLE GIT_COMMIT_RESULT
+    OUTPUT_VARIABLE GIT_COMMIT
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+
+message(STATUS "Building QVD with version ${QVD_VERSION}")
+message(STATUS "Build ${QVD_BUILD}")
+message(STATUS "Git commit ${GIT_COMMIT}")
+
+add_compile_definitions(QVD_VERSION=${QVD_VERSION})
+add_compile_definitions(QVD_VERSION_MAJOR=${QVD_VERSION_MAJOR})
+add_compile_definitions(QVD_VERSION_MINOR=${QVD_VERSION_MINOR})
+add_compile_definitions(QVD_VERSION_REVISION=${QVD_VERSION_REVISION})
+add_compile_definitions(QVD_BUILD=${QVD_BUILD})
+add_compile_definitions(GIT_COMMIT="${GIT_COMMIT}")
+
 # NOTE: The order matters! The most independent ones should go first.
 add_subdirectory(libqvdclient) # B is a static library (depends on Boost)
 add_subdirectory(gui) # C is a shared library (depends on B and external XXX)
