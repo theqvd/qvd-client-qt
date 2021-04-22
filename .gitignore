@@ -10,9 +10,11 @@
 *.pro.user*
 *.rpm
 *.swp
+*.user
 *.xz
 *~
 .DS_Store
+build
 build-*
 doc/
 installer/packages/com.qindel.qvd/data/
