@@ -75,6 +75,7 @@ contains(QVD_BUILD_FLAGS, SANITIZE) {
 
 
 DISTFILES += \
+    CMakeLists.txt \
     config/config.xml \
     packages/com.qindel.qvd/meta/package.xml
 

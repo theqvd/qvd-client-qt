@@ -108,3 +108,6 @@ win32:LIBS += -lkernel32 -lUser32
 
 qvdclient.path = $$[QT_INSTALL_PREFIX]/lib64
 INSTALLS += qvdclient
+
+DISTFILES += \
+    CMakeLists.txt

@@ -84,3 +84,5 @@ ListDialog::~ListDialog()
 {
     delete ui;
 }
+
+#include "moc_listdialog.cpp"

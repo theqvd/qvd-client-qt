@@ -7,6 +7,7 @@
 #include <QFileInfo>
 #include <random>
 
+
 XServerLauncher::XServerLauncher()
 {
     QObject::connect(&m_process, SIGNAL(started()), this, SLOT(processStarted()));
@@ -116,3 +117,7 @@ XServerLauncher::~XServerLauncher()
 {
     m_process.kill();
 }
+
+// Build fails without this. It's probably needed because the header's name
+// doesn't match the source file's name.
+#include "moc_xserverlauncher.cpp"

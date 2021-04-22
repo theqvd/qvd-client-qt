@@ -23,6 +23,7 @@
 class XServerLauncher : public QObject
 {
     Q_OBJECT
+
 public:
     XServerLauncher();
     ~XServerLauncher();
