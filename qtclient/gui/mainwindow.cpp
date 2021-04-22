@@ -219,7 +219,6 @@ void MainWindow::vmConnected(int id)
 {
     qInfo() << "Connection to VM " << id << "established";
     this->hide();
-    m_systray->showMessage("QVD", "Connected to QVD");
 }
 
 void MainWindow::vmPoweredDown(int id)

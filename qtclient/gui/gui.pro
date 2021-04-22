@@ -65,11 +65,14 @@ else:unix: LIBS += -L$$OUT_PWD/../libqvdclient/ -lqvdclient
 INCLUDEPATH += $$PWD/../libqvdclient
 DEPENDPATH += $$PWD/../libqvdclient
 
-#unix:QMAKE_CXXFLAGS += -fsanitize=address -fsanitize=undefined
-#unix:LIBS += -fsanitize=address -fsanitize=undefined
+contains(QVD_BUILD_FLAGS, SANITIZE) {
+    unix:QMAKE_CXXFLAGS += -fsanitize=address -fsanitize=undefined -fsanitize=pointer-compare -fsanitize=builtin  -fsanitize=pointer-overflow -fsanitize=pointer-subtract -fsanitize=null -fsanitize=bounds-strict -fsanitize=object-size -fsanitize=bool -fsanitize=enum
+    unix:LIBS           += -fsanitize=address -fsanitize=undefined -fsanitize=pointer-compare -fsanitize=builtin  -fsanitize=pointer-overflow -fsanitize=pointer-subtract -fsanitize=null -fsanitize=bounds-strict -fsanitize=object-size -fsanitize=bool -fsanitize=enum
+    unix:QMAKE_CXXFLAGS += -ggdb3 -fPIE
+    unix:QMAKE_LFLAGS   += -pie
+}
 
-unix:QMAKE_CXXFLAGS += -ggdb -fPIE
-unix:QMAKE_LFLAGS += -pie
+
 
 DISTFILES += \
     config/config.xml \
