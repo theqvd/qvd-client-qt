@@ -1,6 +1,6 @@
 FROM centos:latest
 
-RUN yum update -y && yum install -y epel-release git glibc-headers
+RUN yum update -y && yum install -y epel-release git glibc-headers rpm-sign expect
 RUN yum install -y mock
 RUN useradd -m -G mock nxbuilder
 RUN mkdir -p /builddir && chmod 777 /builddir 
@@ -13,5 +13,7 @@ RUN mkdir -p ~/result && \
     cd $HOME/nx-libs && git archive -o ../nx-libs-3.5.99.25.tar.gz --prefix=nx-libs-3.5.99.25/ 3.6.x && \
     cd ..
 
+ADD ../../../files/rpm/qvd-pub.gpg
+ADD ../../../files/rpm/qvd-secret.gpg
 COPY nx-libs.spec /home/nxbuilder
 COPY build.sh /

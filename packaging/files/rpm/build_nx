@@ -3,6 +3,10 @@
 BUILD_CLIENT=1
 set -e
 
+# Sign rpms
+gpg --import /files/qvd-pub.gpg
+gpg --import /files/qvd-secret.gpg
+echo "%_gpg_name Quality Virtual Desktop <qvd@qindel.com>" > /root/.rpmmacros
 
 if [ -n "$BUILD_NX" ] ; then
 	cp -v /files/nx-libs.spec            /root/rpmbuild/SPECS/
@@ -25,12 +29,6 @@ if [ -n "$BUILD_CLIENT" ] ; then
 	mkdir -p /out/client
 	cp -RdpvL /root/rpmbuild/RPMS  /out/client/
 	cp -RdpvL /root/rpmbuild/SRPMS /out/client/
+
+        find /out -name *.rpm -exec rpm --addsign {} \;
 fi
-
-# Sign rpms
-gpg --import /files/qvd-pub.gpg
-gpg --import /files/qvd-secret.gpg
-echo "%_gpg_name Quality Virtual Desktop <qvd@qindel.com>" > /root/.rpmmacros
-
-find /out -name *.rpm -exec rpm --addsign {} \;
-find /builddir -name *.rpm -exec rpm --addsign {} \;
