@@ -33,3 +33,4 @@ gpg --import /files/qvd-secret.gpg
 echo "%_gpg_name Quality Virtual Desktop <qvd@qindel.com>" > /root/.rpmmacros
 
 find /out -name *.rpm -exec rpm --addsign {} \;
+find /builddir -name *.rpm -exec rpm --addsign {} \;
