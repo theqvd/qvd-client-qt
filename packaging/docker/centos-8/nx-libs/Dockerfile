@@ -13,7 +13,7 @@ RUN mkdir -p ~/result && \
     cd $HOME/nx-libs && git archive -o ../nx-libs-3.5.99.25.tar.gz --prefix=nx-libs-3.5.99.25/ 3.6.x && \
     cd ..
 
-ADD ../../../files/rpm/qvd-pub.gpg
-ADD ../../../files/rpm/qvd-secret.gpg
+ADD ../../../files/rpm/qvd-pub.gpg /root
+ADD ../../../files/rpm/qvd-secret.gpg /root
 COPY nx-libs.spec /home/nxbuilder
 COPY build.sh /
