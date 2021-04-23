@@ -6,3 +6,9 @@ build --clean --nosignature --root /var/lib/obs-build/ /home/abuild/rpmbuild/SOU
 if [ $? -eq 0 ]; then
    cp -ar /var/lib/obs-build/home/abuild/rpmbuild/* /out/
 fi
+
+# Sign rpms
+gpg --import /files/qvd-pub.gpg
+gpg --import /files/qvd-secret.gpg
+echo "%_gpg_name Quality Virtual Desktop <qvd@qindel.com>" > /root/.rpmmacros
+find /out -name *.rpm -exec rpm --addsign {} \;
