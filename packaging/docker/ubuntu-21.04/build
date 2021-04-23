@@ -1,0 +1,2 @@
+#!/bin/bash
+docker build . -t qvd-build-ubuntu:21.04
