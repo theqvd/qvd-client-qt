@@ -8,7 +8,7 @@ RUN zypper ar http://cpan-mirror.qindel.com/sles15-sp2/installer-full-Media1/Mod
 RUN zypper ref && zypper update -y
 
 # Base build tools
-RUN zypper in -y rpm-build make rpm-sign
+RUN zypper in -y rpm-build make 
 
 # qvdclient-qt dependencies
 RUN zypper in -y  libqt5-qtbase-devel libX11-devel libXt-devel libxkbfile-devel
