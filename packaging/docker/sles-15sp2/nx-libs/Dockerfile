@@ -14,5 +14,7 @@ RUN git clone https://github.com/ArcticaProject/nx-libs.git
 RUN mkdir -p /home/abuild && mkdir -p /home/abuild/rpmbuild/SOURCES /home/abuild/rpmbuild/RPMS /home/abuild/rpmbuild/SRPMS /home/abuild/rpmbuild/OTHER /home/abuild/rpmbuild/BUILD
 RUN cd /nx-libs && git archive -o /home/abuild/rpmbuild/SOURCES/nx-libs-3.5.99.26.tar.gz --prefix=nx-libs-3.5.99.26/ 3.6.x
 RUN cp --preserve=time /nx-libs/nx-libs.spec /home/abuild/rpmbuild/SOURCES
+ADD files/qvd-pub.gpg /root
+ADD files/qvd-secret.gpg /root
 COPY files/build.sh /
 
