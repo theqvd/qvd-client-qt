@@ -8,7 +8,6 @@ tar=`ls -1 /files/*tar*`
 tar_filename=`basename "$tar"`
 tar_dir=`basename "$tar" .orig.tar.xz | sed 's/qt_/qt-/'`
 
-
 cp -v /files/*tar* /tmp/build/
 cd /tmp/build
 tar -xvf $tar
@@ -18,4 +17,3 @@ cp -Rdpv /files/debian .
 dpkg-buildpackage -us -uc
 
 cp -av /tmp/build/*.deb /out/
-

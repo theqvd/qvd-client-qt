@@ -1,0 +1,19 @@
+[Desktop Entry]
+Name=qvd-client
+Name[en_US]=QVD Client
+Name[es_MX]=Cliente QVD
+GenericName=QVD Desktop Client
+GenericName[en_US]=QVD Desktop Client
+GenericName[es_MX]=Cliente de escritorio de QVD
+Comment=Virtual Desktop Interface
+Comment[en_US]=Virtual Desktop Interface
+Comment[es_MX]=Escritorio remoto virtual
+Exec=QVD_Client
+Terminal=false
+X-MultipleArgs=false
+Type=Application
+Icon=qvd-client
+Categories=Office;
+MimeType=application/xhtml_xml;x-scheme-handler/http;x-scheme-handler/https;
+StartupNotify=true
+X-AppInstall-Package=QVD_Client
