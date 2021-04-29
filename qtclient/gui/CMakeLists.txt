@@ -83,7 +83,7 @@ endif()
 # This causes an error of 'dyld: Symbol not found: _gll_noop'.
 
 if (APPLE)
-    target_link_libraries(QVD_Client PRIVATE /opt/X11/lib/libX11.dylib)
+    target_link_libraries(QVD_Client PUBLIC /opt/X11/lib/libX11.dylib)
 endif()
 
 
@@ -91,4 +91,37 @@ target_include_directories(QVD_Client PRIVATE ${libqvdclient_INCLUDE_DIRS} ${X11
 target_link_directories(QVD_Client PRIVATE ${libqvdclient_LIB_DIRS})
 
 target_link_libraries(QVD_Client PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Network ${X11_LIBRARIES} qvdclient)
+
+install(TARGETS QVD_Client
+       RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+   install(FILES "pixmaps/qvd.icns"
+       TYPE DATA
+       )
+
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "QVD Client")
+set(CPACK_PACKAGE_VENDOR "Qindel Group")
+set(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/../../README.md")
+set(CPACK_PACKAGE_FILE_NAME "QVD Client")
+set(CPACK_PACKAGE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/pixmaps/qvd.icns")
+set(CPACK_BUNDLE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/pixmaps/qvd.icns")
+set(CPACK_BUNDLE_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/Info.plist")
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/../../LICENSE")
+set(CPACK_PACKAGE_VERSION_MAJOR "${QVD_VERSION_MAJOR}")
+set(CPACK_PACKAGE_VERSION_MINOR "${QVD_VERSION_MINOR}")
+set(CPACK_PACKAGE_VERSION_PATCH "${QVD_VERSION_REVISION}")
+set(CPACK_PACKAGE_INSTALL_DIRECTORY "QVD_Client")
+set(CPACK_PACKAGE_EXECUTABLES "QVD_Client" "QVD_Client")
+set(CPACK_THREADS 0)
+set(CPACK_GENERATOR "Bundle;TXZ")
+
+set(CPACK_BUNDLE_NAME "QVD Client")
+#install(CODE "
+#include(InstallRequiredSystemLibraries)
+#include(BundleUtilities)
+#message(status, \"Fixup: ${CMAKE_INSTALL_PREFIX}/${CMAKE_PROJECT_NAME}\")
+#FIXUP_BUNDLE(\"${CMAKE_INSTALL_PREFIX}/${CMAKE_PROJECT_NAME}\" \"\" \"\")
+#")
+
+include(CPack)
 

@@ -78,3 +78,29 @@ add_executable(test_pathtools  tests/tst_pathtools.cpp)
 target_link_libraries(test_linebuffer PRIVATE Qt5::Test qvdclient)
 target_link_libraries(test_pulseaudio PRIVATE Qt5::Test Qt5::Network qvdclient)
 target_link_libraries(test_pathtools  PRIVATE Qt5::Test qvdclient)
+
+
+
+
+install(TARGETS qvdclient
+       LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+
+install(TARGETS qvdclient
+       LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+
+install(TARGETS qvdclient
+       PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDE_DIR}/qvdclient
+       )
+
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "QVD Client library")
+set(CPACK_PACKAGE_VENDOR "Qindel Group")
+set(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/../../README.md")
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/../../LICENSE")
+set(CPACK_PACKAGE_VERSION_MAJOR "${QVD_VERSION_MAJOR}")
+set(CPACK_PACKAGE_VERSION_MINOR "${QVD_VERSION_MINOR}")
+set(CPACK_PACKAGE_VERSION_PATCH "${QVD_VERSION_REVISION}")
+set(CPACK_PACKAGE_INSTALL_DIRECTORY "QVD_Client")
+set(CPACK_PACKAGE_EXECUTABLES "QVD_Client" "QVD_Client")
+
+include(CPack)
+include(InstallRequiredSystemLibraries)
