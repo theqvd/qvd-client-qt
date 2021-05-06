@@ -1,0 +1,15 @@
+#!/bin/bash
+
+export DEBIAN_FRONTEND=noninteractive
+apt update -y
+apt-get install -y build-essential \
+                   gpgv2 \
+                   qtbase5-dev \
+                   qtdeclarative5-dev \
+                   qttools5-dev \
+                   devscripts \
+                   lintian \
+                   dh-make \
+                   libxt-dev \
+                   libxkbfile-dev \
+                   libsystemd-dev
