@@ -1,1 +1,3 @@
 usr/bin/*
+gui/qvd-client.desktop usr/share/applications/
+gui/pixmaps/* usr/share/pixmaps
