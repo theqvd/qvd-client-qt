@@ -1,12 +1,14 @@
 #include "keyboarddetector.h"
-
 #include <QDebug>
+
+
+#ifdef Q_OS_UNIX
 #include <X11/Xlib.h>
 #include <X11/Intrinsic.h>
 #include <X11/XKBlib.h>
 #include <X11/Xatom.h>
 #include <X11/extensions/XKBrules.h>
-
+#endif
 
 KeyboardDetector::KeyboardDetector()
 {

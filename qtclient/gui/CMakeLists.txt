@@ -37,17 +37,8 @@ set(COMMON_SOURCES
     sslerrordialog.cpp
     usbdevicelistmodel.cpp
     versioninfo.cpp
+    keyboarddetector.cpp
     )
-
-
-if (WIN32)
-    set(PLATFORM_SOURCES keyboard_detector/keyboarddetector_windows.cpp)
-elsif(APPLE)
-    set(PLATFORM_SOURCES keyboard_detector/keyboarddetector_osx.cpp)
-else()
-    set(PLATFORM_SOURCES keyboard_detector/keyboarddetector_linux.cpp)
-endif()
-
 
 set(PROJECT_SOURCES
     ${COMMON_SOURCES}

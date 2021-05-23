@@ -10,33 +10,11 @@ set(CMAKE_AUTORCC ON)
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Core Network Test REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core Network Test REQUIRED)
 
-
-
-if (WIN32)
-    set(PLATFORM_SRC
-        backends/xserverlauncher_windows.cpp
-        slaveclient/commands/slavesharefolderwithvm_win.cpp
-        pulseaudio/pulseaudio_win.cpp
-        )
-elseif(APPLE)
-    set(PLATFORM_SRC
-        backends/xserverlauncher_osx.cpp
-        slaveclient/commands/slavesharefolderwithvm.cpp
-        pulseaudio/pulseaudio.cpp
-        )
-elseif(UNIX AND NOT APPLE)
-    set(PLATFORM_SRC
-        backends/xserverlauncher_linux.cpp
-        slaveclient/commands/slavesharefolderwithvm.cpp
-        pulseaudio/pulseaudio.cpp
-        )
-endif()
-
-
 add_library(qvdclient SHARED
     backends/qvdbackend.cpp
 #    backends/qvdlibnxbackend.cpp
     backends/qvdnxbackend.cpp
+    backends/xserverlauncher.cpp
     helpers/binaryfinder.cpp
     helpers/linebuffer.cpp
     helpers/portallocator.cpp
@@ -49,12 +27,13 @@ add_library(qvdclient SHARED
     slaveclient/commands/connectaudio.cpp
     slaveclient/commands/qvdslavecommand.cpp
     slaveclient/commands/shareusbdevice.cpp
+    slaveclient/commands/slavesharefolderwithvm.cpp
     slaveclient/qvdslaveclient.cpp
     socketforwarder.cpp
     qvdclient.cpp
     usbip/qvdusbip.cpp
     usbip/usbdevice.cpp
-    ${PLATFORM_SRC}
+    pulseaudio/pulseaudio.cpp
 )
 
 
