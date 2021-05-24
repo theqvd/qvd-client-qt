@@ -30,14 +30,15 @@ find_package(X11 REQUIRED)
 set(COMMON_SOURCES
     commandlineparser.cpp
     configloader.cpp
+    keyboarddetector.cpp
     listdialog.cpp
     main.cpp
     mainwindow.cpp
+    mainwindow.ui
     qvdchecklistview.cpp
     sslerrordialog.cpp
     usbdevicelistmodel.cpp
     versioninfo.cpp
-    keyboarddetector.cpp
     )
 
 set(PROJECT_SOURCES

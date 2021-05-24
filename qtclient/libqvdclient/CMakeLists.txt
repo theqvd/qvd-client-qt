@@ -12,7 +12,6 @@ find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core Network Test REQUIRED)
 
 add_library(qvdclient SHARED
     backends/qvdbackend.cpp
-#    backends/qvdlibnxbackend.cpp
     backends/qvdnxbackend.cpp
     backends/xserverlauncher.cpp
     helpers/binaryfinder.cpp
@@ -20,9 +19,11 @@ add_library(qvdclient SHARED
     helpers/portallocator.cpp
     helpers/qvdfilehelpers.cpp
     nxerrorcommanddata.cpp
+    pulseaudio/pulseaudio.cpp
+    qvdclient.cpp
     qvdconnectionparameters.cpp
-    qvdhttpserver.cpp
     qvdhttp.cpp
+    qvdhttpserver.cpp
     qvdnetworkreply.cpp
     slaveclient/commands/connectaudio.cpp
     slaveclient/commands/qvdslavecommand.cpp
