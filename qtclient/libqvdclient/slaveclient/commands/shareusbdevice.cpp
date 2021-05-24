@@ -33,7 +33,7 @@ void ShareUSBDevice::run()
         return;
     }
 
-    connect( &m_usbip_process, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(processFinished(int, QProcess::ExitStatus)));
+    connect( &m_usbip_process, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(processFinished(int,QProcess::ExitStatus)));
     //connect( &m_usbip_process, &QProcess::finished, this, &ShareUSBDevice::processFinished);
 
     //connect( &m_usbip_process, &QProcess::finished, this, &ShareUSBDevice::processFinished);
