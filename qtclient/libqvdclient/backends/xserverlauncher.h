@@ -65,8 +65,10 @@ private slots:
     void processError(QProcess::ProcessError error);
     void processStdoutReady();
     void processStderrReady();
+#ifdef Q_OS_WIN32
     void checkServerIsUp();
     void serverIsUp();
+#endif
     void socketError(QAbstractSocket::SocketError error);
 
 signals:
