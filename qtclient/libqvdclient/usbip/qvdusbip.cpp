@@ -27,14 +27,14 @@ QVDUSBIP::QVDUSBIP()
                // nothing
             } else if ( line.startsWith("\t")) {
 
-                auto id   = line.mid(1, 4).toInt(&parse_ok, 16);
+                auto id   = line.midRef(1, 4).toInt(&parse_ok, 16);
 
                 if ( parse_ok && cur_vendor != 0 ) {
                     auto desc = line.mid(6).trimmed();
                     m_device_names.insert( (cur_vendor << 16) | id, desc );
                 }
             } else {
-                auto id = line.left(4).toInt(&parse_ok, 16);
+                auto id = line.leftRef(4).toInt(&parse_ok, 16);
 
                 if ( parse_ok ) {
                     auto desc = line.right(line.length() - 4).trimmed();
@@ -70,7 +70,7 @@ QList<USBDevice> QVDUSBIP::getDevices()
 
     auto devices = m_device_path.entryList();
 
-    for( auto file : devices ) {
+    for( auto& file : devices ) {
         qInfo() << "Creating device from " << file;
         USBDevice dev = USBDevice::fromPath(m_device_path.filePath(file));
         if ( dev.isValid() && dev.deviceClass() != USBDevice::Hub ) {
