@@ -2,8 +2,9 @@
 #define BINARYFINDER_H
 
 #include <QObject>
+#include "qvdclient_global.h"
 
-class PathTools
+class LIBQVDCLIENT_EXPORT PathTools
 {
 public:
     PathTools();

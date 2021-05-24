@@ -15,9 +15,9 @@
 #include "backends/qvdbackend.h"
 #include "slaveclient/qvdslaveclient.h"
 
+#include "qvdclient_global.h"
 
-
-class QVDClient : public QObject
+class LIBQVDCLIENT_EXPORT QVDClient : public QObject
 {
     Q_OBJECT
 public:

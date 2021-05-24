@@ -6,6 +6,7 @@
 #include <QByteArray>
 #include <QList>
 
+#include "qvdclient_global.h"
 
 /**
  * @brief Reassembles output read from a process into lines
@@ -23,7 +24,7 @@
  * of \r and \n is counted as a single line ending, so empty lines will be removed.
  *
  */
-class LineBuffer
+class LIBQVDCLIENT_EXPORT LineBuffer
 {
 public:
     LineBuffer();

@@ -12,8 +12,9 @@
 
 #include "helpers/linebuffer.h"
 #include "qvdconnectionparameters.h"
+#include "qvdclient_global.h"
 
-class QVDNXBackend : public QVDBackend
+class LIBQVDCLIENT_EXPORT QVDNXBackend : public QVDBackend
 {
     Q_OBJECT
 public:

@@ -9,9 +9,11 @@
 
 #include "usbip/qvdusbip.h"
 #include "usbip/usbdevice.h"
+#include "qvdclient_global.h"
 
 
-class QVDConnectionParameters
+
+class LIBQVDCLIENT_EXPORT QVDConnectionParameters
 {
 
 public:
@@ -110,6 +112,6 @@ private:
 
 Q_DECLARE_METATYPE(QVDConnectionParameters::ConnectionSpeed)
 
-QDebug operator<<(QDebug debug, const QVDConnectionParameters &p);
+LIBQVDCLIENT_EXPORT QDebug operator<<(QDebug debug, const QVDConnectionParameters &p);
 
 #endif // QVDCONNECTIONPARAMETERS_H

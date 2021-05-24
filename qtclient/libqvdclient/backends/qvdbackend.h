@@ -5,13 +5,15 @@
 #include <QTcpSocket>
 
 #include "qvdconnectionparameters.h"
+#include "qvdclient_global.h"
+
 
 /**
  * @brief QVD backend base class
  *
  * This is the base for QVD backends.
  */
-class QVDBackend : public QObject
+class LIBQVDCLIENT_EXPORT QVDBackend : public QObject
 {
     Q_OBJECT
 public:

@@ -2,8 +2,9 @@
 #define NXERRORCOMMANDDATA_H
 
 #include <QObject>
+#include "qvdclient_global.h"
 
-class NXErrorCommandData
+class LIBQVDCLIENT_EXPORT NXErrorCommandData
 {
 public:
     enum DialogType {

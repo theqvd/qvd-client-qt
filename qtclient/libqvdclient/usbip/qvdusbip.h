@@ -7,11 +7,11 @@
 #include <QMap>
 #include <QPair>
 
-
+#include "qvdclient_global.h"
 #include "usbdevice.h"
 
 
-class QVDUSBIP
+class LIBQVDCLIENT_EXPORT QVDUSBIP
 {
 public:
     static QVDUSBIP &getInstance() {

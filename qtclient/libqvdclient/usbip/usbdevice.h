@@ -5,7 +5,10 @@
 #include <QDir>
 #include <QDebug>
 
-class USBDevice
+#include "qvdclient_global.h"
+
+
+class LIBQVDCLIENT_EXPORT USBDevice
 {
 public:
     // from https://www.usb.org/defined-class-codes
@@ -98,6 +101,6 @@ private:
 };
 
 
-QDebug operator<<(QDebug debug, const USBDevice &p);
+LIBQVDCLIENT_EXPORT QDebug operator<<(QDebug debug, const USBDevice &p);
 
 #endif // USBDEVICE_H

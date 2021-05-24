@@ -7,6 +7,7 @@
 #include <QLocalSocket>
 #include <QVersionNumber>
 #include "helpers/linebuffer.h"
+#include "qvdclient_global.h"
 
 /**
  * @brief Manages a PulseAudio instance
@@ -17,7 +18,7 @@
  * If a PulseAudio instance is started with start(), it will manage the process' lifetime,
  * and monitor its log output to determine exactly when interesting events happen.
  */
-class PulseAudio : public QObject
+class LIBQVDCLIENT_EXPORT PulseAudio : public QObject
 {
     Q_OBJECT
 
