@@ -30,6 +30,7 @@ find_package(X11 REQUIRED)
 set(COMMON_SOURCES
     commandlineparser.cpp
     configloader.cpp
+    images.qrc
     keyboarddetector.cpp
     listdialog.cpp
     main.cpp
