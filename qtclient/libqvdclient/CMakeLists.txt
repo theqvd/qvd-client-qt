@@ -31,19 +31,21 @@ add_library(qvdclient SHARED
     slaveclient/commands/slavesharefolderwithvm.cpp
     slaveclient/qvdslaveclient.cpp
     socketforwarder.cpp
-    qvdclient.cpp
     usbip/qvdusbip.cpp
     usbip/usbdevice.cpp
-    pulseaudio/pulseaudio.cpp
+#    backends/qvdlibnxbackend.cpp
 )
 
+if (WIN32)
+    set(EXTRA_LIBS wsock32 ws2_32)
+endif()
 
 # We export this information so that other projects can use it
 set(${PROJECT_NAME}_INCLUDE_DIRS ${PROJECT_SOURCE_DIR} CACHE INTERNAL "${PROJECT_NAME}: Include directories" FORCE)
 set(${PROJECT_NAME}_LIB_DIRS ${PROJECT_BINARY_DIR} CACHE INTERNAL "${PROJECT_NAME}: Library directories" FORCE)
 
 
-target_link_libraries(qvdclient PRIVATE Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Network)
+target_link_libraries(qvdclient PRIVATE Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Network ${EXTRA_LIBS})
 target_compile_definitions(qvdclient PRIVATE LIBQVDCLIENT_LIBRARY)
 
 
