@@ -40,6 +40,8 @@ set(COMMON_SOURCES
     sslerrordialog.cpp
     usbdevicelistmodel.cpp
     versioninfo.cpp
+    mainwindow.ui
+    images.qrc
     )
 
 set(PROJECT_SOURCES
