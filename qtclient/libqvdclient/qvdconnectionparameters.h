@@ -7,7 +7,7 @@
 #include <QMetaEnum>
 
 
-#include "usbip/qvdusbip.h"
+#include "usbip/usbdevicelist.h"
 #include "usbip/usbdevice.h"
 #include "qvdclient_global.h"
 

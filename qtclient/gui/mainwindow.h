@@ -5,6 +5,8 @@
 #include <qvdclient.h>
 #include "backends/qvdbackend.h"
 #include "backends/qvdnxbackend.h"
+#include "usbip/usbdevicelist.h"
+
 #include "usbdevicelistmodel.h"
 
 #include <qvdchecklistview.h>
@@ -52,6 +54,7 @@ public slots:
     void addSharedFolder();
     void removeSharedFolder();
     void enableSharedFoldersClicked();
+
 private:
     Ui::MainWindow *ui;
     void saveSettings();
@@ -64,6 +67,7 @@ private:
     QStringList m_environment_variables, m_system_evironments_variables;
     QVDListModel m_environment_variables_model;
 
+    UsbDeviceList m_device_list;
     USBDeviceListModel m_usb_device_model;
 
 };

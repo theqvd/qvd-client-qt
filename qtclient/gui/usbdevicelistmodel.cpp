@@ -1,12 +1,8 @@
 #include "usbdevicelistmodel.h"
 
-USBDeviceListModel::USBDeviceListModel()
-{
-    m_devices = QVDUSBIP::getInstance().getDevices();
 
-    for([[maybe_unused]] auto &d : m_devices ) {
-        m_selected.append(false);
-    }
+void USBDeviceListModel::setDeviceList(UsbDeviceList *list)
+{
 
 }
 
@@ -109,6 +105,18 @@ bool USBDeviceListModel::selectDevice(int vendor, int product, const QString &se
     //emit dataChanged();
 
     return found;
+}
+
+void USBDeviceListModel::deviceListUpdated(bool success)
+{
+    if (!success)
+        return;
+
+    m_devices = m_list->getDevices();
+
+    for([[maybe_unused]] auto &d : m_devices ) {
+        m_selected.append(false);
+    }
 }
 
 

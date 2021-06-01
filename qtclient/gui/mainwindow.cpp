@@ -25,7 +25,7 @@ const int MAIN_WINDOW_HEIGHT = 700;
 #include <QStringListModel>
 #include <QStandardItemModel>
 
-#include "usbip/qvdusbip.h"
+#include "usbip/usbdevicelist.h"
 #include "usbip/usbdevice.h"
 
 #include "helpers/binaryfinder.h"
@@ -73,10 +73,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->sharedDevicesList->setSelectionMode(QAbstractItemView::SingleSelection);
     ui->sharedDevicesList->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
-    auto usb_devices = QVDUSBIP::getInstance().getDevices();
-    for(auto& dev : usb_devices) {
-        qWarning() << "DEVICE: " << dev;
-    }
+    m_usb_device_model.setDeviceList(&m_device_list);
+    m_device_list.refresh();
 
     // Ensure the first tab is selected
     ui->tabWidget->setCurrentWidget(ui->connectTab);

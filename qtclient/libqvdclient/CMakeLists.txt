@@ -32,7 +32,7 @@ add_library(qvdclient SHARED
     slaveclient/commands/slavesharefolderwithvm.cpp
     slaveclient/qvdslaveclient.cpp
     socketforwarder.cpp
-    usbip/qvdusbip.cpp
+    usbip/usbdevicelist.cpp
     usbip/usbdevice.cpp
     usbip/usbdatabase.cpp
 #    backends/qvdlibnxbackend.cpp

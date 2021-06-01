@@ -1,14 +1,16 @@
 #include "usbdevice.h"
 #include "helpers/qvdfilehelpers.h"
 #include <QDebug>
-#include "qvdusbip.h"
+#include "usbdevicelist.h"
+#include "usbdatabase.h"
+
 
 USBDevice::USBDevice()
 {
 
 }
 
-USBDevice USBDevice::fromPath(const QDir &path)
+USBDevice USBDevice::fromPath(const QDir &path, const UsbDatabase &db)
 {
     USBDevice ret;
     QString data;
@@ -49,11 +51,10 @@ USBDevice USBDevice::fromPath(const QDir &path)
         ret.setDevpath(data);
     }
 
-    auto &usb = QVDUSBIP::getInstance();
     QString hex;
 
     if ( ret.manufacturer().isEmpty() ) {
-        ret.setManufacturer( usb.getVendorName( ret.vendorId() )  );
+        ret.setManufacturer( db.getVendorName( ret.vendorId() )  );
     }
 
     if ( ret.manufacturer().isEmpty() ) {
@@ -62,7 +63,7 @@ USBDevice USBDevice::fromPath(const QDir &path)
     }
 
     if ( ret.product().isEmpty() ) {
-        ret.setProduct( usb.getDeviceName( ret.vendorId(), ret.productId()) );
+        ret.setProduct( db.getDeviceName( ret.vendorId(), ret.productId()) );
     }
 
     if ( ret.product().isEmpty() ) {

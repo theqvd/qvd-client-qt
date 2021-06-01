@@ -6,7 +6,7 @@
 #include <QDebug>
 
 #include "qvdclient_global.h"
-
+#include "usbdatabase.h"
 
 class LIBQVDCLIENT_EXPORT USBDevice
 {
@@ -39,11 +39,11 @@ public:
 
     USBDevice();
 
-    static USBDevice fromPath(const QString &path) {
-        return fromPath(QDir(path));
+    static USBDevice fromPath(const QString &path, const UsbDatabase &db) {
+        return fromPath(QDir(path), db);
     }
 
-    static USBDevice fromPath(const QDir &path);
+    static USBDevice fromPath(const QDir &path, const UsbDatabase &db);
 
 
     int vendorId() const;

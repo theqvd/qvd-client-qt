@@ -6,7 +6,7 @@
 
 #include "qvdslavecommand.h"
 
-#include "usbip/qvdusbip.h"
+#include "usbip/usbdevicelist.h"
 #include "usbip/usbdevice.h"
 
 
