@@ -20,6 +20,7 @@ private slots:
     void getPulseaudioHome();
     void getPulseaudioStateDir();
     void getPulseaudioBaseConfig();
+    void getPulseaudioModulesDir();
     void findBin();
 
 private:
@@ -79,6 +80,16 @@ void tst_PathTools::getPulseaudioBaseConfig()
     QVERIFY( pastate.isReadable() );
     QWARN( pastate.absolutePath().toUtf8() );
 }
+
+void tst_PathTools::getPulseaudioModulesDir()
+{
+    QFileInfo moddir(PathTools::getPulseaudioModuleDir());
+    QVERIFY( moddir.exists());
+    QVERIFY( moddir.isDir());
+    QWARN( moddir.absolutePath().toUtf8());
+}
+
+
 
 void tst_PathTools::findBin()
 {

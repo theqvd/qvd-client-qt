@@ -47,6 +47,36 @@ QString PathTools::getPulseaudioStateDir()
 #endif
 }
 
+QString PathTools::getPulseaudioModuleDir()
+{
+    QStringList dirs;
+    QStringList filenames;
+
+    QDir appDir( QCoreApplication::applicationDirPath() );
+    addFromEnv(dirs, "QVD_PULSE_MODULES_DIR");
+
+#ifdef Q_OS_MACOS
+    dirs.append(appDir.filePath("../PlugIns/pulseaudio-modules"));
+    dirs.append(appDir.filePath("../Frameworks/pulseaudio-modules"));
+
+    filenames.append("module-cli.so");
+    filenames.append("module-cli.dylib");
+#endif
+#if defined(Q_OS_UNIX) && !defined(Q_OS_MACOS)
+    // Linux, BSD
+    dirs.append(appDir.filePath("/usr/lib/qvd-pulseaudio/modules"));
+    dirs.append(appDir.filePath("/usr/lib64/qvd-pulseaudio/modules"));
+
+    filenames.append("module-cli.so");
+#endif
+#if defined(Q_OS_WIN)
+    dirs.append(homeDir.filePath("../pulseaudio"));
+    filenames.append("module-cli.dll");
+#endif
+
+
+    return findFirstExistingDir(dirs, filenames);
+}
 QString PathTools::getPulseaudioBaseConfig()
 {
 #ifdef Q_OS_WIN
@@ -167,6 +197,55 @@ QString PathTools::getUsbDatabase()
 #ifdef Q_OS_WIN32
     return QCoreApplication::applicationDirPath()  + "\\usb.ids";
 #endif
+}
 
+
+bool PathTools::addFromEnv(QStringList &list, const QString &environment)
+{
+    if ( qEnvironmentVariableIsSet(environment.toUtf8())) {
+	    QString val = qEnvironmentVariable(environment.toUtf8());
+	    qDebug() << "Adding value from" << environment << ": '" << val << "'";
+	    list.append(val);
+	    return true;
+    } else {
+	    qDebug() << environment << " is not set";
+    }
+
+    return false;
+}
+
+QString PathTools::findFirstExistingDir(const QStringList &paths, const QStringList &must_contain)
+{
+    for(auto path : paths) {
+	    QFileInfo fi(path);
+	    if (!fi.exists()) {
+		    qDebug() << "Testing" << fi << ": Doesn't exist, failed.";
+		    continue;
+	    }
+
+	    if (!fi.isDir()) {
+		    qDebug() << "Testing" << fi << ": not a directory, failed.";
+		    continue;
+	    }
+
+	    if (must_contain.isEmpty()) {
+		    // List is empty, so no check
+		    qDebug() << "Testing" << fi << ": Success, no file check.";
+		    return path;
+	    }
+
+	    for(auto& file : must_contain) {
+		    QFileInfo fi2(QDir(path).filePath(file));
+		    if (fi2.exists()) {
+			    qDebug() << "Testing" << fi2 << ": success, file found.";
+			    return path;
+		    } else {
+			    qDebug() << "Testing" << fi2 << ": failure, not found.";
+		    }
+	    }
+
+    }
+
+    qWarning() << "Failed to find any of" << paths << "with files" << must_contain;
     return QString();
 }

@@ -33,6 +33,12 @@ public:
      */
     static QString getPulseaudioBaseConfig();
 
+    /**
+     * @brief Returns the directory that contains pulseaudio modules
+     * @return
+     */
+    static QString getPulseaudioModuleDir();
+
 
     /**
      * @brief Finds the full path to a binary
@@ -44,6 +50,25 @@ public:
 
     static QString getUsbDatabase();
 
+private:
+
+    /**
+     * @brief Finds the first directory that exists and contains one of the listed filenames
+     * @param paths Paths to scan
+     * @param must_contain List of filenames that identify the directory as correct. This check is skipped if the list is empty.
+     * @return
+     */
+    static QString findFirstExistingDir(const QStringList &paths, const QStringList &must_contain);
+
+    /**
+     * @brief Add a value from the environment to a list.
+     *
+     * Utility function.
+     * @param list List to add to
+     * @param environment Environment variable to add
+     * @returns Whether the environment variable existed and was added to list.
+     */
+    static bool addFromEnv(QStringList &list, const QString &environment);
 };
 
 #endif // BINARYFINDER_H
