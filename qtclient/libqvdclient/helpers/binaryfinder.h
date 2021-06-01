@@ -42,6 +42,8 @@ public:
 
     static QString findBin(const QString &name, const QStringList dirs = {});
 
+    static QString getUsbDatabase();
+
 };
 
 #endif // BINARYFINDER_H

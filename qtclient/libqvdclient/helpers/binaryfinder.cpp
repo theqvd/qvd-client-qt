@@ -158,3 +158,15 @@ QString PathTools::findBin(const QString &name, const QStringList dirs)
     return "";
 
 }
+
+QString PathTools::getUsbDatabase()
+{
+#ifdef Q_OS_LINUX
+    return QString("/usr/share/hwdata/usb.ids");
+#endif
+#ifdef Q_OS_WIN32
+    return QCoreApplication::applicationDirPath()  + "\\usb.ids";
+#endif
+
+    return QString();
+}

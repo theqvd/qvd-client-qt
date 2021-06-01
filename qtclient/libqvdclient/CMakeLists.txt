@@ -6,6 +6,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
+set(USBIP_DATABASE "http://www.linux-usb.org/usb.ids")
 
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Core Network Test REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core Network Test REQUIRED)
@@ -33,11 +34,12 @@ add_library(qvdclient SHARED
     socketforwarder.cpp
     usbip/qvdusbip.cpp
     usbip/usbdevice.cpp
+    usbip/usbdatabase.cpp
 #    backends/qvdlibnxbackend.cpp
 )
 
 if (WIN32)
-    set(EXTRA_LIBS wsock32 ws2_32)
+    set(EXTRA_LIBS wsock32 ws2_32 setupapi)
 endif()
 
 # We export this information so that other projects can use it
@@ -48,6 +50,8 @@ set(${PROJECT_NAME}_LIB_DIRS ${PROJECT_BINARY_DIR} CACHE INTERNAL "${PROJECT_NAM
 target_link_libraries(qvdclient PRIVATE Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Network ${EXTRA_LIBS})
 target_compile_definitions(qvdclient PRIVATE LIBQVDCLIENT_LIBRARY)
 
+# Download database of USBIP ids
+file(DOWNLOAD ${USBIP_DATABASE} "${CMAKE_CURRENT_BINARY_DIR}/usb.ids" SHOW_PROGRESS)
 
 ##########################################################################
 # Testing
@@ -56,10 +60,12 @@ enable_testing(true)
 add_executable(test_linebuffer tests/tst_linebuffer.cpp)
 add_executable(test_pulseaudio tests/tst_pulseaudio.cpp)
 add_executable(test_pathtools  tests/tst_pathtools.cpp)
+add_executable(test_usbip      tests/tst_usbip.cpp)
 
 target_link_libraries(test_linebuffer PRIVATE Qt5::Test qvdclient)
 target_link_libraries(test_pulseaudio PRIVATE Qt5::Test Qt5::Network qvdclient)
 target_link_libraries(test_pathtools  PRIVATE Qt5::Test qvdclient)
+target_link_libraries(test_usbip      PRIVATE Qt5::Test qvdclient)
 
 
 

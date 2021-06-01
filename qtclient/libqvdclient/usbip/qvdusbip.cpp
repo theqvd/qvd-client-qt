@@ -2,55 +2,16 @@
 #include <QString>
 #include <QDebug>
 
-QVDUSBIP::QVDUSBIP()
-{
+#ifdef Q_OS_WIN32
+#include <windows.h>
+#include <tchar.h>
+#include <setupapi.h>
+#include <initguid.h>
+#include "helpers/binaryfinder.h"
 
-    QFile input("/usr/share/hwdata/usb.ids");
+DEFINE_GUID(GUID_DEVINTERFACE_USB_DEVICE, 0xA5DCBF10L, 0x6530, 0x11D2, 0x90, 0x1F, 0x00, 0xC0, 0x4F, 0xB9, 0x51, 0xED);
+#endif
 
-    if ( input.open(QIODevice::ReadOnly)) {
-        QTextStream inStream(&input);
-        int cur_vendor = 0;
-
-        while( !inStream.atEnd() ) {
-            auto line = inStream.readLine();
-            bool parse_ok = false;
-            auto comment_pos = line.indexOf("#");
-            if ( comment_pos >= 0 ) {
-                line.truncate(comment_pos);
-            }
-
-            if ( line.trimmed().isEmpty() )
-                continue;
-
-
-            if ( line.startsWith("\t\t") ) {
-               // nothing
-            } else if ( line.startsWith("\t")) {
-
-                auto id   = line.midRef(1, 4).toInt(&parse_ok, 16);
-
-                if ( parse_ok && cur_vendor != 0 ) {
-                    auto desc = line.mid(6).trimmed();
-                    m_device_names.insert( (cur_vendor << 16) | id, desc );
-                }
-            } else {
-                auto id = line.leftRef(4).toInt(&parse_ok, 16);
-
-                if ( parse_ok ) {
-                    auto desc = line.right(line.length() - 4).trimmed();
-                    cur_vendor = id;
-                    m_vendor_names.insert(id, desc);
-                } else {
-                    cur_vendor = 0;
-                }
-            }
-
-        }
-
-        input.close();
-
-    }
-}
 
 QDir QVDUSBIP::getDevicePath() const
 {
@@ -62,10 +23,10 @@ void QVDUSBIP::setDevicePath(const QDir &device_path)
     m_device_path = device_path;
 }
 
-QList<USBDevice> QVDUSBIP::getDevices()
-{
-    QList<USBDevice> ret;
+void QVDUSBIP::refresh() {
+    m_devices.clear();
 
+#ifdef Q_OS_LINUX
     qInfo() << "Retrieving devices from " << m_device_path;
 
     auto devices = m_device_path.entryList();
@@ -74,9 +35,66 @@ QList<USBDevice> QVDUSBIP::getDevices()
         qInfo() << "Creating device from " << file;
         USBDevice dev = USBDevice::fromPath(m_device_path.filePath(file));
         if ( dev.isValid() && dev.deviceClass() != USBDevice::Hub ) {
-            ret.append(dev);
+            m_devices.append(dev);
         }
     }
 
-    return ret;
+    emit updated();
+#endif
+#ifdef WIN32
+
+    QString binary_path = PathTools::findBin("usbip");
+    if ( binary_path.isEmpty() ) {
+        qCritical() << "Failed to find usbip binary";
+        emit updated(false);
+    } else {
+
+        m_usbip_process.execute(binary_path, QStringList{"list", "-p", "-l"});
+    }
+#endif
+#if 0
+    // Left here for a later time, alternative win32 implementation
+    HDEVINFO                         devInfoHandle;
+    SP_DEVICE_INTERFACE_DATA         devIntData;
+    PSP_DEVICE_INTERFACE_DETAIL_DATA devIntDetailData;
+    SP_DEVINFO_DATA                  devData;
+
+    devInfoHandle = SetupDiGetClassDevs( &GUID_DEVINTERFACE_USB_DEVICE, NULL, 0, DIGCF_DEVICEINTERFACE | DIGCF_PRESENT );
+    if ( devInfoHandle == INVALID_HANDLE_VALUE ) {
+        qCritical() << "Failed to get handle for  GUID_DEVINTERFACE_USB_DEVICE";
+        return ret;
+    }
+
+    devIntData.cbSize = sizeof(devIntData);
+    DWORD index = 0;
+
+    SetupDiEnumDeviceInterfaces(devInfoHandle, NULL, &GUID_DEVINTERFACE_USB_DEVICE, index, &devIntData);
+    while( GetLastError() != ERROR_NO_MORE_ITEMS ) {
+        qInfo() << "Found interface " << index;
+
+        DWORD detail_size;
+        devData.cbSize = sizeof(devData);
+        SetupDiGetDeviceInterfaceDetail(devInfoHandle, &devIntData, NULL, 0, &detail_size, NULL);
+
+        devIntDetailData = (PSP_DEVICE_INTERFACE_DETAIL_DATA)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, detail_size);
+        devIntDetailData->cbSize = sizeof(*devIntDetailData);
+
+        if ( SetupDiGetDeviceInterfaceDetail(devInfoHandle, &devIntData, devIntDetailData, detail_size, &detail_size, &devData)) {
+            qInfo() << "Detail: " << devIntDetailData->DevicePath;
+            //devIntDetailData->
+        } else {
+            qCritical() << "Failed to get detail info for index " << index;
+        }
+
+        HeapFree(GetProcessHeap(), 0, devIntDetailData);
+
+        SetupDiEnumDeviceInterfaces(devInfoHandle, NULL, &GUID_DEVINTERFACE_USB_DEVICE, ++index, &devIntData);
+    }
+
+#endif
+}
+
+QList<USBDevice> QVDUSBIP::getDevices()
+{
+    return m_devices;
 }

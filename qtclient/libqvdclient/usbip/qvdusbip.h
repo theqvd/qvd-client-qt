@@ -6,6 +6,8 @@
 #include <QDir>
 #include <QMap>
 #include <QPair>
+#include <QProcess>
+
 
 #include "qvdclient_global.h"
 #include "usbdevice.h"
@@ -14,37 +16,55 @@
 class LIBQVDCLIENT_EXPORT QVDUSBIP
 {
 public:
-    static QVDUSBIP &getInstance() {
-        static QVDUSBIP inst;
-        return inst;
-    }
 
-
-
-    QList<USBDevice> getDevices();
-
+    /**
+     * @brief Path where devices are looked for
+     * @return
+     */
     QDir getDevicePath() const;
+
+    /**
+     * @brief Path where to look for devices.
+     *
+     * This only has an effect on Linux, and is ignored on other platforms.
+     * @param device_path
+     */
     void setDevicePath(const QDir &device_path);
 
-    QString getVendorName(int vendor) {
-        return m_vendor_names[vendor];
-    }
 
-    QString getDeviceName(int vendor, int product) {
-        return m_device_names[ (vendor << 16) + product  ];
-    }
+    /**
+     * @brief Refresh the list of devices
+     */
+    void refresh();
+
+
+
+    /**
+     * @brief getDevices
+     * @return Current list of devices
+     */
+    QList<USBDevice> getDevices();
+
+
+
+public: signals:
+    /**
+     * @brief Device list has been updated
+     * @param success Whether the list has been retrieved successfully
+     */
+    void updated(bool success);
 
 private:
-    QVDUSBIP();
-    QVDUSBIP(const QVDUSBIP &) = delete;
-    QVDUSBIP& operator=(const QVDUSBIP &) = delete;
 
     QDir m_device_path{ "/sys/bus/usb/devices"};
+    QList<USBDevice> m_devices;
 
-    QMap<int,QString> m_vendor_names;
-    QMap<int,QString> m_device_names;
+#ifdef WIN32
+    QProcess m_usbip_process;
 
+private slots:
 
+#endif
 };
 
 #endif // QVDUSBIP_H
