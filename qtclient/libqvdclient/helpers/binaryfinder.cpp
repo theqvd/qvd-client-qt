@@ -197,6 +197,8 @@ QString PathTools::getUsbDatabase()
 #ifdef Q_OS_WIN32
     return QCoreApplication::applicationDirPath()  + "\\usb.ids";
 #endif
+
+    return "";
 }
 
 
