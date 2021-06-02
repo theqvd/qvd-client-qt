@@ -104,10 +104,10 @@ if ( $use_mingw ) {
 	$QT_COMPILER="msvc2019_64"
 	$COMPILER="mingw810_64"
 	$SPEC="win32-msvc"
-	$MAKETOOL="jom"
+	$MAKETOOL="ninja"
 
-	if ( !$Verbose ) {
-		$MAKETOOL_ARGS="/S"
+	if ( $Verbose ) {
+		$MAKETOOL_ARGS="-v"
 	}
 }
 
@@ -177,18 +177,25 @@ Write-Host "$git_commit"
 
 Write-Host -ForegroundColor blue -NoNewLine "Build    : "
 Write-Host "$Env:QVD_BUILD"
-Write-Host ""
+
+
+$subj=$Certificate.Subject.Split(",")[0].Replace("CN=","").Replace('"','')
+$issuer=$Certificate.Issuer.Split(",")[0].Replace("CN=","").Replace('"','')
+$valid=$Certificate.NotAfter
 
 Write-Host -ForegroundColor blue -NoNewLine "Cert     : "
-Write-Host "$Certificate.Subject (Valid until $Certificate.NotAfter)"
+Write-Host "$subj (Valid until $valid)"
+Write-Host -ForegroundColor blue -NoNewLine "Issued by: "
+Write-Host "$issuer"
 Write-Host ""
 
 $build_dir = New-TemporaryDirectory
 Set-Location -Path "$build_dir"
 
-qmake "${PSScriptRoot}\..\qtclient\QVD_Client.pro" -spec $SPEC
+cmake "${PSScriptRoot}\..\qtclient" -G Ninja
+
 if ( $LastExitCode -gt 0 ) {
-	throw "qmake failed with status $LastExitCode !"
+	throw "cmake failed with status $LastExitCode !"
 }
 
 iex "$MAKETOOL $MAKETOOL_ARGS"
