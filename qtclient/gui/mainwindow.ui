@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>395</width>
-    <height>501</height>
+    <width>442</width>
+    <height>542</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,7 +18,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>1</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="connectTab">
        <attribute name="title">
@@ -405,7 +405,7 @@
          <widget class="QPlainTextEdit" name="versionInfoEdit">
           <property name="font">
            <font>
-            <family>Monospace</family>
+            <family>Courier New</family>
            </font>
           </property>
           <property name="readOnly">
@@ -448,6 +448,7 @@ Build: N/A</string>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>
+  <include location="images.qrc"/>
   <include location="images.qrc"/>
  </resources>
  <connections>

@@ -12,7 +12,7 @@ const int MAIN_WINDOW_HEIGHT = 700;
 #include "ui_sslerrordialog.h"
 #include "backends/qvdnxbackend.h"
 #include "qvdconnectionparameters.h"
-#include "keyboard_detector/keyboarddetector.h"
+
 
 #include <QCommandLineParser>
 #include <QCommandLineOption>
@@ -29,6 +29,7 @@ const int MAIN_WINDOW_HEIGHT = 700;
 #include "usbip/usbdevice.h"
 
 #include "helpers/binaryfinder.h"
+#include "helpers/keyboarddetector.h"
 
 #include "versioninfo.h"
 

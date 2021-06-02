@@ -2,7 +2,8 @@
 #include <QDebug>
 
 
-#ifdef Q_OS_UNIX
+#ifdef USE_LIB_X11_KEYBOARD_DETECTION
+//Q_OS_UNIX
 #include <X11/Xlib.h>
 #include <X11/Intrinsic.h>
 #include <X11/XKBlib.h>
@@ -63,7 +64,7 @@ QString get_windows_error() {
 #endif
 
 QString KeyboardDetector::getKeyboardLayout() {
-#ifdef Q_OS_UNIX
+#ifdef USE_LIB_X11_KEYBOARD_DETECTION
     Display *disp = nullptr;
 
      int format;
@@ -158,4 +159,7 @@ QString KeyboardDetector::getKeyboardLayout() {
 
      return layout;
 #endif
+
+     qInfo() << "No keyboard detection code built in, falling back to empty answer";
+     return "empty/empty";
 }

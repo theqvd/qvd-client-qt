@@ -23,7 +23,6 @@ set(CMAKE_AUTORCC ON)
 
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets LinguistTools Network REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets LinguistTools Network REQUIRED)
-find_package(X11 REQUIRED)
 
 #set(TS_FILES QVD_Client_en_US.ts)
 
@@ -31,7 +30,6 @@ set(COMMON_SOURCES
     commandlineparser.cpp
     configloader.cpp
     images.qrc
-    keyboarddetector.cpp
     listdialog.cpp
     main.cpp
     mainwindow.cpp
@@ -71,21 +69,9 @@ else()
 endif()
 
 
-# Link directly against libX11 on OSX, rather than specifying a library path.
-# If we use -L/opt/X11/lib here, it may use /opt/X11/lib/libGL.dylib instead
-# of /System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib
-#
-# This causes an error of 'dyld: Symbol not found: _gll_noop'.
-
-if (APPLE)
-    target_link_libraries(QVD_Client PUBLIC /opt/X11/lib/libX11.dylib)
-endif()
-
-
-target_include_directories(QVD_Client PRIVATE ${libqvdclient_INCLUDE_DIRS} ${X11_INCLUDE_DIR})
+target_include_directories(QVD_Client PRIVATE ${libqvdclient_INCLUDE_DIRS})
 target_link_directories(QVD_Client PRIVATE ${libqvdclient_LIB_DIRS})
-
-target_link_libraries(QVD_Client PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Network ${X11_LIBRARIES} qvdclient)
+target_link_libraries(QVD_Client PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Network qvdclient)
 
 install(TARGETS QVD_Client
        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
