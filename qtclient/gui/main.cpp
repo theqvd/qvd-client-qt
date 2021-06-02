@@ -9,6 +9,7 @@
 #include <QFile>
 #include <QMessageBox>
 #include <QMap>
+#include <QDesktopServices>
 
 #include "helpers/binaryfinder.h"
 
@@ -243,6 +244,28 @@ int main(int argc, char *argv[])
         exit(0);
     }
 
+#ifdef Q_OS_MACX
+    if(qEnvironmentVariableIsEmpty("DISPLAY")) {
+        qWarning() << "Running on MacOS with $DISPLAY set, XQuartz is not installed";
+        QMessageBox msgbox;
+        msgbox.setWindowTitle("QVD Client");
+        msgbox.setText("QVD Client requires XQuartz for its functionality.\n"
+                       "Click Ok to go to the XQuartz website to download it.");
+
+        msgbox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+        QMessageBox::StandardButton selection = static_cast<QMessageBox::StandardButton>(msgbox.exec());
+        qDebug() << "Selection made: " << selection;
+
+        if ( selection == QMessageBox::StandardButton::Ok ) {
+            QDesktopServices::openUrl(QString("https://www.xquartz.org"));
+            exit(0);
+        }
+
+        exit(1);
+    } else {
+        qInfo() << "Running on MacOS, DISPLAY is set to " << qgetenv("DISPLAY") << ", all good.";
+    }
+#endif
 
     MainWindow w;
     w.setConnectionParms(params);
