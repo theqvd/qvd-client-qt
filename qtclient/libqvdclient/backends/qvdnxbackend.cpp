@@ -5,7 +5,7 @@
 #include <QCoreApplication>
 #include <random>
 
-#include "helpers/binaryfinder.h"
+#include "helpers/pathtools.h"
 #include "helpers/portallocator.h"
 
 

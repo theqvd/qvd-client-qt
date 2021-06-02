@@ -5,7 +5,7 @@
 #include <QNetworkProxy>
 #include <QString>
 
-#include "helpers/binaryfinder.h"
+#include "helpers/pathtools.h"
 
 XServerLauncher::XServerLauncher()
 {

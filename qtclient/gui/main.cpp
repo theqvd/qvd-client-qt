@@ -11,7 +11,7 @@
 #include <QMap>
 #include <QDesktopServices>
 
-#include "helpers/binaryfinder.h"
+#include "helpers/pathtools.h"
 
 
 #ifdef Q_OS_UNIX
@@ -250,7 +250,7 @@ int main(int argc, char *argv[])
         QMessageBox msgbox;
         msgbox.setWindowTitle("QVD Client");
         msgbox.setText("QVD Client requires XQuartz for its functionality.\n"
-                       "Click Ok to go to the XQuartz website to download it.");
+                       "Click Ok to go to the XQuartz website to download it.yu");
 
         msgbox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
         QMessageBox::StandardButton selection = static_cast<QMessageBox::StandardButton>(msgbox.exec());

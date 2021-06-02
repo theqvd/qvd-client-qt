@@ -28,7 +28,7 @@ const int MAIN_WINDOW_HEIGHT = 700;
 #include "usbip/usbdevicelist.h"
 #include "usbip/usbdevice.h"
 
-#include "helpers/binaryfinder.h"
+#include "helpers/pathtools.h"
 #include "helpers/keyboarddetector.h"
 
 #include "versioninfo.h"

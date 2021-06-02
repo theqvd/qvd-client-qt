@@ -3,7 +3,7 @@
 #include <QTextStream>
 #include <QCoreApplication>
 
-#include "helpers/binaryfinder.h"
+#include "helpers/pathtools.h"
 UsbDatabase::UsbDatabase(const QString &path)
 {
     load();

@@ -22,7 +22,7 @@ add_library(qvdclient SHARED
     backends/qvdbackend.cpp
     backends/qvdnxbackend.cpp
     backends/xserverlauncher.cpp
-    helpers/binaryfinder.cpp
+    helpers/pathtools.cpp
     helpers/keyboarddetector.cpp
     helpers/linebuffer.cpp
     helpers/portallocator.cpp

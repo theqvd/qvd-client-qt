@@ -5,7 +5,7 @@
 #include <QDebug>
 #include <QRegularExpression>
 #include <QVersionNumber>
-#include <helpers/binaryfinder.h>
+#include <helpers/pathtools.h>
 
 #ifdef Q_OS_UNIX
 #include <signal.h>

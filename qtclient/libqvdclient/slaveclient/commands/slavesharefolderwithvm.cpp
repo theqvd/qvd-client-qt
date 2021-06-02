@@ -18,7 +18,7 @@
 #include <windows.h>
 #endif
 
-#include "helpers/binaryfinder.h"
+#include "helpers/pathtools.h"
 
 SlaveShareFolderWithVM::~SlaveShareFolderWithVM()
 {

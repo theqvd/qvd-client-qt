@@ -1,4 +1,5 @@
-#include "binaryfinder.h"
+#include "pathtools.h"
+
 
 #include <QDir>
 #include <QFile>
