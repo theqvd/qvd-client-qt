@@ -4,11 +4,21 @@
 
 ConnectAudio::ConnectAudio(quint16 port)
 {
+    // We deal with two pulseaudio instances, our own, and the system one.
+    //
+    // Our own instance is shipped with the client.
+    // * On Linux, it acts as a layer for decompressing audio and forwards to the system's PA.
+    // * On OSX and Windows it talks to CoreAudio or Win32 audio.
+    //
+    // We always need this instance.
     QObject::connect(&m_pulse, &PulseAudio::started, this, &ConnectAudio::pulseStarted );
     QObject::connect(&m_pulse, &PulseAudio::stopped, this, &ConnectAudio::pulseStopped );
     QObject::connect(&m_pulse, &PulseAudio::error  , this, &ConnectAudio::pulseError );
 
-#ifndef Q_OS_WIN
+#ifdef Q_OS_LINUX
+    // Only on Linux systems, we also connect to the system's PulseAudio so that we can ask
+    // it to load modules.
+    //
     // We connect both pulseaudio instances to the same handlers, since it we don't care to distinguish them,
     // all that is important is that we need to set things up once both are up and running.
     QObject::connect(&m_system_pulse, &PulseAudio::started, this, &ConnectAudio::pulseStarted );
