@@ -10,6 +10,10 @@ $VCVarsAll = "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\A
 $FilesPath = "C:\Program Files (x86)\QVD Client"
 $ExtFiles  = "${PSScriptRoot}\..\external"
 $TimestampServer = "http://timestamp.sectigo.com"
+$CertificateThumbprint = "4EC4BC69CAF66CFFB8EA1245E12C4C4291A887DB"
+
+$Certificate = Get-ChildItem cert:\CurrentUser\My -CodeSigningCert | Where-Object { $_.Thumbprint -eq "$CertificateThumbprint" }
+
 
 function Invoke-BatchFile
 {
@@ -53,7 +57,8 @@ function Sign {
 	$sign_info = Get-AuthenticodeSignature $Path
 
 	if ( $sign_info.Status -ne "Valid" ) {
-		$sign_info = Set-AuthenticodeSignature $Path -Certificate (Get-ChildItem cert:\CurrentUser\My -CodeSigningCert) -HashAlgorithm SHA256 -TimestampServer $TimestampServer
+		#$sign_info = Set-AuthenticodeSignature $Path -Certificate (Get-ChildItem cert:\CurrentUser\My -CodeSigningCert) -HashAlgorithm SHA256 -TimestampServer $TimestampServer
+		$sign_info = Set-AuthenticodeSignature $Path -Certificate $Certificate -HashAlgorithm SHA256 -TimestampServer $TimestampServer
 
 		if ( $sign_info.Status -eq "Valid" ) {
 			Write-Host -ForegroundColor green "Done."
@@ -174,6 +179,9 @@ Write-Host -ForegroundColor blue -NoNewLine "Build    : "
 Write-Host "$Env:QVD_BUILD"
 Write-Host ""
 
+Write-Host -ForegroundColor blue -NoNewLine "Cert     : "
+Write-Host "$Certificate.Subject (Valid until $Certificate.NotAfter)"
+Write-Host ""
 
 $build_dir = New-TemporaryDirectory
 Set-Location -Path "$build_dir"
