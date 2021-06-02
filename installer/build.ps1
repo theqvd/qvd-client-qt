@@ -222,8 +222,8 @@ $data = "packages\com.qindel.qvd\data"
 
 Write-Host "Copying build files..."
 Copy-Item -Path "..\LICENSE"                             -Destination "$data\LICENSE.txt"
-Copy-Item -Path "$build_dir\gui\release\*.exe"           -Destination "$data"
-Copy-Item -Path "$build_dir\libqvdclient\release\*.dll"  -Destination "$data"
+Copy-Item -Path "$build_dir\gui\*.exe"                   -Destination "$data"
+Copy-Item -Path "$build_dir\libqvdclient\*.dll"          -Destination "$data"
 
 Write-Host "Copying dependencies..."
 Copy-Item -Path "$FilesPath\pulseaudio"                  -Destination "$data" -Recurse
