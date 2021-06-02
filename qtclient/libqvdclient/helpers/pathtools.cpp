@@ -71,7 +71,7 @@ QString PathTools::getPulseaudioModuleDir()
     filenames.append("module-cli.so");
 #endif
 #if defined(Q_OS_WIN)
-    dirs.append(homeDir.filePath("../pulseaudio"));
+    dirs.append(appDir.filePath("../pulseaudio"));
     filenames.append("module-cli.dll");
 #endif
 

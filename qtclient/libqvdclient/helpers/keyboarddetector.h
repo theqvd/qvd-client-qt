@@ -2,6 +2,8 @@
 #define KEYBOARDDETECTOR_H
 
 #include <QString>
+#include "qvdclient_global.h"
+
 
 /**
  * @brief Detects the keyboard
@@ -21,7 +23,7 @@
  *
  */
 
-class KeyboardDetector
+class LIBQVDCLIENT_EXPORT KeyboardDetector
 {
 public:
     KeyboardDetector();
