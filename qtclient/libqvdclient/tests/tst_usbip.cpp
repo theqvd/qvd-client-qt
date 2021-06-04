@@ -1,6 +1,6 @@
 #include <QtTest>
 #include <QCoreApplication>
-#include "helpers/binaryfinder.h"
+#include "helpers/pathtools.h"
 #include <QFile>
 #include <QDir>
 #include <QFileInfo>
