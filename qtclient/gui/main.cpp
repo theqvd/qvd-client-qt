@@ -250,7 +250,7 @@ int main(int argc, char *argv[])
         QMessageBox msgbox;
         msgbox.setWindowTitle("QVD Client");
         msgbox.setText("QVD Client requires XQuartz for its functionality.\n"
-                       "Click Ok to go to the XQuartz website to download it.yu");
+                       "Click Ok to go to the XQuartz website to download it.");
 
         msgbox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
         QMessageBox::StandardButton selection = static_cast<QMessageBox::StandardButton>(msgbox.exec());
