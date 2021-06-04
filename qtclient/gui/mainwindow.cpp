@@ -78,7 +78,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_device_list.refresh();
 
     // Ensure the first tab is selected
-    ui->tabWidget->setCurrentWidget(ui->connectTab);
+    ui->mainTabWidget->setCurrentWidget(ui->connectTab);
 
     // Ensure the window's size is the smallest possible
     resize(MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGHT);
@@ -117,6 +117,15 @@ void MainWindow::connectToVM() {
 
     saveSettings();
 
+    if (ui->serverLineEdit->text().trimmed().isEmpty()) {
+        QMessageBox::critical(this, "QVD", "Server is not set.\nPlease configure a server to connect to.");
+        setUI(true);
+        ui->mainTabWidget->setCurrentWidget(ui->settingsTab);
+        ui->serverLineEdit->setFocus(Qt::FocusReason::OtherFocusReason);
+        return;
+    }
+
+
     auto speed = static_cast<QVDConnectionParameters::ConnectionSpeed>( ui->connectionTypeComboBox->currentData().toInt() );
 
     settings.beginGroup("paths");
@@ -139,7 +148,7 @@ void MainWindow::connectToVM() {
     params.setKeyboard( KeyboardDetector::getKeyboardLayout() );
     params.setUsername(ui->username->text());
     params.setPassword(ui->password->text());
-    params.setHost((ui->serverLineEdit->text()));
+    params.setHost(ui->serverLineEdit->text());
     params.setPort( quint16( settings.value("port", 8443).toInt() ));
     params.setConnectionSpeed(speed);
     params.setPrinting( ui->enablePrintingCheck->isChecked() );
