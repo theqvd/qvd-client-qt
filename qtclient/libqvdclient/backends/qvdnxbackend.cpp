@@ -51,6 +51,7 @@ void QVDNXBackend::setNxproxyBinary(const QString &nxproxy_binary)
 
 void QVDNXBackend::start(QTcpSocket *socket)
 {
+    qDebug() << "Backend starting";
     m_qvd_connection_socket = socket;
     m_x_server_launcher.start();
 }
@@ -110,6 +111,15 @@ void QVDNXBackend::processStarted()
 void QVDNXBackend::processFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
     qInfo() << "NXproxy exited with code " << exitCode << ", status " << exitStatus;
+
+    if ( exitCode != 0 || exitStatus != QProcess::ExitStatus::NormalExit ) {
+        if ( m_linking_error_detected ) {
+            emit failed(BackendError::LinkingError, "Linking error detected");
+        } else {
+            emit failed(BackendError::UnknownError, QString("Process exited with code %1").arg(exitCode));
+        }
+    }
+
     stop();
     emit finished();
 }
@@ -117,6 +127,30 @@ void QVDNXBackend::processFinished(int exitCode, QProcess::ExitStatus exitStatus
 void QVDNXBackend::processError(QProcess::ProcessError error)
 {
     qInfo() << "Error running NXproxy: " << error;
+    switch(error) {
+    case QProcess::ProcessError::Crashed:
+        emit failed(BackendError::Crash, "Proxy process crashed");
+        break;
+    case QProcess::ProcessError::FailedToStart:
+        emit failed(BackendError::StartFailure, "Proxy process failed to start");
+        break;
+    case QProcess::ProcessError::ReadError:
+        emit failed(BackendError::CommunicationFailure, "Proxy process failed to read");
+        break;
+    case QProcess::ProcessError::Timedout:
+        emit failed(BackendError::CommunicationFailure, "Proxy process timeout");
+        break;
+    case QProcess::ProcessError::UnknownError:
+        emit failed(BackendError::UnknownError, "Proxy process failed");
+        break;
+    case QProcess::ProcessError::WriteError:
+        emit failed(BackendError::CommunicationFailure, "Proxy process failed to write");
+        break;
+    }
+
+    stop();
+    emit finished();
+
 }
 
 void QVDNXBackend::processStdoutReady()
@@ -154,6 +188,8 @@ void QVDNXBackend::processStderrReady()
     QRegularExpression listening_re("Listening to (.*?) connections on port '(.*?)'");
     QRegularExpression connection_established_re("Established X server connection");
     QRegularExpression terminated_re("Session: Session terminated");
+    QRegularExpression linking_err_re("dyld: Library not loaded");
+
 
     QByteArray data = m_process.readAllStandardError();
     //qInfo() << "Proxy ERR: " << data;
@@ -183,6 +219,8 @@ void QVDNXBackend::processStderrReady()
 
         auto established_match = connection_established_re.match(line);
         auto terminated_match  = terminated_re.match(line);
+
+        auto linking_err_match = linking_err_re.match(line);
 
         if ( forwarding_match.hasMatch() ) {
             auto  channel    = str_to_channel(forwarding_match.captured(1));
@@ -242,6 +280,11 @@ void QVDNXBackend::processStderrReady()
         if ( terminated_match.hasMatch() ) {
             qInfo() << "Connection terminated";
             emit connectionTerminated();
+        }
+
+        if ( linking_err_match.hasMatch() ) {
+            qCritical() << "Linking error detected in nxproxy";
+            m_linking_error_detected = true;
         }
 
     }
@@ -328,13 +371,14 @@ void QVDNXBackend::XServerReady()
 
     //qputenv("DISPLAY", QString("127.0.0.1:%1").arg( m_x_server_launcher.display() ).toUtf8());
     qInfo() << "DISPLAY = " << env.value("DISPLAY", "[none]");
+    m_linking_error_detected = false;
     m_process.start( nxproxyBinary(), nxproxy_args );
 }
 
 void QVDNXBackend::XServerFailed(const QString &error)
 {
     qCritical() << "X server failed: " << error;
-    emit failed(error);
+    emit failed(QVDBackend::XServerFailed, error);
 }
 
 

@@ -31,6 +31,21 @@ public:
     } NXChannel;
     Q_ENUM(NXChannel)
 
+    /**
+     * @brief Error type
+     */
+    typedef enum {
+        UnknownError,
+        NotFound,
+        LinkingError,
+        Crash,
+        Abort,
+        StartFailure,
+        CommunicationFailure,
+        XServerFailed,
+    } BackendError;
+    Q_ENUM(BackendError)
+
     explicit QVDBackend(QObject *parent = nullptr);
     ~QVDBackend();
 
@@ -164,7 +179,7 @@ signals:
      * @brief The backend has failed, and the connection has been closed
      * @param error Description of the error
      */
-    void failed(const QString &error);
+    void failed(BackendError error, const QString &description);
 
 
     /**
@@ -180,6 +195,8 @@ private:
     quint16 m_slave_port = 63640;
     quint16 m_audio_port = 4713;
 
+protected:
+    bool m_linking_error_detected = false;
 };
 
 #endif // QVDBACKEND_H
