@@ -17,6 +17,10 @@ class LIBQVDCLIENT_EXPORT QVDBackend : public QObject
 {
     Q_OBJECT
 public:
+
+    /**
+     * @brief Channel type
+     */
     typedef enum {
         Unknown,
         X11,
@@ -51,7 +55,18 @@ public:
 
 
 
+    /**
+     * @brief Connection parameters
+     * @return Connection parameters
+     */
     QVDConnectionParameters parameters() const;
+
+    /**
+     * @brief Sets the connection parameters
+     * @param Connection parameters to use
+     *
+     * This should be called before starting the backend. Later changes may have no effect.
+     */
     void setParameters(const QVDConnectionParameters &parameters);
 
 
