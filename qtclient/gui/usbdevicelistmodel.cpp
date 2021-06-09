@@ -3,7 +3,8 @@
 
 void USBDeviceListModel::setDeviceList(UsbDeviceList *list)
 {
-
+    m_list = list;
+    connect(list, &UsbDeviceList::updated, this, &USBDeviceListModel::deviceListUpdated);
 }
 
 int USBDeviceListModel::rowCount(const QModelIndex &parent [[maybe_unused]]) const
@@ -112,11 +113,17 @@ void USBDeviceListModel::deviceListUpdated(bool success)
     if (!success)
         return;
 
+    beginResetModel();
+    qInfo() << "Updating device list model";
     m_devices = m_list->getDevices();
 
     for([[maybe_unused]] auto &d : m_devices ) {
         m_selected.append(false);
     }
+
+    qInfo() << "Now got " << m_devices.count() << "devices";
+    endResetModel();
+    //emit dataChanged();
 }
 
 
