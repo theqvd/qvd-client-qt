@@ -113,6 +113,8 @@ void USBDeviceListModel::deviceListUpdated(bool success)
     if (!success)
         return;
 
+    beginResetModel();
+    qInfo() << "Updating device list model";
     m_devices = m_list->getDevices();
 
     for([[maybe_unused]] auto &d : m_devices ) {
