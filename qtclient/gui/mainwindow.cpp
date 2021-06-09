@@ -109,6 +109,11 @@ void MainWindow::setUI(bool enabled)
 
 }
 
+bool MainWindow::connectionActive()
+{
+    return ui->centralWidget->isEnabled();
+}
+
 void MainWindow::connectToVM() {
     qInfo() << "Connecting to " << ui->serverLineEdit->text();
 
@@ -201,21 +206,26 @@ void MainWindow::vmListReceived(const QList<QVDClient::VMInfo> &vmlist)
 
 void MainWindow::socketError(QAbstractSocket::SocketError error)
 {
+
     qWarning() << "socketError " << error << " connecting with " << m_client->getParameters();
     qWarning() << "Socket error: " << m_client->getSocket()->errorString();
     qWarning() << "Socket error: " << m_client->getSocket()->error();
 
 
 
-    QString message = QString("Failed to connect to QVD at %1:%2\n%3")
-                            .arg(m_client->getParameters().host())
-                            .arg(m_client->getParameters().port())
-                            .arg(m_client->getSocket()->errorString());
+    if ( connectionActive() ) {
+        // This ensures the error only happens once
+        QString message = QString("Failed to connect to QVD at %1:%2\n%3")
+                                .arg(m_client->getParameters().host())
+                                .arg(m_client->getParameters().port())
+                                .arg(m_client->getSocket()->errorString());
 
-    this->show();
-    QMessageBox::critical(this, "QVD", message);
+        this->show();
+        QMessageBox::critical(this, "QVD", message);
 
-    setUI(true);
+        m_client->disconnectFromQVD();
+        setUI(true);
+    }
 }
 
 void MainWindow::connectionEstablished()
