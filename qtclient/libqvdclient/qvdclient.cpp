@@ -10,6 +10,7 @@
 #include <QSysInfo>
 #include <QTcpServer>
 #include <QJsonParseError>
+#include <QTimeZone>
 
 
 #include "qvdnetworkreply.h"
@@ -206,6 +207,18 @@ void QVDClient::handle_printer() {
     connect(ret, &QVDNetworkReply::finished, this, [ret]() { ret->deleteLater(); });
 }
 
+void QVDClient::getTimeZone() {
+    auto timezoneObj = QTimeZone();
+
+    if (!timezoneObj.isValid()) {
+        qDebug("invalid timezone qobject");
+        return;
+    }
+
+    auto timezone = timezoneObj.id();
+    return timezone;
+}
+
 
 void QVDClient::stopVM(int id)
 {
@@ -255,6 +268,7 @@ void QVDClient::connectToVM(int id)
     query.addQueryItem("qvd.client.audio.sound.enable"      , getParameters().audio() ? "1" : "0");
     query.addQueryItem("qvd.client.audio.microphone.enable" , getParameters().microphone() ? "1" : "0");
     query.addQueryItem("qvd.client.audio.compression.enable", getParameters().audioCompression() ? "1" : "0");
+    query.addQueryItem("qvd.client.timezone"                , getTimeZone();
 
     url.setQuery(query);
 
