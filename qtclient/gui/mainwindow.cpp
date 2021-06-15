@@ -451,7 +451,7 @@ void MainWindow::loadSettings() {
 
     for(int i=0;i<ui->connectionTypeComboBox->count(); i++) {
         ui->connectionTypeComboBox->setCurrentIndex(i);
-        if ( ui->connectionTypeComboBox->currentData() == settings.value("speed", QVDConnectionParameters::ConnectionSpeed::LAN ))
+        if ( ui->connectionTypeComboBox->currentData() == settings.value("speed", QVDConnectionParameters::ConnectionSpeed::ADSL ))
             break;
     }
 
