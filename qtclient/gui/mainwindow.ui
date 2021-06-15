@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>442</width>
-    <height>542</height>
+    <width>554</width>
+    <height>747</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,7 +18,7 @@
     <item>
      <widget class="QTabWidget" name="mainTabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="connectTab">
        <attribute name="title">
@@ -283,7 +283,7 @@
           <item>
            <widget class="QTabWidget" name="sharedResourcesTabWidget">
             <property name="currentIndex">
-             <number>0</number>
+             <number>1</number>
             </property>
             <widget class="QWidget" name="SharedFolders">
              <attribute name="title">
@@ -346,9 +346,6 @@
              <layout class="QVBoxLayout" name="verticalLayout_11">
               <item>
                <widget class="QListView" name="EnvVarList">
-                <property name="frameShadow">
-                 <enum>QFrame::Sunken</enum>
-                </property>
                 <property name="resizeMode">
                  <enum>QListView::Adjust</enum>
                 </property>
@@ -448,7 +445,6 @@ Build: N/A</string>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>
-  <include location="images.qrc"/>
   <include location="images.qrc"/>
  </resources>
  <connections>

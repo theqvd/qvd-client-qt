@@ -99,7 +99,7 @@ void QVDNXBackend::connectionAccepted()
         delete m_forwarder;
 
     m_forwarder = new SocketForwarder(this, *connection, *m_qvd_connection_socket);
-
+    connect(m_forwarder, &SocketForwarder::dataTransferred, this, &QVDNXBackend::forwarderTransferred);
     emit started();
 }
 

@@ -80,11 +80,16 @@ MainWindow::MainWindow(QWidget *parent) :
     // Ensure the first tab is selected
     ui->mainTabWidget->setCurrentWidget(ui->connectTab);
 
+    connect(&m_traffic_timer, &QTimer::timeout, this, &MainWindow::printTraffic);
+
+
     // Ensure the window's size is the smallest possible
     resize(MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGHT);
 
     updateVersionInfo();
     loadSettings();
+
+    m_stats_window.show();
 }
 
 MainWindow::~MainWindow()
@@ -100,11 +105,13 @@ void MainWindow::setUI(bool enabled)
     if ( enabled ) {
         ui->progressBar->setMaximum(100);
         ui->progressBar->setValue(0);
+        m_traffic_timer.stop();
     }
     else
     {
         ui->progressBar->setMaximum(0);
         ui->progressBar->setValue(0);
+        m_traffic_timer.start(15000);
     }
 
 }
@@ -136,6 +143,7 @@ void MainWindow::connectToVM() {
     settings.beginGroup("paths");
 
     QVDNXBackend *nx_backend = new QVDNXBackend(this);
+    connect(nx_backend, &QVDBackend::totalTrafficIncrement, this, &MainWindow::backendTrafficInc);
 
     settings.endGroup();
 
@@ -168,6 +176,7 @@ void MainWindow::connectToVM() {
 
     nx_backend->setParameters(params);
     m_client->setBackend(nx_backend);
+    m_stats_window.connectToBackend(nx_backend);
     m_client->setParameters(params);
     m_client->connectToQVD();
     //setUI(false);
@@ -376,6 +385,17 @@ void MainWindow::enableSharedFoldersClicked()
     ui->sharedFoldersList->setEnabled( enabled );
     ui->addSharedFolderButton->setEnabled( enabled );
     ui->removeSharedFolderButton->setEnabled( enabled );
+}
+
+void MainWindow::backendTrafficInc(int64_t in, int64_t out)
+{
+    m_avg_in_15s.add( in );
+    m_avg_out_15s.add( out );
+}
+
+void MainWindow::printTraffic()
+{
+    qInfo() << "Traffic avg in =" << m_avg_in_15s.getAverage() << "bytes/s; out =" << m_avg_out_15s.getAverage() << "bytes/s";
 }
 
 void MainWindow::saveSettings() {

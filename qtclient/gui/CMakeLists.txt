@@ -21,19 +21,23 @@ set(CMAKE_AUTORCC ON)
 #    endif()
 #endif()
 
-find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets LinguistTools Network REQUIRED)
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets LinguistTools Network REQUIRED)
+find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets LinguistTools Network Charts REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets LinguistTools Network Charts REQUIRED)
 
 #set(TS_FILES QVD_Client_en_US.ts)
 
 set(COMMON_SOURCES
     commandlineparser.cpp
     configloader.cpp
+    connectionstatistics.cpp
+    connectionstatistics.ui
+    connectionstatisticschart.cpp
     images.qrc
     listdialog.cpp
     main.cpp
     mainwindow.cpp
     mainwindow.ui
+    movingaverage.cpp
     qvdchecklistview.cpp
     sslerrordialog.cpp
     usbdevicelistmodel.cpp
@@ -71,7 +75,7 @@ endif()
 
 target_include_directories(QVD_Client PRIVATE ${libqvdclient_INCLUDE_DIRS})
 target_link_directories(QVD_Client PRIVATE ${libqvdclient_LIB_DIRS})
-target_link_libraries(QVD_Client PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Network qvdclient)
+target_link_libraries(QVD_Client PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Network Qt${QT_VERSION_MAJOR}::Charts qvdclient)
 
 install(TARGETS QVD_Client
        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})

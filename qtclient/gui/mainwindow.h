@@ -14,8 +14,10 @@
 #include <QSsl>
 #include <QList>
 #include <QStringListModel>
+#include <QTimer>
 
-
+#include "movingaverage.h"
+#include "connectionstatistics.h"
 
 namespace Ui {
 class MainWindow;
@@ -37,6 +39,7 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
     void setUI(bool enabled);
+    bool connectionActive();
     void closeEvent(QCloseEvent *event);
 
 public slots:
@@ -55,6 +58,10 @@ public slots:
     void removeSharedFolder();
     void enableSharedFoldersClicked();
 
+private slots:
+    void backendTrafficInc(int64_t in, int64_t out);
+    void printTraffic();
+
 private:
     Ui::MainWindow *ui;
     void saveSettings();
@@ -70,6 +77,10 @@ private:
     UsbDeviceList m_device_list;
     USBDeviceListModel m_usb_device_model;
 
+    MovingAverage m_avg_in_15s{15000};
+    MovingAverage m_avg_out_15s{15000};
+    QTimer m_traffic_timer;
+    ConnectionStatistics m_stats_window;
 };
 
 #endif // MAINWINDOW_H

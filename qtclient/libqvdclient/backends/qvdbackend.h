@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QTcpSocket>
+#include <QHash>
 
 #include "qvdconnectionparameters.h"
 #include "qvdclient_global.h"
@@ -50,6 +51,16 @@ public:
     } BackendError;
     Q_ENUM(BackendError)
 
+    struct TrafficData {
+        int64_t in;
+        int64_t out;
+    };
+
+    struct Statistics {
+        QHash<NXChannel, TrafficData> channelTraffic;
+        TrafficData totalTraffic{0,0};
+    };
+
     explicit QVDBackend(QObject *parent = nullptr);
     ~QVDBackend();
 
@@ -92,6 +103,12 @@ public:
      * @return Byte count
      */
     virtual int64_t bytesWritten();
+
+    /**
+     * @brief Returns the current statistics
+     * @return Stats
+     */
+    Statistics getStatistics() const { return m_statistics; }
 
     quint16 cupsPort() const;
     void setCupsPort(const quint16 &cupsPort);
@@ -201,7 +218,30 @@ signals:
      * @brief Backend has finished
      */
     void finished();
+
+    /**
+     * @brief The statistics have changed
+     * @param Current stats
+     */
+    void statisticsUpdated(const Statistics &stats);
+
+    void channelStatIncrement(NXChannel chan, int64_t in, int64_t out);
+
+    void totalTrafficIncrement(int16_t in, int64_t out);
+
 public slots:
+
+protected:
+    void addStat(NXChannel channel, int64_t in, int64_t out);
+    void addTotalTraffic(int64_t in, int64_t out) {
+        m_statistics.totalTraffic.in  += in;
+        m_statistics.totalTraffic.out += out;
+
+        emit statisticsUpdated(m_statistics);
+        emit totalTrafficIncrement(in, out);
+    }
+
+    Statistics m_statistics;
 
 private:
     QVDConnectionParameters m_parameters;

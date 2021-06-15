@@ -152,8 +152,6 @@ signals:
     void hostFound();
     void socketStateChanged(QAbstractSocket::SocketState socketState);
 
-
-
 private slots:
     void qvd_sslErrors(const QList<QSslError> &errors);
     void qvd_connectionEstablished();
