@@ -88,8 +88,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     updateVersionInfo();
     loadSettings();
-
-    m_stats_window.show();
 }
 
 MainWindow::~MainWindow()
@@ -511,6 +509,13 @@ void MainWindow::closeEvent(QCloseEvent *event) {
 //    {
         event->accept();
         //    }
+}
+
+void MainWindow::setMiscParameters(CommandLineParser::MiscParameters misc_params)
+{
+    m_misc_params = misc_params;
+
+    ui->showBandwidthGraphCheck->setVisible( m_misc_params.enableExperimentalFeatures );
 }
 
 void MainWindow::setConnectionParms(const QVDConnectionParameters &params)

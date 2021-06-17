@@ -18,7 +18,7 @@
     <item>
      <widget class="QTabWidget" name="mainTabWidget">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="connectTab">
        <attribute name="title">
@@ -201,6 +201,13 @@
            <widget class="QCheckBox" name="fullScreenCheck">
             <property name="text">
              <string>Full screen</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="showBandwidthGraphCheck">
+            <property name="text">
+             <string>Show bandwidth graph</string>
             </property>
            </widget>
           </item>

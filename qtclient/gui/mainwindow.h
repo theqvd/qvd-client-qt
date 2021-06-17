@@ -18,7 +18,7 @@
 
 #include "movingaverage.h"
 #include "connectionstatistics.h"
-
+#include "commandlineparser.h"
 namespace Ui {
 class MainWindow;
 }
@@ -34,13 +34,13 @@ private:
 
 public:
 
-
-public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
     void setUI(bool enabled);
     bool connectionActive();
     void closeEvent(QCloseEvent *event);
+    void setMiscParameters(CommandLineParser::MiscParameters misc_params);
+
 
 public slots:
     void setConnectionParms(const QVDConnectionParameters &params);
@@ -81,6 +81,7 @@ private:
     MovingAverage m_avg_out_15s{15000};
     QTimer m_traffic_timer;
     ConnectionStatistics m_stats_window;
+    CommandLineParser::MiscParameters m_misc_params;
 };
 
 #endif // MAINWINDOW_H

@@ -17,6 +17,10 @@ public:
         CommandLineHelpRequested
     };
 
+    struct MiscParameters {
+        bool enableExperimentalFeatures = false;
+    };
+
     static CommandLineParser& getInstance() {
         static CommandLineParser parser;
         return parser;
@@ -24,7 +28,7 @@ public:
 
     QCommandLineOption addOption(const QString& name, const QString &description, QString valuename = QString());
 
-    Result parse(QVDConnectionParameters &params, NXErrorCommandData &nxerr);
+    Result parse(QVDConnectionParameters &params, NXErrorCommandData &nxerr, MiscParameters &misc_params);
 
     const QString& getError() const { return m_error_message; }
     const QString getHelp() const;
