@@ -290,7 +290,7 @@
           <item>
            <widget class="QTabWidget" name="sharedResourcesTabWidget">
             <property name="currentIndex">
-             <number>1</number>
+             <number>0</number>
             </property>
             <widget class="QWidget" name="SharedFolders">
              <attribute name="title">
