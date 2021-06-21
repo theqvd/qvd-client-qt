@@ -30,7 +30,7 @@ build/QVD_Client: build/Makefile
 
 build/Makefile:
 	#mkdir -p build && cd build && qmake ../QVD_Client.pro
-	mkdir -p build && pwd && cd build && cmake ../
+	mkdir -p build && pwd && ls -latrh && cd build && cmake ../
 
 
 
