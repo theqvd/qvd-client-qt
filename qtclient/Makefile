@@ -29,8 +29,7 @@ build/QVD_Client: build/Makefile
 	cd build && make -j$(CPUS)
 
 build/Makefile:
-	#mkdir -p build && cd build && qmake ../QVD_Client.pro
-	mkdir -p build && pwd && ls -latrh && cd build && cmake ../
+	mkdir -p build && cd build && cmake ../
 
 
 
