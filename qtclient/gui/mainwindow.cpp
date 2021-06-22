@@ -80,6 +80,14 @@ MainWindow::MainWindow(QWidget *parent) :
     // Ensure the first tab is selected
     ui->mainTabWidget->setCurrentWidget(ui->connectTab);
     ui->sharedResourcesTabWidget->setCurrentWidget(ui->SharedFolders);
+#ifdef Q_OS_MACX
+    // No USBIP on Mac currently
+    ui->USBRedirection->setVisible(false);
+    ui->enableUSBRedirectionCheck->setChecked(false);
+
+    int usb_redir_index = ui->sharedResourcesTabWidget->indexOf(ui->USBRedirection);
+    ui->sharedResourcesTabWidget->removeTab(usb_redir_index);
+#endif
 
     connect(&m_traffic_timer, &QTimer::timeout, this, &MainWindow::printTraffic);
 
