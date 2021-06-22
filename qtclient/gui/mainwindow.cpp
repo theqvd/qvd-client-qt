@@ -79,6 +79,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Ensure the first tab is selected
     ui->mainTabWidget->setCurrentWidget(ui->connectTab);
+    ui->sharedResourcesTabWidget->setCurrentWidget(ui->SharedFolders);
 
     connect(&m_traffic_timer, &QTimer::timeout, this, &MainWindow::printTraffic);
 
