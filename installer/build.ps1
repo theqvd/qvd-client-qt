@@ -166,10 +166,21 @@ if ( ! $Env:BUILD_NUMBER ) {
 	$Env:QVD_BUILD = $Env:BUILD_NUMBER
 }
 
+if ( $git_ver -notmatch '^\d+\.\d+\.\d+$' ) {
+	$Env:QVD_PRERELEASE=1
+}
+
 Header "Starting build"
 
 Write-Host -ForegroundColor blue -NoNewLine "Version  : "
-Write-Host "$git_ver ($Env:QVD_VERSION_MAJOR, $Env:QVD_VERSION_MINOR, $Env:QVD_VERSION_REVISION)"
+Write-Host -NoNewLine "$git_ver ($Env:QVD_VERSION_MAJOR, $Env:QVD_VERSION_MINOR, $Env:QVD_VERSION_REVISION)"
+
+if ( "$Env:QVD_PRERELEASE" ) {
+	Write-Host " [pre-release]"
+} else {
+	Write-Host " [release]"
+}
+
 
 Write-Host -ForegroundColor blue -NoNewLine "Commit   : "
 Write-Host "$git_commit"

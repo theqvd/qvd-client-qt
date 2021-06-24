@@ -49,6 +49,10 @@ if(DEFINED ENV{QVD_VERSION_FULL})
     set(QVD_VERSION_FULL "$ENV{QVD_VERSION_FULL}")
 endif()
 
+if(DEFINED ENV{QVD_PRERELEASE})
+    set(QVD_PRERELEASE 1)
+endif()
+
 
 if(DEFINED ENV{GIT_COMMIT})
     set(GIT_COMMIT "$ENV{GIT_COMMIT}")
@@ -89,6 +93,10 @@ execute_process(
     )
 
 message(STATUS "Building QVD with version ${QVD_VERSION_FULL} (${QVD_VERSION})")
+if (QVD_PRERELEASE)
+    message(STATUS "Building a pre-release version")
+    add_compile_definitions(QVD_PRERELEASE=1)
+endif()
 message(STATUS "Build ${QVD_BUILD}")
 message(STATUS "Git commit ${GIT_COMMIT}")
 
