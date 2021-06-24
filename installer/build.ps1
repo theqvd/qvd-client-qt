@@ -55,11 +55,37 @@ function Sign {
 	$relpath = Get-Item $Path | Resolve-Path -Relative
 
 	Write-Host -NoNewLine "Signing $relpath... "
+
 	$sign_info = Get-AuthenticodeSignature $Path
 
 	if ( $sign_info.Status -ne "Valid" ) {
-		#$sign_info = Set-AuthenticodeSignature $Path -Certificate (Get-ChildItem cert:\CurrentUser\My -CodeSigningCert) -HashAlgorithm SHA256 -TimestampServer $TimestampServer
-		$sign_info = Set-AuthenticodeSignature $Path -Certificate $Certificate -HashAlgorithm SHA256 -TimestampServer $TimestampServer
+		$signed = 0
+		$retries = 0
+
+		# This nonsense is here because for some reason often we get:
+		#  | The process cannot access the file '...qvd-client-installer-4.2.0-rc1-11-g0726d65-202.exe'
+		#  | because it is being used by another process.
+		#
+		# This is weird because the name is new and unique -- the build number increments every time.
+		# Must be an antivirus or some such thing. So we just try again, and then it works.
+		while(!$signed) {
+			try {
+				$sign_info = Set-AuthenticodeSignature $Path -Certificate $Certificate -HashAlgorithm SHA256 -TimestampServer $TimestampServer
+				$signed = 1
+			}
+			catch {
+				#Write-Host "Exception"
+				#$PSItem.InvocationInfo | Format-List *
+
+				Write-Host -NoNewLine ", retrying"
+				$retries = $retries + 1
+				if ( $retries > 10 ) {
+					throw "Retry count exceeded"
+				}
+
+				Start-Sleep -Milliseconds 250
+			}
+		}
 
 		if ( $sign_info.Status -eq "Valid" ) {
 			Write-Host -ForegroundColor green "Done."
