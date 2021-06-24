@@ -15,7 +15,7 @@ if (LINUX)
     add_compile_definitions(USE_LIB_X11_KEYBOARD_DETECTION=1)
 endif()
 
-
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/version.rc.in ${CMAKE_CURRENT_BINARY_DIR}/version.rc @ONLY)
 
 
 add_library(qvdclient SHARED
@@ -44,6 +44,7 @@ add_library(qvdclient SHARED
     usbip/usbdevice.cpp
     usbip/usbdatabase.cpp
 #    backends/qvdlibnxbackend.cpp
+    ${CMAKE_CURRENT_BINARY_DIR}/version.rc
 )
 
 if (WIN32)

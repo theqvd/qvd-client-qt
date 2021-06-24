@@ -26,6 +26,9 @@ find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets LinguistTools Network Char
 
 #set(TS_FILES QVD_Client_en_US.ts)
 
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/version.rc.in ${CMAKE_CURRENT_BINARY_DIR}/version.rc @ONLY)
+
+
 set(COMMON_SOURCES
     commandlineparser.cpp
     configloader.cpp
@@ -43,6 +46,7 @@ set(COMMON_SOURCES
     usbdevicelistmodel.cpp
     versioninfo.cpp
     mainwindow.ui
+    icon.rc
     images.qrc
     )
 
@@ -50,6 +54,7 @@ set(PROJECT_SOURCES
     ${COMMON_SOURCES}
     ${PLATFORM_SOURCES}
     ${TS_FILES}
+    ${CMAKE_CURRENT_BINARY_DIR}/version.rc
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

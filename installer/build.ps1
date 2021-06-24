@@ -145,6 +145,7 @@ $rev_parts = $ver_parts[2].Split("-")
 $Env:QVD_VERSION_MAJOR    = $ver_parts[0]
 $Env:QVD_VERSION_MINOR    = $ver_parts[1]
 $Env:QVD_VERSION_REVISION = $rev_parts[0]
+$Env:QVD_VERSION_FULL     = $git_ver
 
 if ( ! $Env:BUILD_NUMBER ) {
 	Write-Host "BUILD_NUMBER variable not set, using build counter"

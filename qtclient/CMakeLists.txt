@@ -29,6 +29,31 @@ if (SANITIZE)
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${SANITIZE_FLAGS}")
 endif()
 
+if(DEFINED ENV{QVD_VERSION_MAJOR})
+    set(QVD_VERSION_MAJOR "$ENV{QVD_VERSION_MAJOR}")
+endif()
+
+if(DEFINED ENV{QVD_VERSION_MINOR})
+    set(QVD_VERSION_MINOR "$ENV{QVD_VERSION_MINOR}")
+endif()
+
+if(DEFINED ENV{QVD_VERSION_REVISION})
+    set(QVD_VERSION_REVISION "$ENV{QVD_VERSION_REVISION}")
+endif()
+
+if(DEFINED ENV{QVD_BUILD})
+    set(QVD_BUILD "$ENV{QVD_BUILD}")
+endif()
+
+if(DEFINED ENV{QVD_VERSION_FULL})
+    set(QVD_VERSION_FULL "$ENV{QVD_VERSION_FULL}")
+endif()
+
+
+if(DEFINED ENV{GIT_COMMIT})
+    set(GIT_COMMIT "$ENV{GIT_COMMIT}")
+endif()
+
 
 if (NOT QVD_VERSION_MAJOR)
     set (QVD_VERSION_MAJOR 4)
@@ -48,6 +73,14 @@ endif()
 
 set (QVD_VERSION "${QVD_VERSION_MAJOR}.${QVD_VERSION_MINOR}.${QVD_VERSION_REVISION}")
 
+if (NOT QVD_VERSION_FULL)
+    # QVD_VERSION_FULL is what we get from 'git describe', containing any additional
+    # suffixes to the version, eg '4.2.0-rc1'.
+    #
+    # This can only be used in places where such version strings are acceptable.
+    set(QVD_VERSION_FULL "${QVD_VERSION}")
+endif()
+
 execute_process(
     COMMAND git rev-parse --short HEAD
     RESULT_VARIABLE GIT_COMMIT_RESULT
@@ -55,7 +88,7 @@ execute_process(
     OUTPUT_STRIP_TRAILING_WHITESPACE
     )
 
-message(STATUS "Building QVD with version ${QVD_VERSION}")
+message(STATUS "Building QVD with version ${QVD_VERSION_FULL} (${QVD_VERSION})")
 message(STATUS "Build ${QVD_BUILD}")
 message(STATUS "Git commit ${GIT_COMMIT}")
 
