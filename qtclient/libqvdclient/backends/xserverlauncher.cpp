@@ -133,7 +133,7 @@ void XServerLauncher::processStderrReady()
 }
 
 
-void XServerLauncher::socketError(QAbstractSocket::SocketError __attribute__((unused)) error)
+void XServerLauncher::socketError([[maybe_unused]] QAbstractSocket::SocketError error)
 {
 
 }
