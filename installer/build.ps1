@@ -94,21 +94,11 @@ $QT_VER="5.15.2"
 $QT_DIR="C:\Qt"
 $use_mingw = 0
 $MAKETOOL_ARGS = ""
+$QT_COMPILER="mingw81_64"
+$MAKETOOL="ninja"
 
-if ( $use_mingw ) {
-	$QT_COMPILER="mingw81_64"
-	$COMPILER="mingw810_64"
-	$SPEC="win32-g++"
-	$MAKETOOL="mingw32-make"
-} else {
-	$QT_COMPILER="msvc2019_64"
-	$COMPILER="mingw810_64"
-	$SPEC="win32-msvc"
-	$MAKETOOL="ninja"
-
-	if ( $Verbose ) {
-		$MAKETOOL_ARGS="-v"
-	}
+if ( $Verbose ) {
+	$MAKETOOL_ARGS="-v"
 }
 
 if ( ! $Env:VCINSTALLDIR ) {
@@ -193,7 +183,9 @@ Write-Host ""
 $build_dir = New-TemporaryDirectory
 Set-Location -Path "$build_dir"
 
-cmake "${PSScriptRoot}\..\qtclient" -G Ninja
+# msvc experiment:
+# -D CMAKE_C_COMPILER=cl CMAKE_CXX_COMPILER=cl
+cmake  "${PSScriptRoot}\..\qtclient" -G Ninja
 
 if ( $LastExitCode -gt 0 ) {
 	throw "cmake failed with status $LastExitCode !"
@@ -220,6 +212,7 @@ $junk = New-Item -Path "packages\com.qindel.qvd\data" -Name "scripts" -ItemType 
 
 
 $data = "packages\com.qindel.qvd\data"
+$data_abspath = Resolve-Path -Path $data
 
 Write-Host "Copying build files..."
 Copy-Item -Path "..\LICENSE"                             -Destination "$data\LICENSE.txt"
@@ -235,6 +228,19 @@ Copy-Item -Path "$FilesPath\redist\*.exe"                -Destination "$data"
 Copy-Item -Path "$SSL_BIN_PATH\libcrypto*"               -Destination "$data"
 Copy-Item -Path "$SSL_BIN_PATH\libssl*"                  -Destination "$data"
 Copy-Item -Path "install_scripts\*"                      -Destination "$data\scripts\"
+
+# GCC requires some extra libraries. We find out whether this is needed by
+# checking which compiler was used to build the .exe. This is embedded into the
+# Comments VERSIONINFO field by CMake.
+$ver=[System.Diagnostics.FileVersionInfo]::GetVersionInfo("$data_abspath\QVD_Client.exe")
+if ($ver.Comments -like 'Built with GNU*') {
+	Write-Host "Copying GCC runtime dependencies..."
+
+	foreach ($file in "libgcc_s_seh-1.dll", "libwinpthread-1.dll", "libstdc++-6.dll") {
+		Copy-Item -Path "$QT_BIN_PATH\$file" -Destination "$data"
+	}
+}
+
 
 $deploy_args = "--verbose=0"
 if ( $Verbose ) {
