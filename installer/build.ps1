@@ -92,6 +92,7 @@ function Header {
 
 function ReplaceVariables($InputFile, $OutputFile) {
 	$data = Get-Content -Path $InputFile -Raw
+	$data = $data -Replace "%QVD_VERSION_FULL%","$Env:QVD_VERSION_FULL"
 	$data = $data -Replace "%QVD_VERSION%","$Env:QVD_VERSION"
 	$data = $data -Replace "%QVD_RELEASE_DATE%","$TODAY"
 	$junk = New-Item -Path $OutputFile -Value "$data" -ItemType File -Force
