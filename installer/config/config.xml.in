@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Installer>
     <Name>QVD Client</Name>
-    <Version>4.3</Version>
+    <Version>%QVD_VERSION%</Version>
     <Title>QVD Client Installer</Title>
 	<Logo>pixmaps/qvd-big.png</Logo>
 	<InstallerApplicationIcon>pixmaps/qvd</InstallerApplicationIcon>

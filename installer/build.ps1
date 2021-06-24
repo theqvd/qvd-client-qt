@@ -13,6 +13,7 @@ $TimestampServer = "http://timestamp.sectigo.com"
 $CertificateThumbprint = "4EC4BC69CAF66CFFB8EA1245E12C4C4291A887DB"
 
 $Certificate = Get-ChildItem cert:\CurrentUser\My -CodeSigningCert | Where-Object { $_.Thumbprint -eq "$CertificateThumbprint" }
+$TODAY = Get-Date -Format "yyyy-MM-dd"
 
 
 function Invoke-BatchFile
@@ -89,6 +90,12 @@ function Header {
 	Write-Host -NoNewLine "$HDR`r"
 }
 
+function ReplaceVariables($InputFile, $OutputFile) {
+	$data = Get-Content -Path $InputFile
+	$data = $data -Replace "%QVD_VERSION%","$Env:QVD_VERSION"
+	$data = $data -Replace "%QVD_RELEASE_DATE%","$TODAY"
+	New-Item -Path $OutputFile -Value "$data" -ItemType File -Force
+}
 
 $QT_VER="5.15.2"
 $QT_DIR="C:\Qt"
@@ -135,6 +142,7 @@ $rev_parts = $ver_parts[2].Split("-")
 $Env:QVD_VERSION_MAJOR    = $ver_parts[0]
 $Env:QVD_VERSION_MINOR    = $ver_parts[1]
 $Env:QVD_VERSION_REVISION = $rev_parts[0]
+$Env:QVD_VERSION          = $ver_parts[0] + "." + $ver_parts[1] + "." + $rev_parts[0]
 $Env:QVD_VERSION_FULL     = $git_ver
 
 if ( ! $Env:BUILD_NUMBER ) {
@@ -262,6 +270,10 @@ foreach ($bin in $binaries) {
 }
 
 
+
+Header "Generating installer config"
+ReplaceVariables -InputFile "config\config.xml.in"                        -OutputFile "config\config.xml"
+ReplaceVariables -InputFile "packages\com.qindel.qvd\meta\package.xml.in" -OutputFile "packages\com.qindel.qvd\meta\package.xml"
 
 Header "Generating installer"
 
