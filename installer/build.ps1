@@ -91,10 +91,10 @@ function Header {
 }
 
 function ReplaceVariables($InputFile, $OutputFile) {
-	$data = Get-Content -Path $InputFile
+	$data = Get-Content -Path $InputFile -Raw
 	$data = $data -Replace "%QVD_VERSION%","$Env:QVD_VERSION"
 	$data = $data -Replace "%QVD_RELEASE_DATE%","$TODAY"
-	New-Item -Path $OutputFile -Value "$data" -ItemType File -Force
+	$junk = New-Item -Path $OutputFile -Value "$data" -ItemType File -Force
 }
 
 $QT_VER="5.15.2"
