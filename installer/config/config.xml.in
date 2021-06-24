@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Installer>
-    <Name>QVD Client</Name>
+    <Name>QVD Client %QVD_VERSION%</Name>
     <Version>%QVD_VERSION%</Version>
     <Title>QVD Client Installer</Title>
 	<Logo>pixmaps/qvd-big.png</Logo>
