@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.16)
 
 project(libqvdclient LANGUAGES CXX)
 
+
+
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)

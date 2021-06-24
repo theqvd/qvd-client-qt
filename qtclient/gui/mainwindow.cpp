@@ -498,7 +498,7 @@ void MainWindow::updateVersionInfo()
     if ( VersionInfo::isRunningFromSource() ) {
         verStr << "Running from source\n";
     } else {
-        verStr << "QVD Client " << VersionInfo::getVersion().toString() << "\n";
+        verStr << "QVD Client " << VersionInfo::getFullVersion() << "\n";
         verStr << QString::fromUtf8(u8"\u00a9 Qindel Group 2021\n\n");
         verStr << "Build " << VersionInfo::getBuild() << "\n";
     }

@@ -96,6 +96,7 @@ add_compile_definitions(QVD_VERSION=${QVD_VERSION})
 add_compile_definitions(QVD_VERSION_MAJOR=${QVD_VERSION_MAJOR})
 add_compile_definitions(QVD_VERSION_MINOR=${QVD_VERSION_MINOR})
 add_compile_definitions(QVD_VERSION_REVISION=${QVD_VERSION_REVISION})
+add_compile_definitions(QVD_VERSION_FULL="${QVD_VERSION_FULL}")
 add_compile_definitions(QVD_BUILD=${QVD_BUILD})
 add_compile_definitions(GIT_COMMIT="${GIT_COMMIT}")
 

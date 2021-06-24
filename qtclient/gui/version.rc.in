@@ -7,14 +7,14 @@
 #define VER_PRODUCTVERSION_STR      "@QVD_VERSION_FULL@\0"
 
 #define VER_COMPANYNAME_STR         "Qindel Group\0"
-#define VER_FILEDESCRIPTION_STR     "QVD Client (built with @CMAKE_CXX_COMPILER_ID@ @CMAKE_CXX_COMPILER_VERSION@)\0"
+#define VER_FILEDESCRIPTION_STR     "QVD Client\0"
 #define VER_INTERNALNAME_STR        "QVD Client Qt\0"
 #define VER_LEGALCOPYRIGHT_STR      "Qindel Group, GPL3 Licensed\0"
 #define VER_LEGALTRADEMARKS1_STR    "\0"
 #define VER_LEGALTRADEMARKS2_STR    "\0"
 #define VER_ORIGINALFILENAME_STR    "QVD Client.exe\0"
 #define VER_PRODUCTNAME_STR         "QVD Client\0"
-
+#define VER_COMMENTS_STR            "Built with @CMAKE_CXX_COMPILER_ID@ @CMAKE_CXX_COMPILER_VERSION@"
 
 #ifndef QVD_PRIVATE_BUILD
 #define VER_PRIVATEBUILD            0
@@ -59,6 +59,7 @@ BEGIN
             VALUE "OriginalFilename", VER_ORIGINALFILENAME_STR
             VALUE "ProductName",      VER_PRODUCTNAME_STR
             VALUE "ProductVersion",   VER_PRODUCTVERSION_STR
+            VALUE "Comments",         VER_COMMENTS_STR
         END
     END
 
