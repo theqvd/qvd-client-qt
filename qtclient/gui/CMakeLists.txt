@@ -77,6 +77,8 @@ else()
 #    qt5_create_translation(QM_FILES ${CMAKE_BINARY_DIR} ${TS_FILES})
 endif()
 
+set_property(TARGET QVD_Client PROPERTY CXX_STANDARD 17)
+set_property(TARGET QVD_Client PROPERTY CXX_STANDARD_REQUIRED ON)
 
 target_include_directories(QVD_Client PRIVATE ${libqvdclient_INCLUDE_DIRS})
 target_link_directories(QVD_Client PRIVATE ${libqvdclient_LIB_DIRS})

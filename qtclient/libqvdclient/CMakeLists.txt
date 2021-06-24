@@ -47,6 +47,10 @@ add_library(qvdclient SHARED
     ${CMAKE_CURRENT_BINARY_DIR}/version.rc
 )
 
+set_property(TARGET qvdclient PROPERTY CXX_STANDARD 17)
+set_property(TARGET qvdclient PROPERTY CXX_STANDARD_REQUIRED ON)
+
+
 if (WIN32)
     set(EXTRA_LIBS wsock32 ws2_32 setupapi)
 endif()
