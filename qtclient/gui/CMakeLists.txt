@@ -69,7 +69,7 @@ else()
             ${PROJECT_SOURCES}
         )
     else()
-        add_executable(QVD_Client
+        add_executable(QVD_Client WIN32
             ${PROJECT_SOURCES}
         )
     endif()
