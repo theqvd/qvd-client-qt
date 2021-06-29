@@ -13,6 +13,7 @@ $TimestampServer = "http://timestamp.sectigo.com"
 $CertificateThumbprint = "4EC4BC69CAF66CFFB8EA1245E12C4C4291A887DB"
 
 $Certificate = Get-ChildItem cert:\CurrentUser\My -CodeSigningCert | Where-Object { $_.Thumbprint -eq "$CertificateThumbprint" }
+$TODAY = Get-Date -Format "yyyy-MM-dd"
 
 
 function Invoke-BatchFile
@@ -54,11 +55,37 @@ function Sign {
 	$relpath = Get-Item $Path | Resolve-Path -Relative
 
 	Write-Host -NoNewLine "Signing $relpath... "
+
 	$sign_info = Get-AuthenticodeSignature $Path
 
 	if ( $sign_info.Status -ne "Valid" ) {
-		#$sign_info = Set-AuthenticodeSignature $Path -Certificate (Get-ChildItem cert:\CurrentUser\My -CodeSigningCert) -HashAlgorithm SHA256 -TimestampServer $TimestampServer
-		$sign_info = Set-AuthenticodeSignature $Path -Certificate $Certificate -HashAlgorithm SHA256 -TimestampServer $TimestampServer
+		$signed = 0
+		$retries = 0
+
+		# This nonsense is here because for some reason often we get:
+		#  | The process cannot access the file '...qvd-client-installer-4.2.0-rc1-11-g0726d65-202.exe'
+		#  | because it is being used by another process.
+		#
+		# This is weird because the name is new and unique -- the build number increments every time.
+		# Must be an antivirus or some such thing. So we just try again, and then it works.
+		while(!$signed) {
+			try {
+				$sign_info = Set-AuthenticodeSignature $Path -Certificate $Certificate -HashAlgorithm SHA256 -TimestampServer $TimestampServer
+				$signed = 1
+			}
+			catch {
+				#Write-Host "Exception"
+				#$PSItem.InvocationInfo | Format-List *
+
+				Write-Host -NoNewLine ", retrying"
+				$retries = $retries + 1
+				if ( $retries > 10 ) {
+					throw "Retry count exceeded"
+				}
+
+				Start-Sleep -Milliseconds 250
+			}
+		}
 
 		if ( $sign_info.Status -eq "Valid" ) {
 			Write-Host -ForegroundColor green "Done."
@@ -89,26 +116,23 @@ function Header {
 	Write-Host -NoNewLine "$HDR`r"
 }
 
+function ReplaceVariables($InputFile, $OutputFile) {
+	$data = Get-Content -Path $InputFile -Raw
+	$data = $data -Replace "%QVD_VERSION_FULL%","$Env:QVD_VERSION_FULL"
+	$data = $data -Replace "%QVD_VERSION%","$Env:QVD_VERSION"
+	$data = $data -Replace "%QVD_RELEASE_DATE%","$TODAY"
+	$junk = New-Item -Path $OutputFile -Value "$data" -ItemType File -Force
+}
 
 $QT_VER="5.15.2"
 $QT_DIR="C:\Qt"
 $use_mingw = 0
 $MAKETOOL_ARGS = ""
+$QT_COMPILER="mingw81_64"
+$MAKETOOL="ninja"
 
-if ( $use_mingw ) {
-	$QT_COMPILER="mingw81_64"
-	$COMPILER="mingw810_64"
-	$SPEC="win32-g++"
-	$MAKETOOL="mingw32-make"
-} else {
-	$QT_COMPILER="msvc2019_64"
-	$COMPILER="mingw810_64"
-	$SPEC="win32-msvc"
-	$MAKETOOL="ninja"
-
-	if ( $Verbose ) {
-		$MAKETOOL_ARGS="-v"
-	}
+if ( $Verbose ) {
+	$MAKETOOL_ARGS="-v"
 }
 
 if ( ! $Env:VCINSTALLDIR ) {
@@ -145,6 +169,8 @@ $rev_parts = $ver_parts[2].Split("-")
 $Env:QVD_VERSION_MAJOR    = $ver_parts[0]
 $Env:QVD_VERSION_MINOR    = $ver_parts[1]
 $Env:QVD_VERSION_REVISION = $rev_parts[0]
+$Env:QVD_VERSION          = $ver_parts[0] + "." + $ver_parts[1] + "." + $rev_parts[0]
+$Env:QVD_VERSION_FULL     = $git_ver
 
 if ( ! $Env:BUILD_NUMBER ) {
 	Write-Host "BUILD_NUMBER variable not set, using build counter"
@@ -167,10 +193,21 @@ if ( ! $Env:BUILD_NUMBER ) {
 	$Env:QVD_BUILD = $Env:BUILD_NUMBER
 }
 
+if ( $git_ver -notmatch '^\d+\.\d+\.\d+$' ) {
+	$Env:QVD_PRERELEASE=1
+}
+
 Header "Starting build"
 
 Write-Host -ForegroundColor blue -NoNewLine "Version  : "
-Write-Host "$git_ver ($Env:QVD_VERSION_MAJOR, $Env:QVD_VERSION_MINOR, $Env:QVD_VERSION_REVISION)"
+Write-Host -NoNewLine "$git_ver ($Env:QVD_VERSION_MAJOR, $Env:QVD_VERSION_MINOR, $Env:QVD_VERSION_REVISION)"
+
+if ( "$Env:QVD_PRERELEASE" ) {
+	Write-Host " [pre-release]"
+} else {
+	Write-Host " [release]"
+}
+
 
 Write-Host -ForegroundColor blue -NoNewLine "Commit   : "
 Write-Host "$git_commit"
@@ -192,7 +229,9 @@ Write-Host ""
 $build_dir = New-TemporaryDirectory
 Set-Location -Path "$build_dir"
 
-cmake "${PSScriptRoot}\..\qtclient" -G Ninja
+# msvc experiment:
+# -D CMAKE_C_COMPILER=cl CMAKE_CXX_COMPILER=cl
+cmake  "${PSScriptRoot}\..\qtclient" -G Ninja
 
 if ( $LastExitCode -gt 0 ) {
 	throw "cmake failed with status $LastExitCode !"
@@ -219,6 +258,7 @@ $junk = New-Item -Path "packages\com.qindel.qvd\data" -Name "scripts" -ItemType 
 
 
 $data = "packages\com.qindel.qvd\data"
+$data_abspath = Resolve-Path -Path $data
 
 Write-Host "Copying build files..."
 Copy-Item -Path "..\LICENSE"                             -Destination "$data\LICENSE.txt"
@@ -234,6 +274,19 @@ Copy-Item -Path "$FilesPath\redist\*.exe"                -Destination "$data"
 Copy-Item -Path "$SSL_BIN_PATH\libcrypto*"               -Destination "$data"
 Copy-Item -Path "$SSL_BIN_PATH\libssl*"                  -Destination "$data"
 Copy-Item -Path "install_scripts\*"                      -Destination "$data\scripts\"
+
+# GCC requires some extra libraries. We find out whether this is needed by
+# checking which compiler was used to build the .exe. This is embedded into the
+# Comments VERSIONINFO field by CMake.
+$ver=[System.Diagnostics.FileVersionInfo]::GetVersionInfo("$data_abspath\QVD_Client.exe")
+if ($ver.Comments -like 'Built with GNU*') {
+	Write-Host "Copying GCC runtime dependencies..."
+
+	foreach ($file in "libgcc_s_seh-1.dll", "libwinpthread-1.dll", "libstdc++-6.dll") {
+		Copy-Item -Path "$QT_BIN_PATH\$file" -Destination "$data"
+	}
+}
+
 
 $deploy_args = "--verbose=0"
 if ( $Verbose ) {
@@ -255,6 +308,10 @@ foreach ($bin in $binaries) {
 }
 
 
+
+Header "Generating installer config"
+ReplaceVariables -InputFile "config\config.xml.in"                        -OutputFile "config\config.xml"
+ReplaceVariables -InputFile "packages\com.qindel.qvd\meta\package.xml.in" -OutputFile "packages\com.qindel.qvd\meta\package.xml"
 
 Header "Generating installer"
 

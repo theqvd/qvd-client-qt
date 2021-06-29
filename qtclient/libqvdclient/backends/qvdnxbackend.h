@@ -45,6 +45,10 @@ private slots:
     void XServerReady();
     void XServerFailed(const QString &error);
 
+    void forwarderTransferred(int64_t a_to_b, int64_t b_to_a) {
+        // Parameters intentionally reversed to match user point of view
+        addTotalTraffic(b_to_a, a_to_b);
+    }
 private:
     QString m_nxproxyBinary = "/usr/bin/nxproxy";
 

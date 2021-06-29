@@ -59,3 +59,16 @@ void QVDBackend::setAudioPort(const quint16 &audio_port)
 {
     m_audio_port = audio_port;
 }
+
+void QVDBackend::addStat(QVDBackend::NXChannel channel, int64_t in, int64_t out)
+{
+    if (!m_statistics.channelTraffic.contains(channel)) {
+        m_statistics.channelTraffic.insert(channel, {in, out});
+    } else {
+        m_statistics.channelTraffic[channel].in  += in;
+        m_statistics.channelTraffic[channel].out += out;
+    }
+
+    emit statisticsUpdated(m_statistics);
+    emit channelStatIncrement(channel, in, out);
+}

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>442</width>
-    <height>542</height>
+    <width>554</width>
+    <height>747</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -205,6 +205,13 @@
            </widget>
           </item>
           <item>
+           <widget class="QCheckBox" name="showBandwidthGraphCheck">
+            <property name="text">
+             <string>Show bandwidth graph</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <spacer name="verticalSpacer_2">
             <property name="orientation">
              <enum>Qt::Vertical</enum>
@@ -346,9 +353,6 @@
              <layout class="QVBoxLayout" name="verticalLayout_11">
               <item>
                <widget class="QListView" name="EnvVarList">
-                <property name="frameShadow">
-                 <enum>QFrame::Sunken</enum>
-                </property>
                 <property name="resizeMode">
                  <enum>QListView::Adjust</enum>
                 </property>
@@ -448,7 +452,6 @@ Build: N/A</string>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>
-  <include location="images.qrc"/>
   <include location="images.qrc"/>
  </resources>
  <connections>

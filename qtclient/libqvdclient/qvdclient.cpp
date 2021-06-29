@@ -475,11 +475,16 @@ void QVDClient::backend_connectionEstablished()
     emit vmConnected(0);
 }
 
-void QVDClient::backend_failed(const QString &error)
+void QVDClient::backend_failed(QVDBackend::BackendError error, const QString &description)
 {
-    qCritical() << "Backend failed with error: " << error;
+    qCritical() << "Backend failed with error: " << error << ", " << description;
     disconnectFromQVD();
-    emit connectionError(QVDClient::ConnectionError::XServerError, error);
+
+    if ( error == QVDBackend::BackendError::XServerFailed ) {
+        emit connectionError(QVDClient::ConnectionError::XServerError, description);
+    } else {
+        emit connectionError(QVDClient::ConnectionError::BackendError, description);
+    }
 }
 
 void QVDClient::slave_success(const QVDSlaveCommand &cmd)

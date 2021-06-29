@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.16)
 
 project(libqvdclient LANGUAGES CXX)
 
+
+
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
@@ -15,7 +17,7 @@ if (LINUX)
     add_compile_definitions(USE_LIB_X11_KEYBOARD_DETECTION=1)
 endif()
 
-
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/version.rc.in ${CMAKE_CURRENT_BINARY_DIR}/version.rc @ONLY)
 
 
 add_library(qvdclient SHARED
@@ -44,7 +46,12 @@ add_library(qvdclient SHARED
     usbip/usbdevice.cpp
     usbip/usbdatabase.cpp
 #    backends/qvdlibnxbackend.cpp
+    ${CMAKE_CURRENT_BINARY_DIR}/version.rc
 )
+
+set_property(TARGET qvdclient PROPERTY CXX_STANDARD 17)
+set_property(TARGET qvdclient PROPERTY CXX_STANDARD_REQUIRED ON)
+
 
 if (WIN32)
     set(EXTRA_LIBS wsock32 ws2_32 setupapi)

@@ -15,6 +15,11 @@ QString VersionInfo::getCommit()
     return QString(QVD_COMMIT_HASH);
 }
 
+QString VersionInfo::getFullVersion()
+{
+    return QString(QVD_VERSION_FULL);
+}
+
 bool VersionInfo::isRunningFromSource()
 {
     return getVersion().majorVersion() == 0;

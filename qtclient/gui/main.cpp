@@ -123,9 +123,11 @@ int main(int argc, char *argv[])
 
     QVDConnectionParameters params = ConfigLoader::loadConnectionParameters();
     NXErrorCommandData nxerr;
+    CommandLineParser::MiscParameters misc_params;
+
 
     auto &parser = CommandLineParser::getInstance();
-    auto retval = parser.parse(params, nxerr);
+    auto retval = parser.parse(params, nxerr, misc_params);
 
     QMap<QMessageBox::Button, Action> button_action_map;
 
@@ -250,7 +252,7 @@ int main(int argc, char *argv[])
         QMessageBox msgbox;
         msgbox.setWindowTitle("QVD Client");
         msgbox.setText("QVD Client requires XQuartz for its functionality.\n"
-                       "Click Ok to go to the XQuartz website to download it.yu");
+                       "Click Ok to go to the XQuartz website to download it.");
 
         msgbox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
         QMessageBox::StandardButton selection = static_cast<QMessageBox::StandardButton>(msgbox.exec());
@@ -269,6 +271,7 @@ int main(int argc, char *argv[])
 
     MainWindow w;
     w.setConnectionParms(params);
+    w.setMiscParameters(misc_params);
     w.show();
 
     return a.exec();

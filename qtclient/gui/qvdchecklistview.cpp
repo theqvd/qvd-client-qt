@@ -29,9 +29,6 @@ QVariant QVDListModel::data(const QModelIndex &index, int role) const {
     if(role == Qt::CheckStateRole)
         return checkedItems.contains(index) ?
                     Qt::Checked : Qt::Unchecked;
-    else if(role == Qt::BackgroundRole)
-        return checkedItems.contains(index) ?
-                    QColor("#ffffb2") : QColor("#ffffff");
     return QStringListModel::data(index, role);
 }
 

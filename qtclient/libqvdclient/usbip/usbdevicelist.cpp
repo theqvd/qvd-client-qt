@@ -7,7 +7,7 @@
 #include <tchar.h>
 #include <setupapi.h>
 #include <initguid.h>
-#include "helpers/binaryfinder.h"
+#include "helpers/pathtools.h"
 
 DEFINE_GUID(GUID_DEVINTERFACE_USB_DEVICE, 0xA5DCBF10L, 0x6530, 0x11D2, 0x90, 0x1F, 0x00, 0xC0, 0x4F, 0xB9, 0x51, 0xED);
 #endif
@@ -29,17 +29,19 @@ void UsbDeviceList::refresh() {
 #ifdef Q_OS_LINUX
     qInfo() << "Retrieving devices from " << m_device_path;
 
+    UsbDatabase db;
     auto devices = m_device_path.entryList();
 
     for( auto& file : devices ) {
         qInfo() << "Creating device from " << file;
-        USBDevice dev = USBDevice::fromPath(m_device_path.filePath(file));
+        USBDevice dev = USBDevice::fromPath(m_device_path.filePath(file), db);
         if ( dev.isValid() && dev.deviceClass() != USBDevice::Hub ) {
             m_devices.append(dev);
         }
     }
 
-    emit updated();
+    qInfo() << "Device list done.";
+    emit updated(true);
 #endif
 #ifdef WIN32
 
