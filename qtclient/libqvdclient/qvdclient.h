@@ -95,7 +95,7 @@ public:
 
     void handle_printer();
 
-
+    QString getTimeZone();
 
     QVDConnectionParameters getParameters() const;
     void setParameters(const QVDConnectionParameters &parameters);
