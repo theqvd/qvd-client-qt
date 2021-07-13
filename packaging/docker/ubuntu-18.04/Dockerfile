@@ -4,7 +4,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt update
 RUN apt upgrade -y
-RUN apt install -y build-essential \
+RUN apt update &&  apt install -y build-essential \
                    qtbase5-dev \ 
                    qtdeclarative5-dev \
                    qttools5-dev \
