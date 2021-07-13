@@ -12,4 +12,6 @@ apt-get install -y build-essential \
                    dh-make \
                    libxt-dev \
                    libxkbfile-dev \
-                   libsystemd-dev
+                   libsystemd-dev \
+		   libqt5charts5-dev \
+		   cmake
