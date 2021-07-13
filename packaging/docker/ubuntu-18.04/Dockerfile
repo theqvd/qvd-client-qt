@@ -21,5 +21,5 @@ RUN curl http://security.ubuntu.com/ubuntu/pool/main/d/debhelper/debhelper_12.1.
     -o debhelper_12.1.1ubuntu1~ubuntu18.04.1_all.deb && \ 
     dpkg -i debhelper_12.1.1ubuntu1~ubuntu18.04.1_all.deb
 
-RUN systemctl start snapd.socket
+RUN /usr/lib/snapd/snapd &
 RUN snap install cmake --classic
