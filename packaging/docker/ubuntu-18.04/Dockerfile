@@ -15,11 +15,12 @@ RUN apt update &&  apt install -y build-essential \
                    libxt-dev \
                    libxkbfile-dev \
                    dwz \
-		   snapd
+                   wget
 
 RUN curl http://security.ubuntu.com/ubuntu/pool/main/d/debhelper/debhelper_12.1.1ubuntu1~ubuntu18.04.1_all.deb \
     -o debhelper_12.1.1ubuntu1~ubuntu18.04.1_all.deb && \ 
     dpkg -i debhelper_12.1.1ubuntu1~ubuntu18.04.1_all.deb
 
-RUN /usr/lib/snapd/snapd &
-RUN snap install cmake --classic
+RUN wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | apt-key add - && \
+    echo 'deb https://apt.kitware.com/ubuntu/ bionic main' >  /etc/apt/sources.list.d/cmake.list && \
+    apt-get update && apt-get install -y cmake
