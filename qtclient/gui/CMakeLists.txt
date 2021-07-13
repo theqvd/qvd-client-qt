@@ -21,24 +21,32 @@ set(CMAKE_AUTORCC ON)
 #    endif()
 #endif()
 
-find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets LinguistTools Network REQUIRED)
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets LinguistTools Network REQUIRED)
+find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets LinguistTools Network Charts REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets LinguistTools Network Charts REQUIRED)
 
 #set(TS_FILES QVD_Client_en_US.ts)
+
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/version.rc.in ${CMAKE_CURRENT_BINARY_DIR}/version.rc @ONLY)
+
 
 set(COMMON_SOURCES
     commandlineparser.cpp
     configloader.cpp
+    connectionstatistics.cpp
+    connectionstatistics.ui
+    connectionstatisticschart.cpp
     images.qrc
     listdialog.cpp
     main.cpp
     mainwindow.cpp
     mainwindow.ui
+    movingaverage.cpp
     qvdchecklistview.cpp
     sslerrordialog.cpp
     usbdevicelistmodel.cpp
     versioninfo.cpp
     mainwindow.ui
+    icon.rc
     images.qrc
     )
 
@@ -46,6 +54,7 @@ set(PROJECT_SOURCES
     ${COMMON_SOURCES}
     ${PLATFORM_SOURCES}
     ${TS_FILES}
+    ${CMAKE_CURRENT_BINARY_DIR}/version.rc
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -60,7 +69,7 @@ else()
             ${PROJECT_SOURCES}
         )
     else()
-        add_executable(QVD_Client
+        add_executable(QVD_Client WIN32
             ${PROJECT_SOURCES}
         )
     endif()
@@ -68,10 +77,12 @@ else()
 #    qt5_create_translation(QM_FILES ${CMAKE_BINARY_DIR} ${TS_FILES})
 endif()
 
+set_property(TARGET QVD_Client PROPERTY CXX_STANDARD 17)
+set_property(TARGET QVD_Client PROPERTY CXX_STANDARD_REQUIRED ON)
 
 target_include_directories(QVD_Client PRIVATE ${libqvdclient_INCLUDE_DIRS})
 target_link_directories(QVD_Client PRIVATE ${libqvdclient_LIB_DIRS})
-target_link_libraries(QVD_Client PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Network qvdclient)
+target_link_libraries(QVD_Client PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Network Qt${QT_VERSION_MAJOR}::Charts qvdclient)
 
 install(TARGETS QVD_Client
        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})

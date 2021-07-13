@@ -41,7 +41,7 @@ QVDConnectionParameters::ConnectionSpeed CommandLineParser::strToConnectionSpeed
     return QVDConnectionParameters::ConnectionSpeed::LAN;
 }
 
-CommandLineParser::Result CommandLineParser::parse(QVDConnectionParameters &params, NXErrorCommandData &nxerr ) {
+CommandLineParser::Result CommandLineParser::parse(QVDConnectionParameters &params, NXErrorCommandData &nxerr, MiscParameters &misc_params) {
 
     const auto username       = addOption("user"           , _t("Login username."), "username");
     const auto password       = addOption("password"       , _t("Login password."), "password");
@@ -56,6 +56,8 @@ CommandLineParser::Result CommandLineParser::parse(QVDConnectionParameters &para
     const auto noheader       = addOption("no-header"      , _t("Don't show the header for --list-vms and --list-apps."), "no-header");
     const auto json           = addOption("json"           , _t("Use JSON to dump the --list-vms and --list-apps data."), "json");
     const auto connectionType = addOption("connection-type", _t("Type of connection to use: ") + getConnectionTypes(), "type");
+
+    const auto experimental   = addOption("experimental"   , _t("Enable experimental features"));
 
     // These are used by nxproxy to show errors. In standard NX this is an external Python script.
     // This is basically a specialized xmessage/kdialog/zenity.
@@ -81,6 +83,11 @@ CommandLineParser::Result CommandLineParser::parse(QVDConnectionParameters &para
 
     if (m_qparser.isSet(helpOption))
         return Result::CommandLineHelpRequested;
+
+    if (m_qparser.isSet(experimental)) {
+        qDebug() << "Experimental features enabled";
+        misc_params.enableExperimentalFeatures = true;
+    }
 
     if (m_qparser.isSet(username))
         params.setUsername(m_qparser.value(username));

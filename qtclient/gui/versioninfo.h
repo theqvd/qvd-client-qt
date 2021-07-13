@@ -24,6 +24,9 @@
 #define QVD_COMMIT_HASH ""
 #endif
 
+#ifndef QVD_VERSION_FULL
+#define QVD_VERSION_FULL ""
+#endif
 
 
 class VersionInfo
@@ -33,6 +36,7 @@ public:
     static QVersionNumber getVersion();
     static int getBuild() { return QVD_BUILD; }
     static QString getCommit();
+    static QString getFullVersion();
     static bool isRunningFromSource();
 };
 

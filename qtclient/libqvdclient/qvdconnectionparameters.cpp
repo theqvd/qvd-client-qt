@@ -193,7 +193,7 @@ QDebug operator<<(QDebug debug, const QVDConnectionParameters &p)
                     << " Host = '" << p.host() << "'"
                     << "; Port = " << p.port()
                     << "; User = '" << p.username() << "'"
-                    << "; Password = '" << p.password() << "'"
+                    << "; Password = '" << "********" /* p.password() */ << "'"
                     << "; Speed = " << p.connectionSpeed()
                     << "; Geometry = " << p.geometry()
                     << "; Keyboard = '" << p.keyboard() << "'"

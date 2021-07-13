@@ -43,6 +43,7 @@ public:
         ServerBlocked,        // Server has been blocked by the admin
         ServerError,          // Server returns an error
         XServerError,         // X server failed to start
+        BackendError,         // Backend failed
         Unexpected            // unforseen error that is not specifically handled
 
     } ConnectionError;
@@ -151,8 +152,6 @@ signals:
     void hostFound();
     void socketStateChanged(QAbstractSocket::SocketState socketState);
 
-
-
 private slots:
     void qvd_sslErrors(const QList<QSslError> &errors);
     void qvd_connectionEstablished();
@@ -169,7 +168,7 @@ private slots:
 
     void backend_listeningOnTcp(QVDBackend::NXChannel channel, quint16 port);
     void backend_connectionEstablished();
-    void backend_failed(const QString &error);
+    void backend_failed(QVDBackend::BackendError error, const QString &description);
 
     void slave_success(const QVDSlaveCommand &cmd);
     void slave_failure(const QVDSlaveCommand &cmd);

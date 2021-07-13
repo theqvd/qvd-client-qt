@@ -86,6 +86,10 @@ void XServerLauncher::start() {
     m_process.setWorkingDirectory(fi.path());
     m_process.start(m_xserver_path, opts);
 #endif
+#ifdef Q_OS_MAC
+    qDebug() << "Running on Mac OS, X server auto-starts";
+    emit running();
+#endif
 }
 
 void XServerLauncher::stop() {
@@ -129,7 +133,7 @@ void XServerLauncher::processStderrReady()
 }
 
 
-void XServerLauncher::socketError(QAbstractSocket::SocketError __attribute__((unused)) error)
+void XServerLauncher::socketError([[maybe_unused]] QAbstractSocket::SocketError error)
 {
 
 }

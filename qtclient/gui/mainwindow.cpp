@@ -79,6 +79,18 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Ensure the first tab is selected
     ui->mainTabWidget->setCurrentWidget(ui->connectTab);
+    ui->sharedResourcesTabWidget->setCurrentWidget(ui->SharedFolders);
+#ifdef Q_OS_MACX
+    // No USBIP on Mac currently
+    ui->USBRedirection->setVisible(false);
+    ui->enableUSBRedirectionCheck->setChecked(false);
+
+    int usb_redir_index = ui->sharedResourcesTabWidget->indexOf(ui->USBRedirection);
+    ui->sharedResourcesTabWidget->removeTab(usb_redir_index);
+#endif
+
+    connect(&m_traffic_timer, &QTimer::timeout, this, &MainWindow::printTraffic);
+
 
     // Ensure the window's size is the smallest possible
     resize(MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGHT);
@@ -100,13 +112,20 @@ void MainWindow::setUI(bool enabled)
     if ( enabled ) {
         ui->progressBar->setMaximum(100);
         ui->progressBar->setValue(0);
+        m_traffic_timer.stop();
     }
     else
     {
         ui->progressBar->setMaximum(0);
         ui->progressBar->setValue(0);
+        m_traffic_timer.start(15000);
     }
 
+}
+
+bool MainWindow::connectionActive()
+{
+    return ui->centralWidget->isEnabled();
 }
 
 void MainWindow::connectToVM() {
@@ -131,6 +150,7 @@ void MainWindow::connectToVM() {
     settings.beginGroup("paths");
 
     QVDNXBackend *nx_backend = new QVDNXBackend(this);
+    connect(nx_backend, &QVDBackend::totalTrafficIncrement, this, &MainWindow::backendTrafficInc);
 
     settings.endGroup();
 
@@ -163,6 +183,7 @@ void MainWindow::connectToVM() {
 
     nx_backend->setParameters(params);
     m_client->setBackend(nx_backend);
+    m_stats_window.connectToBackend(nx_backend);
     m_client->setParameters(params);
     m_client->connectToQVD();
     //setUI(false);
@@ -201,21 +222,26 @@ void MainWindow::vmListReceived(const QList<QVDClient::VMInfo> &vmlist)
 
 void MainWindow::socketError(QAbstractSocket::SocketError error)
 {
+
     qWarning() << "socketError " << error << " connecting with " << m_client->getParameters();
     qWarning() << "Socket error: " << m_client->getSocket()->errorString();
     qWarning() << "Socket error: " << m_client->getSocket()->error();
 
 
 
-    QString message = QString("Failed to connect to QVD at %1:%2\n%3")
-                            .arg(m_client->getParameters().host())
-                            .arg(m_client->getParameters().port())
-                            .arg(m_client->getSocket()->errorString());
+    if ( connectionActive() ) {
+        // This ensures the error only happens once
+        QString message = QString("Failed to connect to QVD at %1:%2\n%3")
+                                .arg(m_client->getParameters().host())
+                                .arg(m_client->getParameters().port())
+                                .arg(m_client->getSocket()->errorString());
 
-    this->show();
-    QMessageBox::critical(this, "QVD", message);
+        this->show();
+        QMessageBox::critical(this, "QVD", message);
 
-    setUI(true);
+        m_client->disconnectFromQVD();
+        setUI(true);
+    }
 }
 
 void MainWindow::connectionEstablished()
@@ -249,6 +275,7 @@ void MainWindow::connectionError(QVDClient::ConnectionError error, QString error
     case QVDClient::ServerBlocked: errstr = "Server blocked"; break;
     case QVDClient::ServerError: errstr = "Server error"; break;
     case QVDClient::XServerError: errstr = "X Server error"; break;
+    case QVDClient::BackendError: errstr = "Backend error"; break;
     }
 
     qCritical() << "Connection error " << error << ": " << error_desc;
@@ -367,6 +394,17 @@ void MainWindow::enableSharedFoldersClicked()
     ui->removeSharedFolderButton->setEnabled( enabled );
 }
 
+void MainWindow::backendTrafficInc(int64_t in, int64_t out)
+{
+    m_avg_in_15s.add( in );
+    m_avg_out_15s.add( out );
+}
+
+void MainWindow::printTraffic()
+{
+    qInfo() << "Traffic avg in =" << m_avg_in_15s.getAverage() << "bytes/s; out =" << m_avg_out_15s.getAverage() << "bytes/s";
+}
+
 void MainWindow::saveSettings() {
     QSettings settings;
 
@@ -420,7 +458,7 @@ void MainWindow::loadSettings() {
 
     for(int i=0;i<ui->connectionTypeComboBox->count(); i++) {
         ui->connectionTypeComboBox->setCurrentIndex(i);
-        if ( ui->connectionTypeComboBox->currentData() == settings.value("speed", QVDConnectionParameters::ConnectionSpeed::LAN ))
+        if ( ui->connectionTypeComboBox->currentData() == settings.value("speed", QVDConnectionParameters::ConnectionSpeed::ADSL ))
             break;
     }
 
@@ -460,7 +498,7 @@ void MainWindow::updateVersionInfo()
     if ( VersionInfo::isRunningFromSource() ) {
         verStr << "Running from source\n";
     } else {
-        verStr << "QVD Client " << VersionInfo::getVersion().toString() << "\n";
+        verStr << "QVD Client " << VersionInfo::getFullVersion() << "\n";
         verStr << QString::fromUtf8(u8"\u00a9 Qindel Group 2021\n\n");
         verStr << "Build " << VersionInfo::getBuild() << "\n";
     }
@@ -480,6 +518,13 @@ void MainWindow::closeEvent(QCloseEvent *event) {
 //    {
         event->accept();
         //    }
+}
+
+void MainWindow::setMiscParameters(CommandLineParser::MiscParameters misc_params)
+{
+    m_misc_params = misc_params;
+
+    ui->showBandwidthGraphCheck->setVisible( m_misc_params.enableExperimentalFeatures );
 }
 
 void MainWindow::setConnectionParms(const QVDConnectionParameters &params)

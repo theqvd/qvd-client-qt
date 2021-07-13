@@ -2,8 +2,8 @@
 <Package>
     <DisplayName>QVD Client</DisplayName>
     <Description>Install the QVD client</Description>
-    <Version>4.3</Version>
-    <ReleaseDate>2020-10-27</ReleaseDate>
+    <Version>%QVD_VERSION%</Version>
+    <ReleaseDate>%QVD_RELEASE_DATE%</ReleaseDate>
     <!--
     <Licenses>
         <License name="GPL3" file="LICENSE.txt" />

@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QTcpSocket>
+#include <QHash>
 
 #include "qvdconnectionparameters.h"
 #include "qvdclient_global.h"
@@ -17,6 +18,10 @@ class LIBQVDCLIENT_EXPORT QVDBackend : public QObject
 {
     Q_OBJECT
 public:
+
+    /**
+     * @brief Channel type
+     */
     typedef enum {
         Unknown,
         X11,
@@ -31,12 +36,48 @@ public:
     } NXChannel;
     Q_ENUM(NXChannel)
 
+    /**
+     * @brief Error type
+     */
+    typedef enum {
+        UnknownError,
+        NotFound,
+        LinkingError,
+        Crash,
+        Abort,
+        StartFailure,
+        CommunicationFailure,
+        XServerFailed,
+    } BackendError;
+    Q_ENUM(BackendError)
+
+    struct TrafficData {
+        int64_t in;
+        int64_t out;
+    };
+
+    struct Statistics {
+        QHash<NXChannel, TrafficData> channelTraffic;
+        TrafficData totalTraffic{0,0};
+    };
+
     explicit QVDBackend(QObject *parent = nullptr);
     ~QVDBackend();
 
 
 
+    /**
+     * @brief Connection parameters
+     * @return Connection parameters
+     */
     QVDConnectionParameters parameters() const;
+
+    /**
+     * @brief Sets the connection parameters
+     * @param Connection parameters to use
+     *
+     * This should be called before starting the backend. Later changes may have no effect.
+     */
     void setParameters(const QVDConnectionParameters &parameters);
 
 
@@ -62,6 +103,12 @@ public:
      * @return Byte count
      */
     virtual int64_t bytesWritten();
+
+    /**
+     * @brief Returns the current statistics
+     * @return Stats
+     */
+    Statistics getStatistics() const { return m_statistics; }
 
     quint16 cupsPort() const;
     void setCupsPort(const quint16 &cupsPort);
@@ -164,14 +211,37 @@ signals:
      * @brief The backend has failed, and the connection has been closed
      * @param error Description of the error
      */
-    void failed(const QString &error);
+    void failed(BackendError error, const QString &description);
 
 
     /**
      * @brief Backend has finished
      */
     void finished();
+
+    /**
+     * @brief The statistics have changed
+     * @param Current stats
+     */
+    void statisticsUpdated(const Statistics &stats);
+
+    void channelStatIncrement(NXChannel chan, int64_t in, int64_t out);
+
+    void totalTrafficIncrement(int16_t in, int64_t out);
+
 public slots:
+
+protected:
+    void addStat(NXChannel channel, int64_t in, int64_t out);
+    void addTotalTraffic(int64_t in, int64_t out) {
+        m_statistics.totalTraffic.in  += in;
+        m_statistics.totalTraffic.out += out;
+
+        emit statisticsUpdated(m_statistics);
+        emit totalTrafficIncrement(in, out);
+    }
+
+    Statistics m_statistics;
 
 private:
     QVDConnectionParameters m_parameters;
@@ -180,6 +250,8 @@ private:
     quint16 m_slave_port = 63640;
     quint16 m_audio_port = 4713;
 
+protected:
+    bool m_linking_error_detected = false;
 };
 
 #endif // QVDBACKEND_H
