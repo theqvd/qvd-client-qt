@@ -21,9 +21,9 @@ if [ -z "$docker_image" ] ; then
    bash -x build
    cd "$curdir"
    mkdir -p output/ubuntu21.04
-   docker run -i -v /tmp/ubuntu-files:/files:Z -v $curdir/output/ubuntu21.04:/out ubuntu-devtools:21.04-0 /files/build
+   docker run -i -v /tmp/ubuntu-files:/files:Z -v $curdir/output/ubuntu21.04:/out ubuntu-devtools:21.04-1 /files/build
 else
    cd "$curdir"
    mkdir -p output/ubuntu21.04
-   docker run -i -v /tmp/ubuntu-files:/files:Z -v $curdir/output/ubuntu21.04:/out ubuntu-devtools:21.04-0 /files/build
+   docker run -i -v /tmp/ubuntu-files:/files:Z -v $curdir/output/ubuntu21.04:/out ubuntu-devtools:21.04-1 /files/build
 fi
