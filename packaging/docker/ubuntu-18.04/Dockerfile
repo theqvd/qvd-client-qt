@@ -14,7 +14,8 @@ RUN apt update &&  apt install -y build-essential \
                    dh-make \
                    libxt-dev \
                    libxkbfile-dev \
-                   dwz
+                   dwz \
+		   snap
 
 RUN curl http://security.ubuntu.com/ubuntu/pool/main/d/debhelper/debhelper_12.1.1ubuntu1~ubuntu18.04.1_all.deb \
     -o debhelper_12.1.1ubuntu1~ubuntu18.04.1_all.deb && \ 
