@@ -9,6 +9,7 @@ tar_filename=`basename "$tar"`
 tar_dir=`basename "$tar" .orig.tar.xz | sed 's/qt_/qt-/'`
 
 cp -v /files/*tar* /tmp/build/
+cp -v /tmp/ubuntu-files/LICENSE /tmp/ubuntu-files/README.md /tmp/build
 cd /tmp/build
 tar -xvf $tar
 cd /tmp/build/$tar_dir
