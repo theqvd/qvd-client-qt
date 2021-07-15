@@ -1,4 +1,4 @@
-
+FROM registry.suse.com/suse/sle15:15.2
 
 # Prepare system
 RUN zypper ar http://cpan-mirror.qindel.com/sles15-sp2/installer-full-Media1 installer-full-Media1
