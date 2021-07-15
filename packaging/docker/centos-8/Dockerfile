@@ -6,10 +6,10 @@ RUN sed -i 's/enabled=0/enabled=1/' /etc/yum.repos.d/CentOS-Linux-PowerTools.rep
 RUN dnf install -y epel-release
 
 # Base build tools
-RUN dnf install -y rpm-build make rpm-sign expect
+RUN dnf install -y rpm-build make cmake rpm-sign expect
 
 # qvdclient-qt dependencies
-RUN dnf install -y qt5-qtbase-devel libX11-devel libXt-devel libxkbfile-devel
+RUN dnf install -y qt5-qtbase-devel qt5-qtcharts-devel qt5-linguist libX11-devel libXt-devel libxkbfile-devel
 
 
 # nxproxy dependencies
