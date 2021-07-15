@@ -64,7 +64,7 @@ void tst_LineBuffer::addEmptyLine()
     lb.add("\n");
     QVERIFY( lb.hasLine() );
     QVERIFY( !lb.hasPartialLine() );
-    QCOMPARE( lb.getPartialLine(), "");
+    QCOMPARE( lb.getPartialLine(), QString(""));
 }
 
 
@@ -75,7 +75,7 @@ void tst_LineBuffer::addPartialLine()
     lb.add("Hello");
     QVERIFY( !lb.hasLine() );
     QVERIFY( lb.hasPartialLine() );
-    QCOMPARE( lb.getPartialLine(), "Hello");
+    QCOMPARE( lb.getPartialLine(), QString("Hello"));
 }
 
 void tst_LineBuffer::addFullLine()
@@ -85,7 +85,7 @@ void tst_LineBuffer::addFullLine()
     lb.add("This is a line\n");
     QVERIFY( lb.hasLine() );
     QVERIFY( !lb.hasPartialLine() );
-    QCOMPARE( lb.getLine(), "This is a line");
+    QCOMPARE( lb.getLine(), QString("This is a line"));
 }
 
 void tst_LineBuffer::addFullAndPartial()
@@ -95,7 +95,7 @@ void tst_LineBuffer::addFullAndPartial()
     lb.add("This is a line\nThis is a part");
     QVERIFY( lb.hasLine() );
     QVERIFY( lb.hasPartialLine() );
-    QCOMPARE( lb.getLine(), "This is a line");
+    QCOMPARE( lb.getLine(), QString("This is a line"));
     QVERIFY( !lb.hasLine() );
     QVERIFY( lb.hasPartialLine() );
     QCOMPARE( lb.getPartialLine(), QString("This is a part"));
@@ -116,9 +116,9 @@ void tst_LineBuffer::multiline()
     LineBuffer lb;
 
     lb.add("one\ntwo\nthree\n");
-    QCOMPARE( lb.getLine(), "one");
-    QCOMPARE( lb.getLine(), "two");
-    QCOMPARE( lb.getLine(), "three");
+    QCOMPARE( lb.getLine(), QString("one"));
+    QCOMPARE( lb.getLine(), QString("two"));
+    QCOMPARE( lb.getLine(), QString("three"));
     QVERIFY( !lb.hasLine() );
     QVERIFY( !lb.hasPartialLine() );
 }
@@ -128,8 +128,8 @@ void tst_LineBuffer::unixLineEnding()
     LineBuffer lb;
 
     lb.add("one\ntwo\n");
-    QCOMPARE( lb.getLine(), "one");
-    QCOMPARE( lb.getLine(), "two");
+    QCOMPARE( lb.getLine(), QString("one"));
+    QCOMPARE( lb.getLine(), QString("two"));
     QVERIFY( !lb.hasLine() );
     QVERIFY( !lb.hasPartialLine() );
 }
@@ -139,8 +139,8 @@ void tst_LineBuffer::windowsLineEnding()
     LineBuffer lb;
 
     lb.add("one\r\ntwo\r\n");
-    QCOMPARE( lb.getLine(), "one");
-    QCOMPARE( lb.getLine(), "two");
+    QCOMPARE( lb.getLine(), QString("one"));
+    QCOMPARE( lb.getLine(), QString("two"));
     QVERIFY( !lb.hasLine() );
     QVERIFY( !lb.hasPartialLine() );
 }
@@ -150,8 +150,8 @@ void tst_LineBuffer::addMultipleEmptyLines()
     LineBuffer lb;
 
     lb.add("one\n\ntwo\n");
-    QCOMPARE( lb.getLine(), "one");
-    QCOMPARE( lb.getLine(), "two");
+    QCOMPARE( lb.getLine(), QString("one"));
+    QCOMPARE( lb.getLine(),QString( "two"));
     QVERIFY( !lb.hasLine() );
     QVERIFY( !lb.hasPartialLine() );
 }
