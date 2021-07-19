@@ -206,12 +206,12 @@ QString PathTools::getUsbDatabase()
 bool PathTools::addFromEnv(QStringList &list, const QString &environment)
 {
     if ( qEnvironmentVariableIsSet(environment.toUtf8())) {
-	    QString val = qEnvironmentVariable(environment.toUtf8());
-	    qDebug() << "Adding value from" << environment << ": '" << val << "'";
-	    list.append(val);
-	    return true;
+        QString val = qgetenv(environment.toUtf8());
+        qDebug() << "Adding value from" << environment << ": '" << val << "'";
+        list.append(val);
+        return true;
     } else {
-	    qDebug() << environment << " is not set";
+        qDebug() << environment << " is not set";
     }
 
     return false;
@@ -220,32 +220,32 @@ bool PathTools::addFromEnv(QStringList &list, const QString &environment)
 QString PathTools::findFirstExistingDir(const QStringList &paths, const QStringList &must_contain)
 {
     for(auto path : paths) {
-	    QFileInfo fi(path);
-	    if (!fi.exists()) {
-		    qDebug() << "Testing" << fi << ": Doesn't exist, failed.";
-		    continue;
-	    }
+        QFileInfo fi(path);
+        if (!fi.exists()) {
+            qDebug() << "Testing" << fi.absoluteFilePath() << ": Doesn't exist, failed.";
+            continue;
+        }
 
-	    if (!fi.isDir()) {
-		    qDebug() << "Testing" << fi << ": not a directory, failed.";
-		    continue;
-	    }
+        if (!fi.isDir()) {
+            qDebug() << "Testing" << fi.absoluteFilePath() << ": not a directory, failed.";
+            continue;
+        }
 
-	    if (must_contain.isEmpty()) {
-		    // List is empty, so no check
-		    qDebug() << "Testing" << fi << ": Success, no file check.";
-		    return path;
-	    }
+        if (must_contain.isEmpty()) {
+            // List is empty, so no check
+            qDebug() << "Testing" << fi.absoluteFilePath() << ": Success, no file check.";
+            return path;
+        }
 
-	    for(auto& file : must_contain) {
-		    QFileInfo fi2(QDir(path).filePath(file));
-		    if (fi2.exists()) {
-			    qDebug() << "Testing" << fi2 << ": success, file found.";
-			    return path;
-		    } else {
-			    qDebug() << "Testing" << fi2 << ": failure, not found.";
-		    }
-	    }
+        for(auto& file : must_contain) {
+            QFileInfo fi2(QDir(path).filePath(file));
+            if (fi2.exists()) {
+                qDebug() << "Testing" << fi2.absoluteFilePath() << ": success, file found.";
+                return path;
+            } else {
+                qDebug() << "Testing" << fi2.absoluteFilePath() << ": failure, not found.";
+            }
+        }
 
     }
 

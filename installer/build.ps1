@@ -193,19 +193,29 @@ if ( ! $Env:BUILD_NUMBER ) {
 	$Env:QVD_BUILD = $Env:BUILD_NUMBER
 }
 
-if ( $git_ver -notmatch '^\d+\.\d+\.\d+$' ) {
+if ( $git_ver -match "^\d+\.\d+\.\d+$" ) {
+	$Env:QVD_OFFICIAL_RELEASE=1
+} elseif ($git_ver -match "\d+\.\d+\.\d+-\w+\d+$" ) {
 	$Env:QVD_PRERELEASE=1
+} else {
+	$Env:QVD_DEV_RELEASE=1
 }
+
 
 Header "Starting build"
 
 Write-Host -ForegroundColor blue -NoNewLine "Version  : "
 Write-Host -NoNewLine "$git_ver ($Env:QVD_VERSION_MAJOR, $Env:QVD_VERSION_MINOR, $Env:QVD_VERSION_REVISION)"
 
-if ( "$Env:QVD_PRERELEASE" ) {
-	Write-Host " [pre-release]"
-} else {
+if ( "$Env:QVD_OFFICIAL_RELEASE" ) {
 	Write-Host " [release]"
+} elseif ( "$Env:QVD_PRERELEASE" ) {
+	Write-Host " [pre-release]"
+} elseif ( "$Env:QVD_DEV_RELEASE" ) {
+	Write-Host " [dev build]"
+} else {
+	Write-Host " [unknown!]"
+	exit 1
 }
 
 
@@ -320,13 +330,21 @@ if ($Verbose) {
 	$creator_args = "-v"
 }
 
+if ("$Env:QVD_DEV_RELEASE") {
+	$installer_name = "qvd-client-installer-${git_ver}-${Env:QVD_BUILD}"
+} else {
+	$installer_name = "qvd-client-installer-${git_ver}"
+}
+
+$installer_file = "$PSScriptRoot\${installer_name}.exe"
+
+
 Write-Host "Generating installer..."
-binarycreator $creator_args -c config\config.xml -p packages qvd-client-installer-${git_ver}-${Env:QVD_BUILD}
+binarycreator $creator_args -c config\config.xml -p packages "${installer_name}"
 if ( $LastExitCode -gt 0 ) {
 	throw "binarycreator failed with status $LastExitCode !"
 }
 
-$installer_file = "$PSScriptRoot\qvd-client-installer-${git_ver}-${Env:QVD_BUILD}.exe"
 
 $installer_signature = Sign $installer_file
 
