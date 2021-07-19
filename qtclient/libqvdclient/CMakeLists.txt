@@ -12,9 +12,10 @@ set(USBIP_DATABASE "http://www.linux-usb.org/usb.ids")
 
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Core Network Test REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core Network Test REQUIRED)
-if (LINUX)
+if (UNIX AND NOT APPLE)
     find_package(X11 REQUIRED)
     add_compile_definitions(USE_LIB_X11_KEYBOARD_DETECTION=1)
+    message(STATUS "Using X11 based keyboard detection (Linux)")
 endif()
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/version.rc.in ${CMAKE_CURRENT_BINARY_DIR}/version.rc @ONLY)
