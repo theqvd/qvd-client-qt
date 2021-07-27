@@ -1,0 +1,24 @@
+Source: qvd-client-qt
+Section: x11
+Priority: optional
+Maintainer: QVD Team <qvd@qindel.com>
+Build-Depends: debhelper-compat (= 12), qtbase5-dev, qtdeclarative5-dev, qttools5-dev, libxt-dev, libxkbfile-dev
+Standards-Version: 4.3.0
+Homepage: https://qindel.com
+#Vcs-Browser: https://salsa.debian.org/debian/qvd-client-qt
+#Vcs-Git: https://salsa.debian.org/debian/qvd-client-qt.git
+
+Package: libqvdclient
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libqt5core5a, nxproxy (>= 3.5.99)
+Multi-Arch: same
+Pre-Depends: ${misc:Pre-Depends}
+Description: QVD Client library
+ Library for interacting with the QVD Virtual Desktop system
+
+Package: qvd-client-qt
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libqt5core5a, libqvdclient
+Description: Client for the QVD Virtual Desktop system
+ This provides a client for Qindel's Virtual Desktop system, which can be
+ found on https://theqvd.com.
