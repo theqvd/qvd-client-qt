@@ -24,6 +24,7 @@ const int MAIN_WINDOW_HEIGHT = 700;
 #include <QFileDialog>
 #include <QStringListModel>
 #include <QStandardItemModel>
+#include <QTimeZone>
 
 #include "usbip/usbdevicelist.h"
 #include "usbip/usbdevice.h"
@@ -178,6 +179,7 @@ void MainWindow::connectToVM() {
     params.setSharedUsbDevices( m_usb_device_model.getSelectedDevices() );
     params.setAudio( ui->enableAudioCheck->isChecked() );
     params.setMicrophone( ui->enableMicrophoneCheck->isChecked() );
+    params.setTimezone(getTimeZone());
 
     qInfo() << "Connecting with parameters " << params;
 
@@ -535,4 +537,8 @@ void MainWindow::setConnectionParms(const QVDConnectionParameters &params)
     ui->serverLineEdit->setText(m_params.host());
 }
 
-
+QString MainWindow::getTimeZone() {
+    QString iana_id(QTimeZone::systemTimeZoneId());
+    qInfo() << "Detected timezone: " << iana_id;
+    return iana_id;
+}

@@ -186,6 +186,16 @@ void QVDConnectionParameters::setAudioCompression(bool audio_compression)
     m_audio_compression = audio_compression;
 }
 
+QString QVDConnectionParameters::timezone() const
+{
+    return m_timezone;
+}
+
+void QVDConnectionParameters::setTimezone(const QString &new_timezone)
+{
+    m_timezone = new_timezone;
+}
+
 QDebug operator<<(QDebug debug, const QVDConnectionParameters &p)
 {
     QDebugStateSaver saver(debug);
@@ -206,6 +216,7 @@ QDebug operator<<(QDebug debug, const QVDConnectionParameters &p)
                     << "; Audio = " << p.audio()
                     << "; Microphone = " << p.microphone()
                     << "; Audio compression = " << p.audioCompression()
+                    << "; Timezone = " << p.timezone()
                     << "}";
     return debug;
 }
