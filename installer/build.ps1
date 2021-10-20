@@ -314,7 +314,7 @@ if ( $Verbose ) {
 Write-Host "Deploying Qt..."
 windeployqt $deploy_args "$data"
 if ( $LastExitCode -gt 0 ) {
-	throw "$windeployqt failed with status $LastExitCode !"
+	throw "windeployqt failed with status $LastExitCode !"
 }
 
 
