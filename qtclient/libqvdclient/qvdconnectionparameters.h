@@ -82,6 +82,8 @@ public:
     bool audioCompression() const;
     void setAudioCompression(bool audioCompression);
 
+    QString timezone() const;
+    void setTimezone(const QString &new_timezone);
 
 private:
     QString m_host;
@@ -104,6 +106,7 @@ private:
     bool m_audio = false;
     bool m_microphone = false;
     bool m_audio_compression = true;
+    QString m_timezone = "";
 
     QStringList m_shared_folders;
     QStringList m_environment_variables;

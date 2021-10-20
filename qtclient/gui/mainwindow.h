@@ -67,6 +67,7 @@ private:
     void saveSettings();
     void loadSettings();
     void updateVersionInfo();
+    QString getTimeZone();
 
     QVDConnectionParameters m_params;
     QStringList m_shared_folders;

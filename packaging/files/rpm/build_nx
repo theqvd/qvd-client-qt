@@ -22,6 +22,7 @@ fi
 if [ -n "$BUILD_CLIENT" ] ; then
 	cp -v /files/qvd-client.spec /root/rpmbuild/SPECS/
 	cp -v /files/qvd-client-qt*  /root/rpmbuild/SOURCES/
+        cp -v /files/README.md /files/LICENSE /root/rpmbuild/BUILD/
 
 	export PATH=/usr/lib64/qt5/bin/:$PATH
 	rpmbuild -ba /root/rpmbuild/SPECS/qvd-client.spec

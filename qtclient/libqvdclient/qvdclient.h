@@ -92,11 +92,7 @@ public:
     void stopVM(int id);
     void connectToVM(int id);
 
-
-
     void handle_printer();
-
-
 
     QVDConnectionParameters getParameters() const;
     void setParameters(const QVDConnectionParameters &parameters);

@@ -10,9 +10,17 @@ $VCVarsAll = "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\A
 $FilesPath = "C:\Program Files (x86)\QVD Client"
 $ExtFiles  = "${PSScriptRoot}\..\external"
 $TimestampServer = "http://timestamp.sectigo.com"
-$CertificateThumbprint = "4EC4BC69CAF66CFFB8EA1245E12C4C4291A887DB"
+$CertificateThumbprint = "4EC4BC69CAF66CFFB8EA1245E12C4C4291A887DB" # SSL.com code signing
+$CertificateThumbprint = "77084494d76d635a8700a6405a9adb8781604522" # SSL.com EV code signing -- Yubikey needed
+
+
 
 $Certificate = Get-ChildItem cert:\CurrentUser\My -CodeSigningCert | Where-Object { $_.Thumbprint -eq "$CertificateThumbprint" }
+
+if ( ! $Certificate ) {
+	Throw "Failed to find certificate $CertificateThumbprint"
+}
+
 $TODAY = Get-Date -Format "yyyy-MM-dd"
 
 
@@ -128,7 +136,7 @@ $QT_VER="5.15.2"
 $QT_DIR="C:\Qt"
 $use_mingw = 0
 $MAKETOOL_ARGS = ""
-$QT_COMPILER="mingw81_64"
+$QT_COMPILER="msvc2019_64"
 $MAKETOOL="ninja"
 
 if ( $Verbose ) {
@@ -141,11 +149,13 @@ if ( ! $Env:VCINSTALLDIR ) {
 }
 
 $QT_BIN_PATH="$QT_DIR\$QT_VER\$QT_COMPILER\bin"
-$COMPILER_BIN_PATH="$QT_DIR\Qt\Tools\COMPILER\bin"
-$QT_INSTALLER_BIN_PATH="$QT_DIR\Tools\QtInstallerFramework\4.0\bin"
+#$COMPILER_BIN_PATH="$QT_DIR\Qt\Tools\COMPILER\bin"
+$QT_INSTALLER_BIN_PATH="$QT_DIR\Tools\QtInstallerFramework\4.1\bin"
 $SSL_BIN_PATH="$QT_DIR\Tools\OpenSSL\Win_x64\bin"
+$WINDEPLOYQT="$QT_DIR\$QT_VER\msvc2019_64\bin\windeployqt.exe"
 
-
+# This is where CMake will find the Qt5 .cmake config files
+$Env:CMAKE_PREFIX_PATH="$QT_DIR\$QT_VER\msvc2019_64\lib\cmake\Qt5"
 $env:PATH="$QT_BIN_PATH;$COMPILER_BIN_PATH;$QT_INSTALLER_BIN_PATH;$QT_DIR\Tools\QtCreator\bin;$env:PATH"
 
 
@@ -306,7 +316,7 @@ if ( $Verbose ) {
 Write-Host "Deploying Qt..."
 windeployqt $deploy_args "$data"
 if ( $LastExitCode -gt 0 ) {
-	throw "$windeployqt failed with status $LastExitCode !"
+	throw "windeployqt failed with status $LastExitCode !"
 }
 
 

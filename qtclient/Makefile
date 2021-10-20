@@ -22,14 +22,14 @@ install: install_files
 install_files:
 	mkdir -p $(DESTDIR)/$(PREFIX)/$(BINDIR) $(DESTDIR)/$(PREFIX)/$(LIBDIR)
 	install -m 755 build/gui/QVD_Client $(DESTDIR)/$(PREFIX)/$(BINDIR)
-	install -m 755 build/libqvdclient/libqvdclient.so.1.0.0 $(DESTDIR)/$(PREFIX)/$(LIBDIR)
-	ln -s libqvdclient.so.1.0.0 $(DESTDIR)/$(PREFIX)/$(LIBDIR)/libqvdclient.so.1
+	install -m 755 build/libqvdclient/libqvdclient.so $(DESTDIR)/$(PREFIX)/$(LIBDIR)
+	ln -s libqvdclient.so $(DESTDIR)/$(PREFIX)/$(LIBDIR)/libqvdclient.so.1
 
 build/QVD_Client: build/Makefile
 	cd build && make -j$(CPUS)
 
 build/Makefile:
-	mkdir -p build && cd build && qmake ../QVD_Client.pro
+	mkdir -p build && cd build && cmake ../
 
 
 

@@ -5,13 +5,15 @@ RUN zypper ar http://cpan-mirror.qindel.com/sles15-sp2/installer-full-Media1 ins
 RUN zypper ar http://cpan-mirror.qindel.com/sles15-sp2/installer-full-Media1/Module-Basesystem/ Module-Basesystem
 RUN zypper ar http://cpan-mirror.qindel.com/sles15-sp2/installer-full-Media1/Module-Development-Tools/ Module-Development-Tools
 RUN zypper ar http://cpan-mirror.qindel.com/sles15-sp2/installer-full-Media1/Module-Python2/ Module-Python2
+RUN zypper ar http://cpan-mirror.qindel.com/sles15-sp2/installer-full-Media1/Module-Desktop-Applications/ Module-Desktop-Applications
+RUN zypper ar -G -K http://download.opensuse.org/repositories/openSUSE:/Backports:/SLE-15-SP2/standard/ Backports\ SLE-15-SP2
 RUN zypper ref && zypper update -y
 
 # Base build tools
-RUN zypper in -y rpm-build make 
+RUN zypper in -y rpm-build make cmake
 
 # qvdclient-qt dependencies
-RUN zypper in -y  libqt5-qtbase-devel libX11-devel libXt-devel libxkbfile-devel
+RUN zypper in -y  libqt5-qtbase-devel libQt5Charts5-devel libqt5-linguist-devel libX11-devel libXt-devel libxkbfile-devel 
 
 
 # nxproxy dependencies
@@ -19,9 +21,6 @@ RUN zypper in -y zlib-devel libxml2-devel libpixman-1-0-devel libtool libtirpc-d
 
 RUN mkdir -p /root/rpmbuild/
 RUN ln -s /usr/src/packages/{SOURCES,SPECS,BUILD,BUILDROOT,RPMS,SRPMS} /root/rpmbuild/
-#COPY /tmp/centos-files/nx-libs.spec                /root/rpmbuild/SPECS
-#COPY /tmp/centos-files/nx-libs-FreeFontNames.patch /root/rpmbuild/SOURCES
-#COPY /tmp/centos-files/nx-libs-3.5.99.25.tar.gz    /root/rpmbuild/SOURCES
 
 #PATH=/usr/lib64/qt5/bin:$PATH
 
