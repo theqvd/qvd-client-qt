@@ -10,9 +10,17 @@ $VCVarsAll = "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\A
 $FilesPath = "C:\Program Files (x86)\QVD Client"
 $ExtFiles  = "${PSScriptRoot}\..\external"
 $TimestampServer = "http://timestamp.sectigo.com"
-$CertificateThumbprint = "4EC4BC69CAF66CFFB8EA1245E12C4C4291A887DB"
+$CertificateThumbprint = "4EC4BC69CAF66CFFB8EA1245E12C4C4291A887DB" # SSL.com code signing
+$CertificateThumbprint = "77084494d76d635a8700a6405a9adb8781604522" # SSL.com EV code signing -- Yubikey needed
+
+
 
 $Certificate = Get-ChildItem cert:\CurrentUser\My -CodeSigningCert | Where-Object { $_.Thumbprint -eq "$CertificateThumbprint" }
+
+if ( ! $Certificate ) {
+	Throw "Failed to find certificate $CertificateThumbprint"
+}
+
 $TODAY = Get-Date -Format "yyyy-MM-dd"
 
 
