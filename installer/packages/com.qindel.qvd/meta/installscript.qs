@@ -121,7 +121,7 @@ Component.prototype.createOperations = function() {
 		installVCRedist("2010", "x64", "10.0", 40219, "vcredist_2010_x64.exe");
 
 		// This is needed for our code.
-		installVCRedist("2019", "x64", "14.0", 29325, "VC_redist.x64.exe");
+		installVCRedist("2019", "x64", "14.0", 30135, "VC_redist.x64.exe");
 
 		// Configure the firewall
 		setupFirewall();
