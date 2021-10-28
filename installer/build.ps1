@@ -12,7 +12,7 @@ $ExtFiles  = "${PSScriptRoot}\..\external"
 $TimestampServer = "http://timestamp.sectigo.com"
 $CertificateThumbprint = "4EC4BC69CAF66CFFB8EA1245E12C4C4291A887DB" # SSL.com code signing
 $CertificateThumbprint = "77084494d76d635a8700a6405a9adb8781604522" # SSL.com EV code signing -- Yubikey needed
-
+$UseCloudSign = 1
 
 
 $Certificate = Get-ChildItem cert:\CurrentUser\My -CodeSigningCert | Where-Object { $_.Thumbprint -eq "$CertificateThumbprint" }
@@ -78,7 +78,12 @@ function Sign {
 		# Must be an antivirus or some such thing. So we just try again, and then it works.
 		while(!$signed) {
 			try {
-				$sign_info = Set-AuthenticodeSignature $Path -Certificate $Certificate -HashAlgorithm SHA256 -TimestampServer $TimestampServer
+				if ( $UseCloudSign ) {
+					.\sign.ps1 $Path
+					$sign_info = Get-AuthenticodeSignature $Path
+				} else {
+					$sign_info = Set-AuthenticodeSignature $Path -Certificate $Certificate -HashAlgorithm SHA256 -TimestampServer $TimestampServer
+				}
 				$signed = 1
 			}
 			catch {
@@ -98,7 +103,9 @@ function Sign {
 		if ( $sign_info.Status -eq "Valid" ) {
 			Write-Host -ForegroundColor green "Done."
 		} else {
-			Write-Host -ForegroundColor red "Error! Signature status is $sign_info.Status"
+			$s_stat = $sign_info.Status
+			$s_mesg = $sign_info.StatusMessage
+			Write-Host -ForegroundColor red "Error! Signature status ${s_stat}: $s_mesg"
 		}
 	} else {
 		Write-Host -ForegroundColor cyan "Already signed."
