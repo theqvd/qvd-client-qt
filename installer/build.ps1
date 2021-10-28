@@ -192,10 +192,14 @@ $Env:QVD_VERSION_FULL     = $git_ver
 if ( ! $Env:BUILD_NUMBER ) {
 	Write-Host "BUILD_NUMBER variable not set, using build counter"
 
-	$build_file = "${PSScriptRoot}/build-num.txt"
+	$build_file = "${PSScriptRoot}/installer_data/build-num.txt"
 
 	if ( ! (Test-Path "$build_file") ) {
 		Write-Host "No build counter found, creating"
+
+		if ( ! (Test-Path "$PSScriptRoot\\installer_data" )) {
+			$junk = New-Item -Path $PSScriptRoot -Name "installer_data" -ItemType Directory
+		}
 		Set-Content -Path "$build_file" -Value '1'
 	}
 
