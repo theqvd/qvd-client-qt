@@ -1,7 +1,56 @@
 
+<#
+.SYNOPSIS
+
+Builds the QVD client
+
+.DESCRIPTION
+
+This script builds, and optionally signs and uploads the QVD Client.
+
+.PARAMETER Verbose
+
+Verbose output for debugging.
+
+.PARAMETER NoUpload
+
+Do not call the upload script. Uploading works by calling the script My Documents\installer_uploader.ps1, if it exists.
+It will be passed a list of paths to upload, and should return a list of URLs.
+
+.PARAMETER NoSign
+
+Do not sign the executables.
+
+.PARAMETER UseCloudSign
+
+Use ssl.com's esigner service to sign the installer.
+
+.PARAMETER Certificate
+
+Which certificate to use for signing. This can be a certificate thumbprint, or one of the builtin options:
+
+default:  QVD's normal certificate
+EV: QVD's Extended Validation certificate
+
+.EXAMPLE 
+
+.\build.ps1
+
+.LINK
+
+https://theqvd.com
+
+.LINK
+
+https://github.com/theqvd/qvd-client-qt
+
+#>
 param (
 	[switch]$Verbose=$false,
-	[switch]$NoUpload=$false
+	[switch]$NoUpload=$false,
+	[switch]$NoSign=$false,
+	[switch]$UseCloudSign=$false,
+	$Certificate="ev"
 )
 
 
@@ -10,9 +59,18 @@ $VCVarsAll = "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\A
 $FilesPath = "C:\Program Files (x86)\QVD Client"
 $ExtFiles  = "${PSScriptRoot}\..\external"
 $TimestampServer = "http://timestamp.sectigo.com"
-$CertificateThumbprint = "4EC4BC69CAF66CFFB8EA1245E12C4C4291A887DB" # SSL.com code signing
-$CertificateThumbprint = "77084494d76d635a8700a6405a9adb8781604522" # SSL.com EV code signing -- Yubikey needed
-$UseCloudSign = 1
+
+$Certificate = $Certificate.ToLower().Trim()
+
+if( $Certificate -eq "ev" ) {
+	$CertificateThumbprint = "77084494d76d635a8700a6405a9adb8781604522" # SSL.com EV code signing -- Yubikey needed
+} elseif ( $Certificate -eq "normal" ) {
+	$CertificateThumbprint = "4EC4BC69CAF66CFFB8EA1245E12C4C4291A887DB" # SSL.com code signing
+} elseif ( $Certificate.length -eq 40 ) {
+	$CertificateThumbprint = $Certificate
+} else {
+	Throw "Invalid certificate parameter: '$Certificate'"
+}
 
 
 $Certificate = Get-ChildItem cert:\CurrentUser\My -CodeSigningCert | Where-Object { $_.Thumbprint -eq "$CertificateThumbprint" }
@@ -257,26 +315,29 @@ Write-Host -ForegroundColor blue -NoNewLine "Issued by: "
 Write-Host "$issuer"
 Write-Host ""
 
-$build_dir = New-TemporaryDirectory
-Set-Location -Path "$build_dir"
+try {
+	$build_dir = New-TemporaryDirectory
+	Set-Location -Path "$build_dir"
 
-# msvc experiment:
-# -D CMAKE_C_COMPILER=cl CMAKE_CXX_COMPILER=cl
-cmake  "${PSScriptRoot}\..\qtclient" -G Ninja
+	# msvc experiment:
+	# -D CMAKE_C_COMPILER=cl CMAKE_CXX_COMPILER=cl
+	cmake  "${PSScriptRoot}\..\qtclient" -G Ninja
 
-if ( $LastExitCode -gt 0 ) {
-	throw "cmake failed with status $LastExitCode !"
-}
+	if ( $LastExitCode -gt 0 ) {
+		throw "cmake failed with status $LastExitCode !"
+	}
 
-iex "$MAKETOOL $MAKETOOL_ARGS"
-if ( $LastExitCode -gt 0 ) {
-	throw "$MAKETOOL failed with status $LastExitCode !"
+	iex "$MAKETOOL $MAKETOOL_ARGS"
+	if ( $LastExitCode -gt 0 ) {
+		throw "$MAKETOOL failed with status $LastExitCode !"
+	}
+} finally {
+	Set-Location -Path "$PSScriptRoot"
 }
 
 
 Header "Copying data"
 
-Set-Location -Path "$PSScriptRoot"
 
 if ( Test-Path "packages\com.qindel.qvd\data" ) {
 	Remove-Item "packages\com.qindel.qvd\data" -Recurse -Force
@@ -295,6 +356,7 @@ Write-Host "Copying build files..."
 Copy-Item -Path "..\LICENSE"                             -Destination "$data\LICENSE.txt"
 Copy-Item -Path "$build_dir\gui\*.exe"                   -Destination "$data"
 Copy-Item -Path "$build_dir\libqvdclient\*.dll"          -Destination "$data"
+Copy-Item -Path "$Env:SystemRoot\System32\ucrtbased.dll" -Destination "$data"
 
 Write-Host "Copying dependencies..."
 Copy-Item -Path "$FilesPath\pulseaudio"                  -Destination "$data" -Recurse
@@ -307,7 +369,7 @@ Copy-Item -Path "$SSL_BIN_PATH\libssl*"                  -Destination "$data"
 Copy-Item -Path "install_scripts\*"                      -Destination "$data\scripts\"
 
 # GCC requires some extra libraries. We find out whether this is needed by
-# checking which compiler was used to build the .exe. This is embedded into the
+# checking which compiler was used to build the .exe. This is embedded into the 
 # Comments VERSIONINFO field by CMake.
 $ver=[System.Diagnostics.FileVersionInfo]::GetVersionInfo("$data_abspath\QVD_Client.exe")
 if ($ver.Comments -like 'Built with GNU*') {
