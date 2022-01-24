@@ -79,7 +79,6 @@ if( $Certificate -eq "ev" ) {
 	Throw "Invalid certificate parameter: '$Certificate'"
 }
 
-
 $Certificate = Get-ChildItem cert:\CurrentUser\My -CodeSigningCert | Where-Object { $_.Thumbprint -eq "$CertificateThumbprint" }
 
 if ( ! $Certificate ) {
