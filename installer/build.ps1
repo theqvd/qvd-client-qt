@@ -32,6 +32,11 @@ Which certificate to use for signing. This can be a certificate thumbprint, or o
 default:  QVD's normal certificate
 EV: QVD's Extended Validation certificate
 
+.PARAMETER TestSign
+
+Sign a binary for testing. This is used to try the signing process without going through the full build.
+
+
 .EXAMPLE 
 
 .\build.ps1
@@ -50,7 +55,9 @@ param (
 	[switch]$NoUpload=$false,
 	[switch]$NoSign=$false,
 	[switch]$UseCloudSign=$false,
-	$Certificate="ev"
+	[switch]$UseSignTool=$false,
+	$Certificate="ev",
+	$TestSign=""
 )
 
 
@@ -78,6 +85,7 @@ $Certificate = Get-ChildItem cert:\CurrentUser\My -CodeSigningCert | Where-Objec
 if ( ! $Certificate ) {
 	Throw "Failed to find certificate $CertificateThumbprint"
 }
+
 
 $TODAY = Get-Date -Format "yyyy-MM-dd"
 
@@ -139,8 +147,12 @@ function Sign {
 				if ( $UseCloudSign ) {
 					.\sign.ps1 $Path
 					$sign_info = Get-AuthenticodeSignature $Path
+				} elseif ( $UseSignTool ) {
+					signtool sign /sha1 $CertificateThumbprint /fd SHA256 /t $TimestampServer $Path
+					$sign_info = Get-AuthenticodeSignature $Path
 				} else {
-					$sign_info = Set-AuthenticodeSignature $Path -Certificate $Certificate -HashAlgorithm SHA256 -TimestampServer $TimestampServer
+					#$sign_info = Set-AuthenticodeSignature $Path -Certificate $Certificate -HashAlgorithm SHA256 -TimestampServer $TimestampServer
+					$sign_info = Set-AuthenticodeSignature $Path -Certificate $Certificate
 				}
 				$signed = 1
 			}
@@ -164,6 +176,9 @@ function Sign {
 			$s_stat = $sign_info.Status
 			$s_mesg = $sign_info.StatusMessage
 			Write-Host -ForegroundColor red "Error! Signature status ${s_stat}: $s_mesg"
+			
+			$Certificate | Format-List *
+			$sign_info | Format-List *
 		}
 	} else {
 		Write-Host -ForegroundColor cyan "Already signed."
@@ -195,6 +210,12 @@ function ReplaceVariables($InputFile, $OutputFile) {
 	$data = $data -Replace "%QVD_VERSION%","$Env:QVD_VERSION"
 	$data = $data -Replace "%QVD_RELEASE_DATE%","$TODAY"
 	$junk = New-Item -Path $OutputFile -Value "$data" -ItemType File -Force
+}
+
+if ( $TestSign.length -gt 0 ) {
+	Sign $TestSign
+	
+	exit
 }
 
 $QT_VER="5.15.2"
