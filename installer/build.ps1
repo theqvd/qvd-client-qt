@@ -62,7 +62,7 @@ param (
 
 
 $ErrorActionPreference = "Stop"
-$VCVarsAll = "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsall.bat"
+$VCVarsAll = "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvarsall.bat"
 $FilesPath = "C:\Program Files (x86)\QVD Client"
 $ExtFiles  = "${PSScriptRoot}\..\external"
 $TimestampServer = "http://timestamp.sectigo.com"
@@ -70,6 +70,8 @@ $TimestampServer = "http://timestamp.sectigo.com"
 $Certificate = $Certificate.ToLower().Trim()
 
 if( $Certificate -eq "ev" ) {
+	$CertificateThumbprint = "77084494d76d635a8700a6405a9adb8781604522" # SSL.com EV code signing -- Yubikey needed
+} elseif ( $Certificate -eq "ev-old" ) {
 	$CertificateThumbprint = "77084494d76d635a8700a6405a9adb8781604522" # SSL.com EV code signing -- Yubikey needed
 } elseif ( $Certificate -eq "normal" ) {
 	$CertificateThumbprint = "4EC4BC69CAF66CFFB8EA1245E12C4C4291A887DB" # SSL.com code signing
@@ -246,6 +248,10 @@ $env:PATH="$QT_BIN_PATH;$COMPILER_BIN_PATH;$QT_INSTALLER_BIN_PATH;$QT_DIR\Tools\
 
 $git_ver = git describe HEAD --tags
 $git_commit = git rev-parse HEAD
+
+if ( !$git_ver ) {
+	throw "Failed to 'git describe HEAD --tags', can't find out the code's version. The git repository needs to have tags."
+}
 
 if ( $git_ver[0] -eq "v" ) {
 	$git_ver = $git_ver.substring(1)

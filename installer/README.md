@@ -2,7 +2,10 @@
  
 ## Requirements
  
-* PowerShell
+* Qt 5.15
+* PowerShell 7
+* CMake (present in PATH)
+* Ninja (present in PATH)
  
 ## Optional
  
