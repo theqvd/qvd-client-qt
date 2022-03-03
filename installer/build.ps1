@@ -70,12 +70,12 @@ $TimestampServer = "http://timestamp.sectigo.com"
 $Certificate = $Certificate.ToLower().Trim()
 
 if( $Certificate -eq "ev" ) {
-	$CertificateThumbprint = "77084494d76d635a8700a6405a9adb8781604522" # SSL.com EV code signing -- Yubikey needed
+	$CertificateThumbprint = "01C50290432C1063E460C69123224E6A7C16DC17" # SSL.com EV code signing -- Yubikey needed
 } elseif ( $Certificate -eq "ev-old" ) {
 	$CertificateThumbprint = "77084494d76d635a8700a6405a9adb8781604522" # SSL.com EV code signing -- Yubikey needed
 } elseif ( $Certificate -eq "normal" ) {
-	$CertificateThumbprint = "4EC4BC69CAF66CFFB8EA1245E12C4C4291A887DB" # SSL.com code signing
 } elseif ( $Certificate.length -eq 40 ) {
+	$CertificateThumbprint = "4EC4BC69CAF66CFFB8EA1245E12C4C4291A887DB" # SSL.com code signing
 	$CertificateThumbprint = $Certificate
 } else {
 	Throw "Invalid certificate parameter: '$Certificate'"
@@ -87,6 +87,8 @@ if ( ! $Certificate ) {
 	Throw "Failed to find certificate $CertificateThumbprint"
 }
 
+Write-Host "Found certificate with thumbprint ${CertificateThumbprint}: "
+Write-Host $Certificate.Subject
 
 $TODAY = Get-Date -Format "yyyy-MM-dd"
 
@@ -153,7 +155,7 @@ function Sign {
 					$sign_info = Get-AuthenticodeSignature $Path
 				} else {
 					#$sign_info = Set-AuthenticodeSignature $Path -Certificate $Certificate -HashAlgorithm SHA256 -TimestampServer $TimestampServer
-					$sign_info = Set-AuthenticodeSignature $Path -Certificate $Certificate
+					$sign_info = Set-AuthenticodeSignature $Path -Certificate $Certificate -HashAlgorithm SHA384 -TimestampServer $TimestampServer -IncludeChain All
 				}
 				$signed = 1
 			}
