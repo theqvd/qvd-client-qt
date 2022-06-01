@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=QVD Client
+Comment=QVD Remote desktop client
+Exec=QVD_Client
+Icon=qvd
+Terminal=false
+Categories=Network;RemoteAccess;Qt

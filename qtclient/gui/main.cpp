@@ -116,6 +116,8 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationName("Qindel");
     QCoreApplication::setOrganizationDomain("qindel.com");
     QCoreApplication::setApplicationName("QVD Client");
+    QGuiApplication::setDesktopFileName("com.theqvd.client");
+
 
     qSetMessagePattern("[%{type}] (%{file}:%{line}) %{message}");
 
