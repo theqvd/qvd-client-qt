@@ -12,7 +12,7 @@ const int MAIN_WINDOW_HEIGHT = 700;
 #include "ui_sslerrordialog.h"
 #include "backends/qvdnxbackend.h"
 #include "qvdconnectionparameters.h"
-
+#include "totpenrollment.h"
 
 #include <QCommandLineParser>
 #include <QCommandLineOption>
@@ -48,11 +48,15 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(m_client, &QVDClient::sslErrors, this, &MainWindow::sslErrors);
     QObject::connect(m_client, &QVDClient::vmConnected, this, &MainWindow::vmConnected);
     QObject::connect(m_client, &QVDClient::vmPoweredDown, this, &MainWindow::vmPoweredDown);
+    connect(m_client, &QVDClient::twoFactorAuthenticationRequired, this, &MainWindow::twoFactorAuthenticationRequired);
+    connect(m_client, &QVDClient::twoFactorEnrollment, this, &MainWindow::twoFactorEnrollment);
 
     ui->setupUi(this);
 
     setWindowIcon(QIcon(":/pixmaps/qvd.ico"));
 
+
+    connect(ui->serverLineEdit, &QLineEdit::editingFinished, this, &MainWindow::updateTwoFactorField);
 
 
     ui->connectionTypeComboBox->addItem( "Modem", QVDConnectionParameters::ConnectionSpeed::Modem );
@@ -114,6 +118,9 @@ void MainWindow::setUI(bool enabled)
         ui->progressBar->setMaximum(100);
         ui->progressBar->setValue(0);
         m_traffic_timer.stop();
+
+        // Clear second factor on each login attempt
+        ui->secondFactor->setText("");
     }
     else
     {
@@ -169,6 +176,11 @@ void MainWindow::connectToVM() {
     params.setKeyboard( KeyboardDetector::getKeyboardLayout() );
     params.setUsername(ui->username->text());
     params.setPassword(ui->password->text());
+
+    if ( ui->secondFactor->isVisible()) {
+        params.setSecondFactor(ui->secondFactor->text());
+    }
+
     params.setHost(ui->serverLineEdit->text());
     params.setPort( quint16( settings.value("port", 8443).toInt() ));
     params.setConnectionSpeed(speed);
@@ -263,29 +275,34 @@ void MainWindow::vmPoweredDown(int id)
     m_client->connectToVM(id);
 }
 
-void MainWindow::connectionError(QVDClient::ConnectionError error, QString error_desc)
+void MainWindow::connectionError(QVDClient::ConnectionError error, const QString& error_desc, const QMap<QString, QString>& headers)
 {
     QString errstr;
 
     switch(error) {
     case QVDClient::ConnectionError::None: errstr = "Bug: no error"; break;
     case QVDClient::ConnectionError::AuthenticationError: errstr = "Authentication error"; break;
-    case QVDClient::ProtocolError: errstr = "Protocol error"; break;
-    case QVDClient::Unexpected: errstr = "Internal error"; break;
-    case QVDClient::Timeout: errstr = "Timeout"; break;
-    case QVDClient::VMStartError: errstr = "Error when starting the VM"; break;
-    case QVDClient::ServerBlocked: errstr = "Server blocked"; break;
-    case QVDClient::ServerError: errstr = "Server error"; break;
-    case QVDClient::XServerError: errstr = "X Server error"; break;
-    case QVDClient::BackendError: errstr = "Backend error"; break;
+    case QVDClient::ConnectionError::SecondFactorRequired: errstr = "Authentication error"; break;
+    case QVDClient::ConnectionError::ProtocolError: errstr = "Protocol error"; break;
+    case QVDClient::ConnectionError::Unexpected: errstr = "Internal error"; break;
+    case QVDClient::ConnectionError::Timeout: errstr = "Timeout"; break;
+    case QVDClient::ConnectionError::VMStartError: errstr = "Error when starting the VM"; break;
+    case QVDClient::ConnectionError::ServerBlocked: errstr = "Server blocked"; break;
+    case QVDClient::ConnectionError::ServerError: errstr = "Server error"; break;
+    case QVDClient::ConnectionError::XServerError: errstr = "X Server error"; break;
+    case QVDClient::ConnectionError::BackendError: errstr = "Backend error"; break;
     }
 
-    qCritical() << "Connection error " << error << ": " << error_desc;
+    qCritical() << "Connection error " << (int)error << ": " << error_desc;
 
-    QMessageBox::critical(this, "QVD", errstr + "\n" + error_desc);
+    if (!m_skip_auth_error_messagebox) {
+        // We skip this if we've shown the TOTP enrollment window
+        QMessageBox::critical(this, "QVD", errstr + "\n" + error_desc);
+    }
+
+    m_skip_auth_error_messagebox = false;
 
     setUI(true);
-
 }
 
 void MainWindow::connectionTerminated()
@@ -396,6 +413,53 @@ void MainWindow::enableSharedFoldersClicked()
     ui->removeSharedFolderButton->setEnabled( enabled );
 }
 
+void MainWindow::twoFactorAuthenticationRequired(QVDClient::SecondFactorType type, int min_length, int max_length)
+{
+
+
+    QSettings settings;
+    QString host = m_client->getParameters().host().toLower().trimmed();
+
+
+    if ( type == QVDClient::SecondFactorType::None ) {
+        qDebug() << "Server" << host << "doesn't use two factor authentication";
+    } else {
+        qDebug() << "Server" << host << "requires two factor authentication. Factor type " << (int)type << ", length from " << min_length << " to " << max_length << "characters";
+    }
+
+    settings.beginGroup("TwoFactorServers");
+
+    switch(type) {
+    case QVDClient::SecondFactorType::None:
+        // This server doesn't have 2FA enabled
+        settings.remove(host);
+        break;
+    case QVDClient::SecondFactorType::TOTP:
+        QMap<QString, QVariant> data;
+        data.insert("Type", (int)type);
+        data.insert("MinLength", min_length);
+        data.insert("MaxLength", max_length);
+
+        settings.setValue(host, data);
+        break;
+    }
+
+    settings.endGroup();
+    emit updateTwoFactorField();
+}
+
+void MainWindow::twoFactorEnrollment(const QVDClient::SecondFactorEnrollmentData &data)
+{
+    qInfo() << "Server requests second factor enrollment";
+
+    m_skip_auth_error_messagebox = true;
+
+    auto totp_window = new TotpEnrollment(this);
+    totp_window->setData(data);
+    totp_window->setModal(true);
+    totp_window->show();
+}
+
 void MainWindow::backendTrafficInc(int64_t in, int64_t out)
 {
     m_avg_in_15s.add( in );
@@ -405,6 +469,36 @@ void MainWindow::backendTrafficInc(int64_t in, int64_t out)
 void MainWindow::printTraffic()
 {
     qInfo() << "Traffic avg in =" << m_avg_in_15s.getAverage() << "bytes/s; out =" << m_avg_out_15s.getAverage() << "bytes/s";
+}
+
+void MainWindow::updateTwoFactorField()
+{
+    QSettings settings;
+
+    settings.beginGroup("TwoFactorServers");
+    QString server = ui->serverLineEdit->text().trimmed().toLower();
+
+    QVariant sdata = settings.value(server);
+    if (!sdata.isNull()) {
+        // Got settings for this server
+        QMap<QString, QVariant> data = sdata.toMap();
+        if ( data["Type"] == (int)QVDClient::SecondFactorType::TOTP ) {
+            int max_len = data["MaxLength"].toInt();
+
+            qInfo() << "Server" << server << "requires TOTP with" << max_len << "characters";
+
+            ui->secondFactorLabel->setVisible(true);
+            ui->secondFactor->setVisible(true);
+            ui->secondFactor->setMaxLength(max_len);
+            ui->secondFactor->setText("");
+            ui->secondFactor->setValidator(new QIntValidator(this));
+            return;
+        }
+    }
+    settings.endGroup();
+
+    ui->secondFactorLabel->setVisible(false);
+    ui->secondFactor->setVisible(false);
 }
 
 void MainWindow::saveSettings() {
@@ -498,7 +592,7 @@ void MainWindow::loadSettings() {
     }
     settings.endArray();
 
-
+    emit updateTwoFactorField();
 }
 
 void MainWindow::updateVersionInfo()

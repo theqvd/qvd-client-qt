@@ -51,16 +51,20 @@ public slots:
     void connectionEstablished();
     void vmConnected(int id);
     void vmPoweredDown(int id);
-    void connectionError(QVDClient::ConnectionError error, QString error_desc);
+    void connectionError(QVDClient::ConnectionError error, const QString &error_desc, const QMap<QString, QString>& headers);
     void connectionTerminated();
     void sslErrors(const QList<QSslError> &errors, const QList<QSslCertificate> &cert_chain, bool &continueConnection);
     void addSharedFolder();
     void removeSharedFolder();
     void enableSharedFoldersClicked();
 
+    void twoFactorAuthenticationRequired(QVDClient::SecondFactorType type, int min_length, int max_length);
+    void twoFactorEnrollment(const QVDClient::SecondFactorEnrollmentData &data);
+
 private slots:
     void backendTrafficInc(int64_t in, int64_t out);
     void printTraffic();
+    void updateTwoFactorField();
 
 private:
     Ui::MainWindow *ui;
@@ -85,6 +89,9 @@ private:
     QTimer m_traffic_timer;
     ConnectionStatistics m_stats_window;
     CommandLineParser::MiscParameters m_misc_params;
+
+    bool m_skip_auth_error_messagebox = false;
+
 };
 
 #endif // MAINWINDOW_H

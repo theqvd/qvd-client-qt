@@ -40,6 +40,9 @@ public:
     QString password() const;
     void setPassword(const QString &password);
 
+    QString secondFactor() const;
+    void setSecondFactor(const QString &second_factor);
+
     QString token() const;
     void setToken(const QString &token);
 
@@ -90,6 +93,7 @@ private:
     quint16 m_port = 8443;
     QString m_username;
     QString m_password;
+    QString m_second_factor;
     QString m_token;
     ConnectionSpeed m_connectionSpeed = ConnectionSpeed::ADSL;
     QSize m_geometry = QSize(1024, 768);

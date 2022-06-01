@@ -76,7 +76,7 @@ QNetworkRequest QVDClient::createRequest(const QUrl &url)
 
     QString headerdata = "Basic " + authdata;
     req.setRawHeader("Authorization", headerdata.toLocal8Bit());
-
+    req.setRawHeader("Authorization2FA", getParameters().secondFactor().toUtf8().toBase64());
     req.setRawHeader("User-Agent", "QVDClient Qt/0.01 (Linux)");
 
     auto env = QProcessEnvironment::systemEnvironment();
@@ -110,24 +110,76 @@ bool QVDClient::checkReply(QVDNetworkReply *reply)
 {
     Q_ASSERT(reply);
 
+
     int http_code = reply->attribute(QNetworkRequest::Attribute::HttpStatusCodeAttribute).toInt();
+    QString http_reason = reply->attribute(QNetworkRequest::Attribute::HttpReasonPhraseAttribute).toString();
+    QString http_detail;
+
+    if ( http_code < 200 || http_code > 299 ) {
+        // readAll is destructive, it will mess with things like the VM list.
+        http_detail = reply->readAll();
+    } else {
+        http_detail = "[not captured]";
+    }
+
+    qInfo() << "Reply code  : " << http_code;
+    qInfo() << "Reply reason: " << http_reason;
+    qInfo() << "Reply data  : " << http_detail;
+
+    QMap<QString, QString> headers;
+    for( auto header_pair : reply->rawHeaderPairs()) {
+        auto key   = QString::fromUtf8(header_pair.first);
+        auto value = QString::fromUtf8(header_pair.second);
+
+        headers.insert(key, value);
+    }
+
     if ( http_code == 401 ) {
-        emit connectionError(ConnectionError::AuthenticationError, "Incorrect username or password");
+        if ( headers.contains("TOTP-Required") && headers["TOTP-Required"].toInt() ) {
+
+            if ( headers.contains("TOTP-MinLength") && headers.contains("TOTP-MaxLength")) {
+                // Server is telling us what kind of second factor it wants.
+
+                int min_length = headers["TOTP-MinLength"].toInt();
+                int max_length = headers["TOTP-MaxLength"].toInt();
+
+                emit twoFactorAuthenticationRequired(SecondFactorType::TOTP, min_length, max_length);
+            }
+
+            if ( headers.contains("TOTP-Enrollment") && headers["TOTP-Enrollment"].toInt() ) {
+                // Server is giving us a second factor secret to enroll the user in 2FA.
+
+                SecondFactorEnrollmentData sfe;
+                sfe.Type        = SecondFactorType::TOTP;
+                sfe.Issuer      = headers.value("TOTP-Issuer", "(Unknown issuer)");
+                sfe.AuthURL     = QUrl( headers.value("TOTP-Auth") );
+                sfe.Secret      = headers["TOTP-Secret"];
+                sfe.QrPicture   = QByteArray::fromBase64(headers["TOTP-PNG"].toUtf8());
+                sfe.helpMessage = QString::fromUtf8( QByteArray::fromBase64(headers["AssistanceInstructions"].toUtf8()) );
+
+                emit twoFactorEnrollment(sfe);
+            }
+
+            emit connectionError(ConnectionError::SecondFactorRequired, "Second factor required", headers);
+        } else {
+            emit twoFactorAuthenticationRequired(SecondFactorType::None, 0, 0);
+            emit connectionError(ConnectionError::AuthenticationError, "Incorrect username or password", headers);
+        }
         disconnectFromQVD();
         return false;
     } else if ( http_code == 404 ) {
-        emit connectionError(ConnectionError::ProtocolError, "VM list command unrecognized. This may not be a QVD server.");
+        emit connectionError(ConnectionError::ProtocolError, "VM list command unrecognized. This may not be a QVD server.", headers);
         disconnectFromQVD();
         return false;
     } else if ( http_code == 503 ) {
-        emit connectionError(ConnectionError::ServerBlocked, "Server blocked");
+        emit connectionError(ConnectionError::ServerBlocked, "Server blocked", headers);
         disconnectFromQVD();
     } else if ( http_code >= 500 && http_code < 600 ) {
-        emit connectionError(ConnectionError::ProtocolError, "Server failure.");
+        emit connectionError(ConnectionError::ProtocolError, "Server failure.", headers);
         disconnectFromQVD();
         return false;
     } else if ( http_code != 200 ) {
-        emit connectionError(ConnectionError::ProtocolError, "Unexpected HTTP code " + QString::number(http_code));
+        emit connectionError(ConnectionError::ProtocolError, "Unexpected HTTP code " + QString::number(http_code), headers);
         disconnectFromQVD();
         return false;
     }
@@ -327,7 +379,7 @@ void QVDClient::qvd_vmListDownloaded()
     QJsonParseError parse_error;
     QJsonDocument doc = QJsonDocument::fromJson(json_data, &parse_error);
     if ( parse_error.error != QJsonParseError::NoError ) {
-        emit connectionError(ConnectionError::ProtocolError, "Failed to parse VM list: " + parse_error.errorString());
+        emit connectionError(ConnectionError::ProtocolError, "Failed to parse VM list: " + parse_error.errorString(), QMap<QString, QString>());
         disconnectFromQVD();
         return;
     }
@@ -471,9 +523,9 @@ void QVDClient::backend_failed(QVDBackend::BackendError error, const QString &de
     disconnectFromQVD();
 
     if ( error == QVDBackend::BackendError::XServerFailed ) {
-        emit connectionError(QVDClient::ConnectionError::XServerError, description);
+        emit connectionError(QVDClient::ConnectionError::XServerError, description, QMap<QString, QString>());
     } else {
-        emit connectionError(QVDClient::ConnectionError::BackendError, description);
+        emit connectionError(QVDClient::ConnectionError::BackendError, description, QMap<QString, QString>());
     }
 }
 

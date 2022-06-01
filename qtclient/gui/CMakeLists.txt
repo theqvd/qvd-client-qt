@@ -43,9 +43,11 @@ set(COMMON_SOURCES
     movingaverage.cpp
     qvdchecklistview.cpp
     sslerrordialog.cpp
+    totpenrollment.cpp
     usbdevicelistmodel.cpp
     versioninfo.cpp
     mainwindow.ui
+    totpenrollment.ui
     icon.rc
     images.qrc
     )

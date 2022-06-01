@@ -21,11 +21,71 @@ class LIBQVDCLIENT_EXPORT QVDClient : public QObject
 {
     Q_OBJECT
 public:
-    enum VMState {
+    enum class VMState {
         Stopped,
         Starting,
         Running
     };
+
+    /**
+     * @brief Type of second factor
+     */
+    enum class SecondFactorType {
+        None,
+        TOTP
+    };
+
+    /**
+     * @brief Data for enrolling in the second factor
+     */
+    typedef struct {
+        /**
+         * @brief Type of second factor
+         */
+        SecondFactorType Type;
+
+        /**
+         * @brief Second factor issuer
+         */
+        QString          Issuer;
+
+        /**
+         * @brief Username we tried to log in as
+         */
+        QString          Login;
+
+        /**
+         * @brief TOTP secret, or similar
+         */
+        QString          Secret;
+
+        /**
+         * @brief OTP auth URL
+         * See https://github.com/google/google-authenticator/wiki/Key-Uri-Format
+         */
+        QUrl             AuthURL;
+
+        /**
+         * @brief QR Code picture
+         *
+         * The server may provide us with the picture of the QR code directly, for our convenience.
+         * It should be a PNG, and correspond to the AuthURL above.
+         *
+         * All the data contained here is encoded in the other class members, so this can be safely ignored and recreated locally if wanted.
+         */
+        QByteArray       QrPicture;
+
+        /**
+         * @brief helpMessage
+         *
+         * The server may provide an admin-configured message to help users obtain help when having trouble with authentication.
+         * This may contain a phone number, an email address, or some other way to contain support.
+         *
+         * The message may contain HTML.
+         */
+        QString          helpMessage;
+
+    } SecondFactorEnrollmentData;
 
     typedef struct VMInfo {
         QString name;
@@ -34,9 +94,10 @@ public:
         VMState state;
     } VMInfo;
 
-    typedef enum ConnectionError {
+    typedef enum class ConnectionError {
         None,
         AuthenticationError,  // bad pw
+        SecondFactorRequired, // Server wants 2FA
         Timeout,              // command is taking too long
         VMStartError,         // vm failed to start
         ProtocolError,        // error in the protocol -- bad JSON for example
@@ -124,8 +185,31 @@ signals:
      */
     void vmConnected(int id);
 
-    void connectionError(QVDClient::ConnectionError error, QString error_text);
+    /**
+     * @brief connectionError
+     * @param error Error code due to which the connection failed
+     * @param error_text Error description
+     * @param headers Headers sent with the error. This is used for TOTP enrollment.
+     */
+    void connectionError(QVDClient::ConnectionError error, const QString& error_text, const QMap<QString, QString> headers);
 
+    /**
+     * @brief The server we tried to log into requires two factor authentication, but we didn't provide it.
+     *
+     * This event may be followed by twoFactorEnrollment, and will always be followed by connectionError.
+     * @param type Type of second factor wanted
+     * @param min_length Minimum length
+     * @param max_length Maximum length
+     */
+    void twoFactorAuthenticationRequired(SecondFactorType type, int min_length, int max_length);
+
+    /**
+     * @brief The user or admin enabled TOTP. Server is providing us the data to enroll in the second factor from the client
+     * @param data TOTP enrollment data
+     *
+     * This event will always be followed by connectionError.
+     */
+    void twoFactorEnrollment(const SecondFactorEnrollmentData &data);
 
     /**
      * @brief Connection terminated
@@ -176,5 +260,8 @@ public slots:
 
 
 };
+
+Q_DECLARE_METATYPE(QVDClient::VMState)
+Q_DECLARE_METATYPE(QVDClient::SecondFactorType)
 
 #endif // QVDCLIENT_H

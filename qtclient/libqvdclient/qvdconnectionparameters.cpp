@@ -46,6 +46,16 @@ void QVDConnectionParameters::setPassword(const QString &password)
     m_password = password;
 }
 
+QString QVDConnectionParameters::secondFactor() const
+{
+    return m_second_factor;
+}
+
+void QVDConnectionParameters::setSecondFactor(const QString &second_factor)
+{
+    m_second_factor = second_factor;
+}
+
 QString QVDConnectionParameters::token() const
 {
     return m_token;
@@ -204,6 +214,7 @@ QDebug operator<<(QDebug debug, const QVDConnectionParameters &p)
                     << "; Port = " << p.port()
                     << "; User = '" << p.username() << "'"
                     << "; Password = '" << "********" /* p.password() */ << "'"
+                    << "; SecondFactor =" << "******"
                     << "; Speed = " << p.connectionSpeed()
                     << "; Geometry = " << p.geometry()
                     << "; Keyboard = '" << p.keyboard() << "'"
