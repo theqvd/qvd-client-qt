@@ -68,6 +68,7 @@ CommandLineParser::Result CommandLineParser::parse(QVDConnectionParameters &para
     const auto local          = addOption("local"           , _t("Dialog - Proxy mode is used (ignored)"), "0 or 1");
     const auto parent         = addOption("parent"          , _t("Dialog - nagent's PID"), "pid");
     const auto display        = addOption("display"         , _t("Dialog - X11 display"), "display");
+    const auto autologin      = addOption("autologin"       , _t("Log in automatically if possible"));
 
 
     const auto helpOption = m_qparser.addHelpOption();
@@ -87,6 +88,11 @@ CommandLineParser::Result CommandLineParser::parse(QVDConnectionParameters &para
     if (m_qparser.isSet(experimental)) {
         qDebug() << "Experimental features enabled";
         misc_params.enableExperimentalFeatures = true;
+    }
+
+    if (m_qparser.isSet(autologin)) {
+        qDebug() << "Auto-login enabled";
+        misc_params.autoLogin = true;
     }
 
     if (m_qparser.isSet(username))

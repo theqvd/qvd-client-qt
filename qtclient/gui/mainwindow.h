@@ -39,6 +39,8 @@ public:
     void setUI(bool enabled);
     bool connectionActive();
     void closeEvent(QCloseEvent *event);
+    void showEvent( QShowEvent *event);
+
     void setMiscParameters(CommandLineParser::MiscParameters misc_params);
 
 

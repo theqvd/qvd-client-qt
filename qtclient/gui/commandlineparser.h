@@ -19,6 +19,7 @@ public:
 
     struct MiscParameters {
         bool enableExperimentalFeatures = false;
+        bool autoLogin = false;
     };
 
     static CommandLineParser& getInstance() {

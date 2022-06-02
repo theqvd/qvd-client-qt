@@ -625,6 +625,16 @@ void MainWindow::closeEvent(QCloseEvent *event) {
         //    }
 }
 
+void MainWindow::showEvent(QShowEvent *event)
+{
+    QWidget::showEvent(event);
+
+    if ( m_misc_params.autoLogin ) {
+        qInfo() << "Automatically logging in";
+        emit connectToVM();
+    }
+}
+
 void MainWindow::setMiscParameters(CommandLineParser::MiscParameters misc_params)
 {
     m_misc_params = misc_params;
