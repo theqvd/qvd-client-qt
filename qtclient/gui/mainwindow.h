@@ -68,6 +68,8 @@ private:
     void loadSettings();
     void updateVersionInfo();
     QString getTimeZone();
+    void setTabVisibility(QWidget *tab, bool visibility);
+
 
     QVDConnectionParameters m_params;
     QStringList m_shared_folders;

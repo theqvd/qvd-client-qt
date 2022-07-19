@@ -454,6 +454,15 @@ void MainWindow::loadSettings() {
 
     qDebug() << "Loading settings";
 
+    settings.beginGroup("UI");
+    bool settingsVisible = settings.value("settingsTabVisible", true).toBool();
+    bool versionVisible = settings.value("versionTabVisible", true).toBool();
+
+    setTabVisibility(ui->settingsTab, settingsVisible);
+    setTabVisibility(ui->versionTab, versionVisible);
+
+
+
     settings.beginGroup("Connection");
 
     ui->serverLineEdit->setText( settings.value("host", "").toString());
@@ -541,4 +550,13 @@ QString MainWindow::getTimeZone() {
     QString iana_id(QTimeZone::systemTimeZoneId());
     qInfo() << "Detected timezone: " << iana_id;
     return iana_id;
+}
+
+void MainWindow::setTabVisibility(QWidget *tab, bool visibility)
+{
+    for(int i=0;i<ui->mainTabWidget->count();i++) {
+        if ( ui->mainTabWidget->widget(i) == tab) {
+            ui->mainTabWidget->setTabVisible(i, visibility);
+        }
+    }
 }
