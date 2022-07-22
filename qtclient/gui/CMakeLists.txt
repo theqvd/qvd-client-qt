@@ -24,7 +24,7 @@ set(CMAKE_AUTORCC ON)
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets LinguistTools Network Charts REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets LinguistTools Network Charts REQUIRED)
 
-#set(TS_FILES QVD_Client_en_US.ts)
+set(TS_FILES QVD_Client_en_US.ts QVD_Client_es_ES.ts)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/version.rc.in ${CMAKE_CURRENT_BINARY_DIR}/version.rc @ONLY)
 
