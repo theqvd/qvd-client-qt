@@ -10,6 +10,7 @@
 #include <QMessageBox>
 #include <QMap>
 #include <QDesktopServices>
+#include <QTranslator>
 
 #include "helpers/pathtools.h"
 
@@ -17,6 +18,8 @@
 #ifdef Q_OS_UNIX
 #include <signal.h>
 #endif
+
+const QStringList TRANSLATION_DIRS{"i18n", "/usr/share/QVD_Client/i18n", "/usr/lib/qvd/share/QVD_Client/i18n"};
 
 
 
@@ -118,7 +121,6 @@ int main(int argc, char *argv[])
     QCoreApplication::setApplicationName("QVD Client");
     QGuiApplication::setDesktopFileName("com.theqvd.client");
 
-
     qSetMessagePattern("[%{type}] (%{file}:%{line}) %{message}");
 
     QApplication a(argc, argv);
@@ -130,6 +132,25 @@ int main(int argc, char *argv[])
 
     auto &parser = CommandLineParser::getInstance();
     auto retval = parser.parse(params, nxerr, misc_params);
+
+    QTranslator translator;
+    bool translation_loaded = false;
+
+    for(QString dir : TRANSLATION_DIRS) {
+        if ( translator.load(QLocale(), "QVD_Client", "_", "i18n") ) {
+            qInfo() << "Loaded translation for" << QLocale() << "from" << dir;
+            qApp->installTranslator(&translator);
+            translation_loaded = true;
+            break;
+        }
+    }
+
+    if (!translation_loaded) {
+        qWarning() << "Failed to load translation for" << QLocale();
+    }
+
+
+
 
     QMap<QMessageBox::Button, Action> button_action_map;
 
