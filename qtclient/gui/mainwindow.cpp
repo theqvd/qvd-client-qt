@@ -145,7 +145,7 @@ void MainWindow::connectToVM() {
     saveSettings();
 
     if (ui->serverLineEdit->text().trimmed().isEmpty()) {
-        QMessageBox::critical(this, "QVD", "Server is not set.\nPlease configure a server to connect to.");
+        QMessageBox::critical(this, tr("QVD"), tr("Server is not set.\nPlease configure a server to connect to."));
         setUI(true);
         ui->mainTabWidget->setCurrentWidget(ui->settingsTab);
         ui->serverLineEdit->setFocus(Qt::FocusReason::OtherFocusReason);
@@ -245,13 +245,13 @@ void MainWindow::socketError(QAbstractSocket::SocketError error)
 
     if ( connectionActive() ) {
         // This ensures the error only happens once
-        QString message = QString("Failed to connect to QVD at %1:%2\n%3")
+        QString message = QString(tr("Failed to connect to QVD at %1:%2\n%3"))
                                 .arg(m_client->getParameters().host())
                                 .arg(m_client->getParameters().port())
                                 .arg(m_client->getSocket()->errorString());
 
         this->show();
-        QMessageBox::critical(this, "QVD", message);
+        QMessageBox::critical(this, tr("QVD"), message);
 
         m_client->disconnectFromQVD();
         setUI(true);
@@ -280,24 +280,24 @@ void MainWindow::connectionError(QVDClient::ConnectionError error, const QString
     QString errstr;
 
     switch(error) {
-    case QVDClient::ConnectionError::None: errstr = "Bug: no error"; break;
-    case QVDClient::ConnectionError::AuthenticationError: errstr = "Authentication error"; break;
-    case QVDClient::ConnectionError::SecondFactorRequired: errstr = "Authentication error"; break;
-    case QVDClient::ConnectionError::ProtocolError: errstr = "Protocol error"; break;
-    case QVDClient::ConnectionError::Unexpected: errstr = "Internal error"; break;
-    case QVDClient::ConnectionError::Timeout: errstr = "Timeout"; break;
-    case QVDClient::ConnectionError::VMStartError: errstr = "Error when starting the VM"; break;
-    case QVDClient::ConnectionError::ServerBlocked: errstr = "Server blocked"; break;
-    case QVDClient::ConnectionError::ServerError: errstr = "Server error"; break;
-    case QVDClient::ConnectionError::XServerError: errstr = "X Server error"; break;
-    case QVDClient::ConnectionError::BackendError: errstr = "Backend error"; break;
+    case QVDClient::ConnectionError::None: errstr = tr("Bug: no error"); break;
+    case QVDClient::ConnectionError::AuthenticationError: errstr = tr("Authentication error"); break;
+    case QVDClient::ConnectionError::SecondFactorRequired: errstr = tr("Authentication error"); break;
+    case QVDClient::ConnectionError::ProtocolError: errstr = tr("Protocol error"); break;
+    case QVDClient::ConnectionError::Unexpected: errstr = tr("Internal error"); break;
+    case QVDClient::ConnectionError::Timeout: errstr = tr("Timeout"); break;
+    case QVDClient::ConnectionError::VMStartError: errstr = tr("Error when starting the VM"); break;
+    case QVDClient::ConnectionError::ServerBlocked: errstr = tr("Server blocked"); break;
+    case QVDClient::ConnectionError::ServerError: errstr = tr("Server error"); break;
+    case QVDClient::ConnectionError::XServerError: errstr = tr("X Server error"); break;
+    case QVDClient::ConnectionError::BackendError: errstr = tr("Backend error"); break;
     }
 
     qCritical() << "Connection error " << (int)error << ": " << error_desc;
 
     if (!m_skip_auth_error_messagebox) {
         // We skip this if we've shown the TOTP enrollment window
-        QMessageBox::critical(this, "QVD", errstr + "\n" + error_desc);
+        QMessageBox::critical(this, tr("QVD"), errstr + "\n" + error_desc);
     }
 
     m_skip_auth_error_messagebox = false;
@@ -387,7 +387,7 @@ void   MainWindow::sslErrors(const QList<QSslError> &errors, const QList<QSslCer
 
 void MainWindow::addSharedFolder()
 {
-    QString folder = QFileDialog::getExistingDirectory(this, "Select a folder to share", QDir::home().path());
+    QString folder = QFileDialog::getExistingDirectory(this, tr("Select a folder to share"), QDir::home().path());
     m_shared_folders.append(folder);
     m_shared_folders.removeDuplicates();
     m_shared_folders_model.setStringList(m_shared_folders);
@@ -601,10 +601,10 @@ void MainWindow::updateVersionInfo()
     QTextStream verStr(&verText);
 
     if ( VersionInfo::isRunningFromSource() ) {
-        verStr << "Running from source\n";
+        verStr << tr("Running from source\n");
     } else {
         verStr << "QVD Client " << VersionInfo::getFullVersion() << "\n";
-        verStr << QString::fromUtf8(u8"\u00a9 Qindel Group 2021\n\n");
+        verStr << QString::fromUtf8(u8"\u00a9 Qindel Group 2022\n\n");
         verStr << "Build " << VersionInfo::getBuild() << "\n";
     }
 

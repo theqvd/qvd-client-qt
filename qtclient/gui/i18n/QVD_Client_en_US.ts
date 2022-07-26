@@ -21,11 +21,19 @@
         <source>Connect</source>
         <translation></translation>
     </message>
+    <message>
+        <location line="+1"/>
+        <source>Cancel</source>
+        <translation></translation>
+    </message>
 </context>
 <context>
     <name>MainWindow</name>
     <message>
         <location filename="../mainwindow.ui" line="+14"/>
+        <location filename="../mainwindow.cpp" line="+148"/>
+        <location line="+106"/>
+        <location line="+46"/>
         <source>QVD</source>
         <translation></translation>
     </message>
@@ -162,6 +170,80 @@ Build: N/A</source>
         <source>&lt;a href=&quot;http://theqvd.com&quot;&gt;© 2022 Qindel Group&lt;/a&gt;</source>
         <translation></translation>
     </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="-152"/>
+        <source>Server is not set.
+Please configure a server to connect to.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location line="+100"/>
+        <source>Failed to connect to QVD at %1:%2
+%3</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location line="+35"/>
+        <source>Bug: no error</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <location line="+1"/>
+        <source>Authentication error</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Protocol error</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Internal error</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Timeout</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Error when starting the VM</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Server blocked</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Server error</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>X Server error</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Backend error</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location line="+97"/>
+        <source>Select a folder to share</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location line="+214"/>
+        <source>Running from source
+</source>
+        <translation></translation>
+    </message>
 </context>
 <context>
     <name>SSLErrorDialog</name>
@@ -193,6 +275,16 @@ Build: N/A</source>
     <message>
         <location filename="../sslerrordialog.cpp" line="+27"/>
         <source>Accept temporarily</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Accept permanently</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Cancel</source>
         <translation></translation>
     </message>
 </context>

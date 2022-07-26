@@ -11,7 +11,7 @@ struct QVDCert{
 QList<QVDCert> qvdCerts;
 
 SSLErrorDialog::SSLErrorDialog(QWidget *parent) :
-	QDialog(parent),
+    QDialog(parent),
     ui(new Ui::SSLErrorDialog)
 {
     ui->setupUi(this);
@@ -25,8 +25,8 @@ SSLErrorDialog::SSLErrorDialog(QWidget *parent) :
     connect(ui->buttonBox->button(QDialogButtonBox::Cancel), SIGNAL(clicked()),this, SLOT(reject_ssl()));
 
     ui->buttonBox->button(QDialogButtonBox::Ok)->setText(tr("Accept temporarily"));
-    ui->buttonBox->button(QDialogButtonBox::Save)->setText("Accept permanently");
-    ui->buttonBox->button(QDialogButtonBox::Cancel)->setText("Cancel");
+    ui->buttonBox->button(QDialogButtonBox::Save)->setText(tr("Accept permanently"));
+    ui->buttonBox->button(QDialogButtonBox::Cancel)->setText(tr("Cancel"));
 
 }
 
@@ -34,7 +34,7 @@ void SSLErrorDialog::displayErrors(const QList<QSslError> &errors, const QList<Q
 {
     ui->errorTree->clear();
 
-	QMap<QByteArray, QTreeWidgetItem*> cert_list;
+    QMap<QByteArray, QTreeWidgetItem*> cert_list;
 
     for(auto cert : cert_chain )
     {

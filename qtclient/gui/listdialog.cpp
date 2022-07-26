@@ -30,7 +30,7 @@ ListDialog::ListDialog(QWidget *parent) :
     connect(ui->buttonBox->button(QDialogButtonBox::Cancel), SIGNAL(clicked()),this, SLOT(cancel_connect()));
 
     ui->buttonBox->button(QDialogButtonBox::Ok)->setText(tr("Connect"));
-    ui->buttonBox->button(QDialogButtonBox::Cancel)->setText("Cancel");
+    ui->buttonBox->button(QDialogButtonBox::Cancel)->setText(tr("Cancel"));
 
 }
 
