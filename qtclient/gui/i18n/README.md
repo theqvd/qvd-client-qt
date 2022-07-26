@@ -20,3 +20,11 @@ Run `./update_translations.sh` to scan the source code for new changes, and add 
 
 The client looks for translation files in the paths `i18n` (same directory as the binary), `/usr/share/QVD_Client/i18n` and `/usr/lib/qvd/share/QVD_Client/i18n`. This is defined in a constant on top of `main.cpp`.
 
+## Testing
+
+Set `LC_ALL` to force a particular locale. Eg,
+
+```
+$ LC_ALL=es_ES.UTF-8 ./QVD_Client
+```
+
