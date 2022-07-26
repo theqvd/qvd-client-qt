@@ -24,10 +24,9 @@ set(CMAKE_AUTORCC ON)
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets LinguistTools Network Charts REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets LinguistTools Network Charts REQUIRED)
 
-set(TS_FILES QVD_Client_en_US.ts QVD_Client_es_ES.ts)
+file(GLOB TS_FILES "${PROJECT_SOURCE_DIR}/i18n/*.ts")
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/version.rc.in ${CMAKE_CURRENT_BINARY_DIR}/version.rc @ONLY)
-
 
 set(COMMON_SOURCES
     commandlineparser.cpp
@@ -52,19 +51,24 @@ set(COMMON_SOURCES
     images.qrc
     )
 
+set_source_files_properties(${TS_FILES} PROPERTIES OUTPUT_LOCATION "${CMAKE_CURRENT_BINARY_DIR}/i18n")
+qt5_add_translation(QM_FILES ${TS_FILES})
+list(LENGTH TS_FILES LANGCOUNT)
+
+message(STATUS "Will generate translations for ${LANGCOUNT} languages.")
+
 set(PROJECT_SOURCES
     ${COMMON_SOURCES}
     ${PLATFORM_SOURCES}
-    ${TS_FILES}
+    ${QM_FILES}
     ${CMAKE_CURRENT_BINARY_DIR}/version.rc
 )
+
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(QVD_Client
         ${PROJECT_SOURCES}
     )
-
-    qt_create_translation(QM_FILES ${CMAKE_BUILD_DIR} ${TS_FILES})
 else()
     if(ANDROID)
         add_library(QVD_Client SHARED
@@ -75,8 +79,6 @@ else()
             ${PROJECT_SOURCES}
         )
     endif()
-
-#    qt5_create_translation(QM_FILES ${CMAKE_BINARY_DIR} ${TS_FILES})
 endif()
 
 set_property(TARGET QVD_Client PROPERTY CXX_STANDARD 17)
