@@ -4,6 +4,7 @@
 <context>
     <name>ConnectionStatistics</name>
     <message>
+	<location filename="../connectionstatistics.ui" line="+14"/>
         <source>Dialog</source>
         <translation></translation>
     </message>
@@ -11,6 +12,7 @@
 <context>
     <name>ListDialog</name>
     <message>
+	<location filename="../listdialog.ui" line="+14"/>
         <source>Select your VM</source>
         <translation></translation>
     </message>
@@ -22,6 +24,7 @@
 <context>
     <name>MainWindow</name>
     <message>
+	<location filename="../mainwindow.ui" line="+14"/>
         <source>QVD</source>
         <translation></translation>
     </message>
@@ -135,6 +138,7 @@ Build: N/A</source>
 <context>
     <name>SSLErrorDialog</name>
     <message>
+	<location filename="../sslerrordialog.ui" line="+14"/>
         <source>Dialog</source>
         <translation></translation>
     </message>
@@ -162,6 +166,7 @@ Build: N/A</source>
 <context>
     <name>TotpEnrollment</name>
     <message>
+	<location filename="../totpenrollment.ui" line="+14"/>
         <source>Two factor authentication is required</source>
         <translation></translation>
     </message>
