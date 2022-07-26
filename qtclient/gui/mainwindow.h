@@ -76,6 +76,7 @@ private:
     QString getTimeZone();
     void setTabVisibility(QWidget *tab, bool visibility);
 
+    void writeDefaultSetting(QSettings &settings, const QString &name, QVariant defaultValue = QVariant());
 
     QVDConnectionParameters m_params;
     QStringList m_shared_folders;

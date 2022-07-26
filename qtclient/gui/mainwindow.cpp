@@ -506,6 +506,15 @@ void MainWindow::saveSettings() {
 
     qDebug() << "Saving settings";
 
+    settings.beginGroup("UI");
+
+    writeDefaultSetting(settings, "settingsTabVisible", true);
+    writeDefaultSetting(settings, "versionTabVisible", true);
+    writeDefaultSetting(settings, "rememberPasswordVisible", true);
+    writeDefaultSetting(settings, "restartSessionVisible", true);
+
+    settings.endGroup();
+
     settings.beginGroup("Connection");
     settings.setValue("host", ui->serverLineEdit->text() );
     settings.setValue("speed", ui->connectionTypeComboBox->currentData());
@@ -551,9 +560,14 @@ void MainWindow::loadSettings() {
     settings.beginGroup("UI");
     bool settingsVisible = settings.value("settingsTabVisible", true).toBool();
     bool versionVisible = settings.value("versionTabVisible", true).toBool();
+    bool rememberPasswordVisible = settings.value("rememberPasswordVisible", true).toBool();
+    bool restartSessionVisible = settings.value("restartSessionVisible", true).toBool();
 
     setTabVisibility(ui->settingsTab, settingsVisible);
     setTabVisibility(ui->versionTab, versionVisible);
+
+    ui->rememberPasswordCheck->setVisible(rememberPasswordVisible);
+    ui->restartSession->setVisible(restartSessionVisible);
 
 
 
@@ -663,4 +677,9 @@ void MainWindow::setTabVisibility(QWidget *tab, bool visibility)
             ui->mainTabWidget->setTabVisible(i, visibility);
         }
     }
+}
+
+void MainWindow::writeDefaultSetting(QSettings &settings, const QString &name, QVariant defaultValue)
+{
+    settings.setValue(name, settings.value(name, defaultValue));
 }
