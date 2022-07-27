@@ -137,7 +137,8 @@ int main(int argc, char *argv[])
     bool translation_loaded = false;
 
     for(QString dir : TRANSLATION_DIRS) {
-        if ( translator.load(QLocale(), "QVD_Client", "_", "i18n") ) {
+        qDebug() << "Trying to load translation for" << QLocale() << "from" << dir;
+        if ( translator.load(QLocale(), "QVD_Client", "_", dir) ) {
             qInfo() << "Loaded translation for" << QLocale() << "from" << dir;
             qApp->installTranslator(&translator);
             translation_loaded = true;
