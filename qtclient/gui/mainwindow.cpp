@@ -133,7 +133,7 @@ void MainWindow::setUI(bool enabled)
 
 bool MainWindow::connectionActive()
 {
-    return ui->centralWidget->isEnabled();
+    return !ui->centralWidget->isEnabled();
 }
 
 void MainWindow::connectToVM() {
