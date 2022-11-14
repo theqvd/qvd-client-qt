@@ -117,7 +117,10 @@ void ConnectionStatisticsChart::connectBackend(QVDBackend *backend)
 
 void ConnectionStatisticsChart::disconnectBackend()
 {
-    disconnect(m_backend, &QVDBackend::totalTrafficIncrement, this, &ConnectionStatisticsChart::backendTraffic);
+    if (m_backend) {
+        disconnect(m_backend, &QVDBackend::totalTrafficIncrement, this, &ConnectionStatisticsChart::backendTraffic);
+    }
+
     m_timer.stop();
     m_backend = nullptr;
 }
@@ -127,8 +130,6 @@ void ConnectionStatisticsChart::updateChart()
     //qreal seconds =  m_start_time.msecsTo(QDateTime::currentDateTimeUtc()) / 1000.0;
     QDateTime now = QDateTime::currentDateTime();
 
-
-
     qreal msecs = now.toMSecsSinceEpoch();
 
     qreal in_bw = m_in_avg.getAverage() / 1024;
@@ -137,6 +138,18 @@ void ConnectionStatisticsChart::updateChart()
     m_input_series->append(msecs, in_bw);
     m_output_series->append(msecs, -out_bw);
     m_center_series->append(msecs, 0);
+
+
+    while(m_input_series->count() > m_max_history_length)
+        m_input_series->remove(0);
+
+    while(m_output_series->count() > m_max_history_length)
+        m_output_series->remove(0);
+
+    while(m_center_series->count() > m_max_history_length)
+        m_center_series->remove(0);
+
+
 
     m_values[m_value_pos++] = std::max(in_bw, out_bw);
     if ( m_value_pos >= m_values.size() ) {

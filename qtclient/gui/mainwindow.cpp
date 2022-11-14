@@ -147,6 +147,7 @@ void MainWindow::connectToVM() {
     if (ui->serverLineEdit->text().trimmed().isEmpty()) {
         QMessageBox::critical(this, tr("QVD"), tr("Server is not set.\nPlease configure a server to connect to."));
         setUI(true);
+        m_stats_window.disconnectBackend();
         ui->mainTabWidget->setCurrentWidget(ui->settingsTab);
         ui->serverLineEdit->setFocus(Qt::FocusReason::OtherFocusReason);
         return;
@@ -255,6 +256,7 @@ void MainWindow::socketError(QAbstractSocket::SocketError error)
 
         m_client->disconnectFromQVD();
         setUI(true);
+        m_stats_window.disconnectBackend();
     }
 }
 
@@ -303,12 +305,14 @@ void MainWindow::connectionError(QVDClient::ConnectionError error, const QString
     m_skip_auth_error_messagebox = false;
 
     setUI(true);
+    m_stats_window.disconnectBackend();
 }
 
 void MainWindow::connectionTerminated()
 {
     qInfo() << "Connection terminated";
     setUI(true);
+    m_stats_window.disconnectBackend();
     show();
 }
 
