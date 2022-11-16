@@ -63,6 +63,8 @@ public slots:
     void twoFactorAuthenticationRequired(QVDClient::SecondFactorType type, int min_length, int max_length);
     void twoFactorEnrollment(const QVDClient::SecondFactorEnrollmentData &data);
 
+    void cancelButtonClicked();
+
 private slots:
     void backendTrafficInc(int64_t in, int64_t out);
     void printTraffic();

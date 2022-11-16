@@ -111,9 +111,26 @@ MainWindow::~MainWindow()
 
 
 
-void MainWindow::setUI(bool enabled)
-{
-    ui->centralWidget->setEnabled(enabled);
+/**
+ * @brief Sets up the main UI
+ *
+ * When the main UI is enabled, we're not inside a connection. Login info can be edited.
+ * When the main UI is disabled, we're in an active conection. The connection can be canceled.
+ *
+ * @param enabled Whether it's to be enabled
+ */
+void MainWindow::setUI(bool enabled) {
+
+    // We want to enable/disable everything inside the connectionLayout
+    for(int i=0;i<ui->connectionLayout->count(); ++i) {
+        QWidget *w = ui->connectionLayout->itemAt(i)->widget();
+        if (w) {
+            w->setEnabled(enabled);
+        }
+    }
+
+    ui->cancelButton->setEnabled(!enabled);
+
     if ( enabled ) {
         ui->progressBar->setMaximum(100);
         ui->progressBar->setValue(0);
@@ -121,12 +138,16 @@ void MainWindow::setUI(bool enabled)
 
         // Clear second factor on each login attempt
         ui->secondFactor->setText("");
+
+        ui->cancelButton->setEnabled(false);
     }
     else
     {
         ui->progressBar->setMaximum(0);
         ui->progressBar->setValue(0);
         m_traffic_timer.start(15000);
+
+        ui->cancelButton->setEnabled(true);
     }
 
 }
@@ -462,6 +483,12 @@ void MainWindow::twoFactorEnrollment(const QVDClient::SecondFactorEnrollmentData
     totp_window->setData(data);
     totp_window->setModal(true);
     totp_window->show();
+}
+
+void MainWindow::cancelButtonClicked()
+{
+    qWarning() << "Cancelling active connection";
+    m_client->disconnectFromQVD();
 }
 
 void MainWindow::backendTrafficInc(int64_t in, int64_t out)
