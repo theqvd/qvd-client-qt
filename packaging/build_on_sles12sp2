@@ -1,0 +1,46 @@
+#!/bin/bash
+
+tar=`../make_tar`
+tar_filename=`basename "$tar"`
+tar_dir=`basename "$tar" .orig.tar.xz | sed 's/qt_/qt-/'`
+
+[ -d "/tmp/sles-files" ] && rm -rf /tmp/sles-files
+mkdir -p /tmp/sles-files
+cp -Rpv files/rpm/*  /tmp/sles-files/
+cp -Rpv "$tar"       /tmp/sles-files/
+cp -v ../LICENSE ../README.md /tmp/sles-files/
+
+curdir=`pwd`
+
+BUILD_NX=$1
+DISTRO=$2
+
+if [ "$BUILD_NX" == "{true}" ] ; then
+
+   [ -d "$curdir/output/sles12sp2_nx-libs" ] && rm -rf $curdir/output/sles12sp2_nx-libs
+   mkdir -p $curdir/output/sles12sp2_nx-libs
+   docker_image=`docker images -q nx-libs:sles12sp2`
+
+   if [ -z "$docker_image" ] ; then
+      cd docker/sles-12sp2/nx-libs
+      docker build . -t nx-libs:sles12sp2
+      cd $curdir
+      docker run -i --privileged -u root -v $curdir/output/sles12sp2_nx-libs:/out nx-libs:sles12sp2 /build.sh
+   else
+      docker run -i --privileged -u root -v $curdir/output/sles12sp2_nx-libs:/out nx-libs:sles12sp2 /build.sh
+   fi
+
+fi
+
+docker_image=`docker images -q qvd-build-sles:12sp2`
+[ -d "$curdir/output/sles12sp2" ] && rm -rf $curdir/output/sles12sp2
+mkdir -p $curdir/output/sles12sp2
+
+if [ -z "$docker_image" ] ; then
+   cd docker/sles-12sp2
+   bash -x build
+   cd "$curdir"
+   docker run -i -v /tmp/sles-files:/files:Z -v $curdir/output/sles12sp2:/out qvd-build-sles:12sp2 /files/build_nx $DISTRO
+else
+   docker run -i -v /tmp/sles-files:/files:Z -v $curdir/output/sles12sp2:/out qvd-build-sles:12sp2 /files/build_nx $DISTRO
+fi

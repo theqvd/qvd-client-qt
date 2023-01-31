@@ -42,6 +42,7 @@ private:
     QString m_folder;
     QString m_sftp_server_binary = "/usr/lib/openssh/sftp-server";
     bool m_enable_debug = true;
+    const int HTTP_SWITCHING_PROTOCOLS = 101;
 };
 
 

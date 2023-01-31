@@ -70,13 +70,14 @@ QNetworkRequest QVDClient::createRequest(const QUrl &url)
 {
     QNetworkRequest req = QNetworkRequest(url);
 
-
-    QString concat = getParameters().username() + ":" + getParameters().password();
+    // The second factor is simply concatenated with the password
+    // Server-side it's split out by knowing how long it is -- it must be a configurable fixed length
+    QString concat = getParameters().username() + ":" + getParameters().password() + getParameters().secondFactor();
     QByteArray authdata = concat.toLocal8Bit().toBase64();
 
     QString headerdata = "Basic " + authdata;
     req.setRawHeader("Authorization", headerdata.toLocal8Bit());
-    req.setRawHeader("Authorization2FA", getParameters().secondFactor().toUtf8().toBase64());
+
     req.setRawHeader("User-Agent", "QVDClient Qt/0.01 (Linux)");
 
     auto env = QProcessEnvironment::systemEnvironment();
@@ -110,76 +111,25 @@ bool QVDClient::checkReply(QVDNetworkReply *reply)
 {
     Q_ASSERT(reply);
 
-
     int http_code = reply->attribute(QNetworkRequest::Attribute::HttpStatusCodeAttribute).toInt();
-    QString http_reason = reply->attribute(QNetworkRequest::Attribute::HttpReasonPhraseAttribute).toString();
-    QString http_detail;
-
-    if ( http_code < 200 || http_code > 299 ) {
-        // readAll is destructive, it will mess with things like the VM list.
-        http_detail = reply->readAll();
-    } else {
-        http_detail = "[not captured]";
-    }
-
-    qInfo() << "Reply code  : " << http_code;
-    qInfo() << "Reply reason: " << http_reason;
-    qInfo() << "Reply data  : " << http_detail;
-
-    QMap<QString, QString> headers;
-    for( auto header_pair : reply->rawHeaderPairs()) {
-        auto key   = QString::fromUtf8(header_pair.first);
-        auto value = QString::fromUtf8(header_pair.second);
-
-        headers.insert(key, value);
-    }
-
     if ( http_code == 401 ) {
-        if ( headers.contains("TOTP-Required") && headers["TOTP-Required"].toInt() ) {
-
-            if ( headers.contains("TOTP-MinLength") && headers.contains("TOTP-MaxLength")) {
-                // Server is telling us what kind of second factor it wants.
-
-                int min_length = headers["TOTP-MinLength"].toInt();
-                int max_length = headers["TOTP-MaxLength"].toInt();
-
-                emit twoFactorAuthenticationRequired(SecondFactorType::TOTP, min_length, max_length);
-            }
-
-            if ( headers.contains("TOTP-Enrollment") && headers["TOTP-Enrollment"].toInt() ) {
-                // Server is giving us a second factor secret to enroll the user in 2FA.
-
-                SecondFactorEnrollmentData sfe;
-                sfe.Type        = SecondFactorType::TOTP;
-                sfe.Issuer      = headers.value("TOTP-Issuer", "(Unknown issuer)");
-                sfe.AuthURL     = QUrl( headers.value("TOTP-Auth") );
-                sfe.Secret      = headers["TOTP-Secret"];
-                sfe.QrPicture   = QByteArray::fromBase64(headers["TOTP-PNG"].toUtf8());
-                sfe.helpMessage = QString::fromUtf8( QByteArray::fromBase64(headers["AssistanceInstructions"].toUtf8()) );
-
-                emit twoFactorEnrollment(sfe);
-            }
-
-            emit connectionError(ConnectionError::SecondFactorRequired, "Second factor required", headers);
-        } else {
-            emit twoFactorAuthenticationRequired(SecondFactorType::None, 0, 0);
-            emit connectionError(ConnectionError::AuthenticationError, "Incorrect username or password", headers);
-        }
+        //emit connectionError(ConnectionError::AuthenticationError, "Incorrect username or password.");
+        emit connectionError(ConnectionError::AuthenticationError, "Nombre de usuario o contraseña incorrecta.");
         disconnectFromQVD();
         return false;
     } else if ( http_code == 404 ) {
-        emit connectionError(ConnectionError::ProtocolError, "VM list command unrecognized. This may not be a QVD server.", headers);
+        emit connectionError(ConnectionError::ProtocolError, "VM list command unrecognized. This may not be a QVD server.");
         disconnectFromQVD();
         return false;
     } else if ( http_code == 503 ) {
-        emit connectionError(ConnectionError::ServerBlocked, "Server blocked", headers);
+        emit connectionError(ConnectionError::ServerBlocked, "Server blocked");
         disconnectFromQVD();
     } else if ( http_code >= 500 && http_code < 600 ) {
-        emit connectionError(ConnectionError::ProtocolError, "Server failure.", headers);
+        emit connectionError(ConnectionError::ProtocolError, "Server failure.");
         disconnectFromQVD();
         return false;
     } else if ( http_code != 200 ) {
-        emit connectionError(ConnectionError::ProtocolError, "Unexpected HTTP code " + QString::number(http_code), headers);
+        emit connectionError(ConnectionError::ProtocolError, "Unexpected HTTP code " + QString::number(http_code));
         disconnectFromQVD();
         return false;
     }
@@ -206,22 +156,20 @@ void QVDClient::connectToQVD() {
 
     m_http = new QVDHTTP(*m_socket, this);
 
+    auto m_host = getParameters().host();
+    auto m_port = getParameters().port();
+
     connect(m_socket, SIGNAL(encrypted()), this, SLOT(qvd_connectionEstablished()));
     connect(m_socket, SIGNAL(sslErrors(QList<QSslError>)), this, SLOT(qvd_sslErrors(QList<QSslError>)));
     connect(m_socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(qvd_socketError(QAbstractSocket::SocketError)));
     connect(m_socket, SIGNAL(hostFound()), this, SLOT(qvd_hostFound()));
     connect(m_socket, SIGNAL(stateChanged(QAbstractSocket::SocketState)), this, SLOT(qvd_socketStateChanged(QAbstractSocket::SocketState)));
 
-    m_socket->connectToHostEncrypted(getParameters().host(), getParameters().port());
-
-//	if ( !m_socket->waitForEncrypted( )) {
-//		qCritical() << "Failed to establish an encrypted connection to " << m_host << ":" << m_port << ": " << m_socket->errorString();
-//		return false;
-//	}
-
-//	qInfo() << "Connection established!";
-
-
+    m_socket->connectToHostEncrypted(m_host, m_port);
+  
+    if ( ! m_socket->waitForConnected(20000) ) {
+        m_socket->close();
+    }
 
 }
 
@@ -379,7 +327,7 @@ void QVDClient::qvd_vmListDownloaded()
     QJsonParseError parse_error;
     QJsonDocument doc = QJsonDocument::fromJson(json_data, &parse_error);
     if ( parse_error.error != QJsonParseError::NoError ) {
-        emit connectionError(ConnectionError::ProtocolError, "Failed to parse VM list: " + parse_error.errorString(), QMap<QString, QString>());
+        emit connectionError(ConnectionError::ProtocolError, "Failed to parse VM list: " + parse_error.errorString());
         disconnectFromQVD();
         return;
     }
@@ -502,8 +450,8 @@ void QVDClient::backend_listeningOnTcp(QVDBackend::NXChannel channel, quint16 po
         if ( m_parameters.audio() && m_parameters.audioCompression() ) {
             qInfo() << "Starting compressed audio";
             auto slave = createSlaveClient();
-          //  quint16 temp_audio_port = 63731;  // TODO: generate dynamically
-      //      quint16 system_audio_port = 4731; //
+            //quint16 temp_audio_port = 63731;  // TODO: generate dynamically
+            //quint16 system_audio_port = 4731; //
 
             //m_backend->setAudioPort(temp_audio_port);
             slave->connectCompressedAudio(m_backend->audioPort());
@@ -523,9 +471,9 @@ void QVDClient::backend_failed(QVDBackend::BackendError error, const QString &de
     disconnectFromQVD();
 
     if ( error == QVDBackend::BackendError::XServerFailed ) {
-        emit connectionError(QVDClient::ConnectionError::XServerError, description, QMap<QString, QString>());
+        emit connectionError(QVDClient::ConnectionError::XServerError, description);
     } else {
-        emit connectionError(QVDClient::ConnectionError::BackendError, description, QMap<QString, QString>());
+        emit connectionError(QVDClient::ConnectionError::BackendError, description);
     }
 }
 

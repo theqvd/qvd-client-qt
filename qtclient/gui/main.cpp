@@ -11,8 +11,10 @@
 #include <QMap>
 #include <QDesktopServices>
 #include <QTranslator>
+#include <QSettings>
 
 #include "helpers/pathtools.h"
+#include "qvdconnectionparameters.h"
 
 
 #ifdef Q_OS_UNIX
@@ -20,8 +22,6 @@
 #endif
 
 const QStringList TRANSLATION_DIRS{"i18n", "/usr/share/QVD_Client/i18n", "/usr/lib/qvd/share/QVD_Client/i18n"};
-
-
 
 // TODO: make this come from the build script
 //#define HAVE_SYSTEMD
@@ -84,8 +84,13 @@ void LogHandler(QtMsgType type, const QMessageLogContext &context, const QString
 
     QDateTime now = QDateTime::currentDateTime();
 
+#if QT_VERSION >= QT_VERSION_CHECK(5, 7, 0)
     log_stream << now.toString(Qt::ISODateWithMs) << level << " [" << context.file << ":" << context.line << "] " << msg << "\n";
     err_stream << now.toString(Qt::ISODateWithMs) << level << " [" << context.file << ":" << context.line << "] " << msg << "\n";
+#else
+    log_stream << now.toString(Qt::ISODate) << level << " [" << context.file << ":" << context.line << "] " << msg << "\n";
+    err_stream << now.toString(Qt::ISODate) << level << " [" << context.file << ":" << context.line << "] " << msg << "\n";
+#endif
 
     // Avoid Qt::endl, which is missing in Qt 5.11 used on the Pi
     log_stream.flush();
@@ -119,7 +124,6 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationName("Qindel");
     QCoreApplication::setOrganizationDomain("qindel.com");
     QCoreApplication::setApplicationName("QVD Client");
-    QGuiApplication::setDesktopFileName("com.theqvd.client");
 
     qSetMessagePattern("[%{type}] (%{file}:%{line}) %{message}");
 
@@ -137,7 +141,7 @@ int main(int argc, char *argv[])
     bool translation_loaded = false;
 
     for(QString dir : TRANSLATION_DIRS) {
-        qDebug() << "Trying to load translation for" << QLocale() << "from" << dir;
+	    qDebug() << "Trying to load translation for" << QLocale() << "from" << dir;
         if ( translator.load(QLocale(), "QVD_Client", "_", dir) ) {
             qInfo() << "Loaded translation for" << QLocale() << "from" << dir;
             qApp->installTranslator(&translator);

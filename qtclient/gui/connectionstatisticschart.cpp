@@ -139,7 +139,6 @@ void ConnectionStatisticsChart::updateChart()
     m_output_series->append(msecs, -out_bw);
     m_center_series->append(msecs, 0);
 
-
     while(m_input_series->count() > m_max_history_length)
         m_input_series->remove(0);
 

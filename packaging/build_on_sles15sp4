@@ -1,0 +1,43 @@
+#!/bin/bash
+
+tar=`../make_tar`
+tar_filename=`basename "$tar"`
+tar_dir=`basename "$tar" .orig.tar.xz | sed 's/qt_/qt-/'`
+
+[ -d "/tmp/sles-files" ] && rm -rf /tmp/sles-files
+mkdir -p /tmp/sles-files
+cp -Rpv files/rpm/*  /tmp/sles-files/
+cp -Rpv "$tar"       /tmp/sles-files/
+cp -v ../LICENSE ../README.md /tmp/sles-files/
+
+curdir=`pwd`
+
+BUILD_NX=$1
+
+if [ "$BUILD_NX" == "{true}" ] ; then
+
+   [ -d "$curdir/output/sles15sp4_nx-libs" ] && rm -rf $curdir/output/sles15sp4_nx-libs
+   mkdir -p $curdir/output/sles15sp4_nx-libs
+   docker_image=`docker images -q nx-libs:sles15sp4`
+
+   if [ -z "$docker_image" ] ; then
+      cd docker/sles-15sp4/nx-libs
+      docker build . -t nx-libs:sles15sp4
+      cd $curdir
+      docker run -i --privileged -u root -v $curdir/output/sles15sp4_nx-libs:/out nx-libs:sles15sp4 /build.sh
+   else
+      docker run -i --privileged -u root -v $curdir/output/sles15sp4_nx-libs:/out nx-libs:sles15sp4 /build.sh
+   fi
+
+fi
+
+docker_image=`docker images -q qvd-build-sles:15sp4`
+
+if [ -z "$docker_image" ] ; then
+   cd docker/sles-15sp4
+   bash -x build
+   cd "$curdir"
+   docker run -i -v /tmp/sles-files:/files:Z -v $curdir/output/sles15sp4:/out qvd-build-sles:15sp4 /files/build_nx
+else
+   docker run -i -v /tmp/sles-files:/files:Z -v $curdir/output/sles15sp4:/out qvd-build-sles:15sp4 /files/build_nx
+fi

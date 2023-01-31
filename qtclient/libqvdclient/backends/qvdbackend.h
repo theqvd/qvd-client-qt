@@ -113,6 +113,9 @@ public:
     quint16 cupsPort() const;
     void setCupsPort(const quint16 &cupsPort);
 
+    quint16 smbPort() const;
+    void setSmbPort(const quint16 &smbPort);
+
     quint16 slavePort() const;
     void setSlavePort(const quint16 &slavePort);
 
@@ -247,6 +250,7 @@ private:
     QVDConnectionParameters m_parameters;
 
     quint16 m_cups_port = 631;
+    quint16 m_smb_port = 445;
     quint16 m_slave_port = 63640;
     quint16 m_audio_port = 4713;
 

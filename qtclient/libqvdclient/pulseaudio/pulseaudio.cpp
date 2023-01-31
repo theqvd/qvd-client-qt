@@ -21,7 +21,11 @@ PulseAudio::PulseAudio()
 
 
     QObject::connect(&m_process, &QProcess::started, this, &PulseAudio::processStarted);
+#if QT_VERSION >= QT_VERSION_CHECK(5, 7, 0)
     QObject::connect(&m_process, QOverload<int,QProcess::ExitStatus>::of(&QProcess::finished), this, &PulseAudio::processFinished);
+#else
+    QObject::connect(&m_process, static_cast<void(QProcess::*)(int,QProcess::ExitStatus)>(&QProcess::finished), this, &PulseAudio::processFinished);
+#endif
     QObject::connect(&m_process, &QProcess::errorOccurred, this, &PulseAudio::processError);
     QObject::connect(&m_process, &QProcess::readyReadStandardOutput, this, &PulseAudio::processReadyReadOutput);
     QObject::connect(&m_process, &QProcess::readyReadStandardError, this, &PulseAudio::processReadyReadError);
@@ -204,7 +208,7 @@ bool PulseAudio::isRunning()
 
 QString PulseAudio::getPulseModuleExtension()
 {
-#ifdef Q_OS_LINUX
+#if defined(Q_OS_LINUX) || defined(Q_OS_FREEBSD)
     return ".so";
 #endif
 #ifdef Q_OS_DARWIN

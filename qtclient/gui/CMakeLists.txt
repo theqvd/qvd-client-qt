@@ -24,9 +24,11 @@ set(CMAKE_AUTORCC ON)
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets LinguistTools Network Charts REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets LinguistTools Network Charts REQUIRED)
 
+#set(TS_FILES QVD_Client_en_US.ts)
 file(GLOB TS_FILES "${PROJECT_SOURCE_DIR}/i18n/*.ts")
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/version.rc.in ${CMAKE_CURRENT_BINARY_DIR}/version.rc @ONLY)
+
 
 set(COMMON_SOURCES
     commandlineparser.cpp
@@ -42,11 +44,9 @@ set(COMMON_SOURCES
     movingaverage.cpp
     qvdchecklistview.cpp
     sslerrordialog.cpp
-    totpenrollment.cpp
     usbdevicelistmodel.cpp
     versioninfo.cpp
     mainwindow.ui
-    totpenrollment.ui
     icon.rc
     images.qrc
     )
@@ -64,7 +64,6 @@ set(PROJECT_SOURCES
     ${CMAKE_CURRENT_BINARY_DIR}/version.rc
 )
 
-
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(QVD_Client
         ${PROJECT_SOURCES}
@@ -79,6 +78,8 @@ else()
             ${PROJECT_SOURCES}
         )
     endif()
+
+#    qt5_create_translation(QM_FILES ${CMAKE_BINARY_DIR} ${TS_FILES})
 endif()
 
 set_property(TARGET QVD_Client PROPERTY CXX_STANDARD 17)

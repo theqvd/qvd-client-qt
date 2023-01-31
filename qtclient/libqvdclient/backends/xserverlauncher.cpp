@@ -9,8 +9,8 @@
 
 XServerLauncher::XServerLauncher()
 {
-#ifdef Q_OS_LINUX
-    // On Linux we don't launch the X Server, since it has to be already running.
+#if defined(Q_OS_LINUX) || defined(Q_OS_FREEBSD)
+    // On Linux, Freebsd or Unix systems with X11  we don't launch the X Server, since it has to be already running.
     // We instead call xhost to allow NX to connect. Most distributions these days allow
     // the local user to connect, but some don't.
 
@@ -48,7 +48,7 @@ XServerLauncher::XServerLauncher()
 
 
 void XServerLauncher::start() {
-#ifdef Q_OS_LINUX
+#if defined(Q_OS_LINUX) || defined(Q_OS_FREEBSD)
     QString user = qgetenv("USER");
     qDebug() << "Allowing user " << user << " to connect to X server";
 
@@ -98,7 +98,7 @@ void XServerLauncher::stop() {
 
 void XServerLauncher::processStarted()
 {
-#ifdef Q_OS_LINUX
+#if defined(Q_OS_LINUX) || defined(Q_OS_FREEBSD)
     qDebug() << "xhost process started";
 #endif
 #ifdef Q_OS_WIN32

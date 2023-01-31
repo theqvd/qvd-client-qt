@@ -40,6 +40,16 @@ void QVDBackend::setCupsPort(const quint16 &cups_port)
     m_cups_port = cups_port;
 }
 
+quint16 QVDBackend::smbPort() const
+{
+    return m_smb_port;
+}
+
+void QVDBackend::setSmbPort(const quint16 &smb_port)
+{
+    m_smb_port = smb_port;
+}
+
 quint16 QVDBackend::slavePort() const
 {
     return m_slave_port;

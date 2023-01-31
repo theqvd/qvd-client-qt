@@ -300,26 +300,24 @@ void QVDNXBackend::XServerReady()
 
     nxproxy_args.append(QString("slave=%1").arg(slavePort()));
 
+    qInfo() << m_parameters.printing();
+
     if ( parameters().printing() ) {
-        nxproxy_args.append(QString("cups=%1").arg(cupsPort()));
+        #ifdef Q_OS_WIN
+            nxproxy_args.append(QString("smb=%1").arg(smbPort()));
+        #else
+            nxproxy_args.append(QString("cups=%1").arg(cupsPort()));
+        #endif
     }
 
     if ( parameters().audio() ) {
         nxproxy_args.append(QString("media=%1").arg(audioPort()));
     }
 
-    qInfo() << m_parameters.printing();
+    QStringList nxproxy_extra_args = m_parameters.nxproxy_extra_args().split(",");
 
-    if ( m_parameters.printing() ) {
-        #ifdef Q_OS_WIN
-            nxproxy_args << "smb=443";
-        #else
-            nxproxy_args << "cups=631";
-        #endif
-    }
-
-    if ( m_parameters.fullscreen() ) {
-        nxproxy_args << "fullscreen=1";
+    if ( nxproxy_extra_args.size() != 0 ) {
+        nxproxy_args << nxproxy_extra_args;
     }
 
     qInfo() << "Starting listener at localhost";
@@ -380,6 +378,3 @@ void QVDNXBackend::XServerFailed(const QString &error)
     qCritical() << "X server failed: " << error;
     emit failed(QVDBackend::XServerFailed, error);
 }
-
-
-

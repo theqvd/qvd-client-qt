@@ -27,20 +27,20 @@ void UsbDeviceList::refresh() {
     m_devices.clear();
 
 #ifdef Q_OS_LINUX
-    qDebug() << "Retrieving devices from " << m_device_path;
+    qInfo() << "Retrieving devices from " << m_device_path;
 
     UsbDatabase db;
     auto devices = m_device_path.entryList();
 
     for( auto& file : devices ) {
-        qDebug() << "Creating device from " << file;
+        qInfo() << "Creating device from " << file;
         USBDevice dev = USBDevice::fromPath(m_device_path.filePath(file), db);
         if ( dev.isValid() && dev.deviceClass() != USBDevice::Hub ) {
             m_devices.append(dev);
         }
     }
 
-    qDebug() << "Device list done.";
+    qInfo() << "Device list done.";
     emit updated(true);
 #endif
 #ifdef WIN32

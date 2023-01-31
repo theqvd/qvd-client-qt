@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>459</width>
-    <height>721</height>
+    <width>438</width>
+    <height>544</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -53,74 +53,70 @@
         </item>
         <item>
          <layout class="QVBoxLayout" name="connectionLayout">
-          <property name="sizeConstraint">
-           <enum>QLayout::SetDefaultConstraint</enum>
-          </property>
-          <item>
-           <widget class="QLabel" name="title">
+          <item row="0" column="0">
+           <widget class="QLabel" name="usernameLabel">
             <property name="text">
-             <string/>
-            </property>
-            <property name="pixmap">
-             <pixmap>../pixmaps/qvd-big.png</pixmap>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
+             <string>User name</string>
             </property>
            </widget>
           </item>
-          <item>
-           <layout class="QFormLayout" name="loginLayout">
-            <item row="0" column="0">
-             <widget class="QLabel" name="usernameLabel">
-              <property name="text">
-               <string>Username</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="1">
-             <widget class="QLineEdit" name="username">
-              <property name="text">
-               <string/>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="0">
-             <widget class="QLabel" name="passwordLabel">
-              <property name="text">
-               <string>Password</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="1">
-             <widget class="QLineEdit" name="password">
-              <property name="text">
-               <string/>
-              </property>
-              <property name="echoMode">
-               <enum>QLineEdit::Password</enum>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="0">
-             <widget class="QLabel" name="secondFactorLabel">
-              <property name="text">
-               <string>Second Factor</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="1">
-             <widget class="QLineEdit" name="secondFactor">
-              <property name="maxLength">
-               <number>6</number>
-              </property>
-              <property name="echoMode">
-               <enum>QLineEdit::PasswordEchoOnEdit</enum>
-              </property>
-             </widget>
-            </item>
-           </layout>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="username">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
           </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="passwordLabel">
+            <property name="text">
+             <string>Password</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="password">
+            <property name="text">
+             <string/>
+            </property>
+            <property name="echoMode">
+             <enum>QLineEdit::Password</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="secondFactorLabel">
+            <property name="text">
+             <string>Second factor</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLineEdit" name="secondFactor"/>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <spacer name="verticalSpacer">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Fixed</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>10</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_2">
+          <property name="sizeConstraint">
+           <enum>QLayout::SetDefaultConstraint</enum>
+          </property>
           <item>
            <widget class="QCheckBox" name="rememberPasswordCheck">
             <property name="text">
@@ -129,32 +125,25 @@
            </widget>
           </item>
           <item>
-           <spacer name="verticalSpacer">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
+           <widget class="QCheckBox" name="restartSession">
+            <property name="text">
+             <string>Restart session</string>
             </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Fixed</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>20</width>
-              <height>10</height>
-             </size>
-            </property>
-           </spacer>
+           </widget>
           </item>
           <item>
            <widget class="QPushButton" name="connectButton">
             <property name="text">
              <string>Connect</string>
             </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QCheckBox" name="restartSession">
-            <property name="text">
-             <string>Restart session</string>
+            <property name="shortcut">
+             <string>Return</string>
+            </property>
+            <property name="autoDefault">
+             <bool>true</bool>
+            </property>
+            <property name="default">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -225,6 +214,13 @@
             </property>
             <property name="text">
              <string>Options</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="enableTwoFactorAuthCheck">
+            <property name="text">
+             <string>Two factor authentication</string>
             </property>
            </widget>
           </item>
@@ -486,7 +482,7 @@ Build: N/A</string>
        </font>
       </property>
       <property name="text">
-       <string>&lt;a href=&quot;http://theqvd.com&quot;&gt;© 2022 Qindel Group&lt;/a&gt;</string>
+       <string>&lt;a href=&quot;http://theqvd.com&quot;&gt;© 2021 Qindel Group&lt;/a&gt;</string>
       </property>
       <property name="textFormat">
        <enum>Qt::RichText</enum>
@@ -514,8 +510,8 @@ Build: N/A</string>
    <slot>connectToVM()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>363</x>
-     <y>370</y>
+     <x>381</x>
+     <y>581</y>
     </hint>
     <hint type="destinationlabel">
      <x>384</x>
@@ -530,8 +526,8 @@ Build: N/A</string>
    <slot>addSharedFolder()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>232</x>
-     <y>288</y>
+     <x>439</x>
+     <y>609</y>
     </hint>
     <hint type="destinationlabel">
      <x>383</x>
@@ -546,8 +542,8 @@ Build: N/A</string>
    <slot>removeSharedFolder()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>311</x>
-     <y>293</y>
+     <x>543</x>
+     <y>609</y>
     </hint>
     <hint type="destinationlabel">
      <x>381</x>
@@ -562,8 +558,8 @@ Build: N/A</string>
    <slot>enableSharedFoldersClicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>109</x>
-     <y>295</y>
+     <x>131</x>
+     <y>606</y>
     </hint>
     <hint type="destinationlabel">
      <x>379</x>
@@ -571,7 +567,7 @@ Build: N/A</string>
     </hint>
    </hints>
   </connection>
-  <connection>
+   <connection>
    <sender>cancelButton</sender>
    <signal>clicked()</signal>
    <receiver>MainWindow</receiver>

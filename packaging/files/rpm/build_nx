@@ -1,5 +1,6 @@
 #!/bin/bash
 
+DISTRO=$1
 BUILD_CLIENT=1
 set -e
 
@@ -26,6 +27,11 @@ if [ -n "$BUILD_CLIENT" ] ; then
 
 	export PATH=/usr/lib64/qt5/bin/:$PATH
 	rpmbuild -ba /root/rpmbuild/SPECS/qvd-client.spec
+
+	if [ "$DISTRO" == "{sles12sp2}" ] ; then
+	   cp -v /files/libqt5-qtcharts.spec /root/rpmbuild/SPECS/
+	   rpmbuild -ba /root/rpmbuild/SPECS/libqt5-qtcharts.spec
+	fi
 
 	mkdir -p /out/client
 	cp -RdpvL /root/rpmbuild/RPMS  /out/client/

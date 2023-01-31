@@ -31,30 +31,60 @@
     <name>MainWindow</name>
     <message>
         <location filename="../mainwindow.ui" line="+14"/>
-        <location filename="../mainwindow.cpp" line="+148"/>
-        <location line="+106"/>
-        <location line="+46"/>
+        <location filename="../mainwindow.cpp" line="+171"/>
+        <location line="+123"/>
+        <location line="+45"/>
         <source>QVD</source>
         <translation></translation>
     </message>
     <message>
-        <location line="+11"/>
-        <location line="+125"/>
+        <location line="+76"/>
+        <source>Second factor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-65"/>
+        <location line="+112"/>
         <source>Connect</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-23"/>
+        <location line="-78"/>
+        <source>User name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+14"/>
+        <source>Password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+50"/>
         <source>Remember password</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+30"/>
+        <location line="+7"/>
         <source>Restart session</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+39"/>
+        <location line="+10"/>
+        <source>Return</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+49"/>
+        <source>Cancel the connection attempt</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+10"/>
         <source>Settings</source>
         <translation></translation>
     </message>
@@ -62,6 +92,11 @@
         <location line="+14"/>
         <source>Options</source>
         <translation></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Two factor authentication</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+7"/>
@@ -151,44 +186,22 @@ Build: N/A</source>
         <translation></translation>
     </message>
     <message>
-        <location line="-377"/>
-        <source>Username</source>
-        <translation></translation>
+        <location line="+18"/>
+        <source>&lt;a href=&quot;http://theqvd.com&quot;&gt;© 2021 Qindel Group&lt;/a&gt;</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+14"/>
-        <source>Password</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location line="+17"/>
-        <source>Second Factor</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location line="+364"/>
-        <source>&lt;a href=&quot;http://theqvd.com&quot;&gt;© 2022 Qindel Group&lt;/a&gt;</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../mainwindow.cpp" line="-152"/>
+        <location filename="../mainwindow.cpp" line="-168"/>
         <source>Server is not set.
 Please configure a server to connect to.</source>
         <translation></translation>
     </message>
     <message>
-        <location line="+100"/>
-        <source>Failed to connect to QVD at %1:%2
-%3</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location line="+35"/>
+        <location line="+153"/>
         <source>Bug: no error</source>
         <translation></translation>
     </message>
     <message>
-        <location line="+1"/>
         <location line="+1"/>
         <source>Authentication error</source>
         <translation></translation>
@@ -234,12 +247,12 @@ Please configure a server to connect to.</source>
         <translation></translation>
     </message>
     <message>
-        <location line="+97"/>
+        <location line="+93"/>
         <source>Select a folder to share</source>
         <translation></translation>
     </message>
     <message>
-        <location line="+214"/>
+        <location line="+215"/>
         <source>Running from source
 </source>
         <translation></translation>
@@ -285,29 +298,6 @@ Please configure a server to connect to.</source>
     <message>
         <location line="+1"/>
         <source>Cancel</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>TotpEnrollment</name>
-    <message>
-        <location filename="../totpenrollment.ui" line="+14"/>
-        <source>Two factor authentication is required</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location line="+8"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Either you or the system administrator enabled two factor authentication for your account.&lt;/p&gt;&lt;p&gt;Please scan the code shown below with your phone using Google Authenticator or a similar tool. Once that is done, enter the code generated by the app into t he &amp;quot;Second Factor&amp;quot; field. You can also enter the code below into your application by hand.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location line="+51"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If you are having trouble logging in, the server&apos;s owner provided the following message:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location line="+10"/>
-        <source>(no message has been set)</source>
         <translation></translation>
     </message>
 </context>

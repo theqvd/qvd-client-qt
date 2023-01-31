@@ -1,94 +1,25 @@
 
-<#
-.SYNOPSIS
-
-Builds the QVD client
-
-.DESCRIPTION
-
-This script builds, and optionally signs and uploads the QVD Client.
-
-.PARAMETER Verbose
-
-Verbose output for debugging.
-
-.PARAMETER NoUpload
-
-Do not call the upload script. Uploading works by calling the script My Documents\installer_uploader.ps1, if it exists.
-It will be passed a list of paths to upload, and should return a list of URLs.
-
-.PARAMETER NoSign
-
-Do not sign the executables.
-
-.PARAMETER UseCloudSign
-
-Use ssl.com's esigner service to sign the installer.
-
-.PARAMETER Certificate
-
-Which certificate to use for signing. This can be a certificate thumbprint, or one of the builtin options:
-
-default:  QVD's normal certificate
-EV: QVD's Extended Validation certificate
-
-.PARAMETER TestSign
-
-Sign a binary for testing. This is used to try the signing process without going through the full build.
-
-
-.EXAMPLE 
-
-.\build.ps1
-
-.LINK
-
-https://theqvd.com
-
-.LINK
-
-https://github.com/theqvd/qvd-client-qt
-
-#>
 param (
 	[switch]$Verbose=$false,
-	[switch]$NoUpload=$false,
-	[switch]$NoSign=$false,
-	[switch]$UseCloudSign=$false,
-	[switch]$UseSignTool=$false,
-	$Certificate="ev",
-	$TestSign=""
+	[switch]$NoUpload=$false
 )
 
 
 $ErrorActionPreference = "Stop"
-$VCVarsAll = "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvarsall.bat"
+$VCVarsAll = "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsall.bat"
 $FilesPath = "C:\Program Files (x86)\QVD Client"
 $ExtFiles  = "${PSScriptRoot}\..\external"
 $TimestampServer = "http://timestamp.sectigo.com"
+$CertificateThumbprint = "4EC4BC69CAF66CFFB8EA1245E12C4C4291A887DB" # SSL.com code signing
+$CertificateThumbprint = "77084494d76d635a8700a6405a9adb8781604522" # SSL.com EV code signing -- Yubikey needed
 
-$Certificate = $Certificate.ToLower().Trim()
 
-if( $Certificate -eq "ev" ) {
-	$CertificateThumbprint = "01C50290432C1063E460C69123224E6A7C16DC17" # SSL.com EV code signing -- Yubikey needed
-} elseif ( $Certificate -eq "ev-old" ) {
-	$CertificateThumbprint = "77084494d76d635a8700a6405a9adb8781604522" # SSL.com EV code signing -- Yubikey needed
-} elseif ( $Certificate -eq "normal" ) {
-} elseif ( $Certificate.length -eq 40 ) {
-	$CertificateThumbprint = "4EC4BC69CAF66CFFB8EA1245E12C4C4291A887DB" # SSL.com code signing
-	$CertificateThumbprint = $Certificate
-} else {
-	Throw "Invalid certificate parameter: '$Certificate'"
-}
 
 $Certificate = Get-ChildItem cert:\CurrentUser\My -CodeSigningCert | Where-Object { $_.Thumbprint -eq "$CertificateThumbprint" }
 
 if ( ! $Certificate ) {
 	Throw "Failed to find certificate $CertificateThumbprint"
 }
-
-Write-Host "Found certificate with thumbprint ${CertificateThumbprint}: "
-Write-Host $Certificate.Subject
 
 $TODAY = Get-Date -Format "yyyy-MM-dd"
 
@@ -147,16 +78,7 @@ function Sign {
 		# Must be an antivirus or some such thing. So we just try again, and then it works.
 		while(!$signed) {
 			try {
-				if ( $UseCloudSign ) {
-					.\sign.ps1 $Path
-					$sign_info = Get-AuthenticodeSignature $Path
-				} elseif ( $UseSignTool ) {
-					signtool sign /sha1 $CertificateThumbprint /fd SHA256 /t $TimestampServer $Path
-					$sign_info = Get-AuthenticodeSignature $Path
-				} else {
-					#$sign_info = Set-AuthenticodeSignature $Path -Certificate $Certificate -HashAlgorithm SHA256 -TimestampServer $TimestampServer
-					$sign_info = Set-AuthenticodeSignature $Path -Certificate $Certificate -HashAlgorithm SHA384 -TimestampServer $TimestampServer -IncludeChain All
-				}
+				$sign_info = Set-AuthenticodeSignature $Path -Certificate $Certificate -HashAlgorithm SHA256 -TimestampServer $TimestampServer
 				$signed = 1
 			}
 			catch {
@@ -176,12 +98,7 @@ function Sign {
 		if ( $sign_info.Status -eq "Valid" ) {
 			Write-Host -ForegroundColor green "Done."
 		} else {
-			$s_stat = $sign_info.Status
-			$s_mesg = $sign_info.StatusMessage
-			Write-Host -ForegroundColor red "Error! Signature status ${s_stat}: $s_mesg"
-			
-			$Certificate | Format-List *
-			$sign_info | Format-List *
+			Write-Host -ForegroundColor red "Error! Signature status is $sign_info.Status"
 		}
 	} else {
 		Write-Host -ForegroundColor cyan "Already signed."
@@ -215,12 +132,6 @@ function ReplaceVariables($InputFile, $OutputFile) {
 	$junk = New-Item -Path $OutputFile -Value "$data" -ItemType File -Force
 }
 
-if ( $TestSign.length -gt 0 ) {
-	Sign $TestSign
-	
-	exit
-}
-
 $QT_VER="5.15.2"
 $QT_DIR="C:\Qt"
 $use_mingw = 0
@@ -251,10 +162,6 @@ $env:PATH="$QT_BIN_PATH;$COMPILER_BIN_PATH;$QT_INSTALLER_BIN_PATH;$QT_DIR\Tools\
 $git_ver = git describe HEAD --tags
 $git_commit = git rev-parse HEAD
 
-if ( !$git_ver ) {
-	throw "Failed to 'git describe HEAD --tags', can't find out the code's version. The git repository needs to have tags."
-}
-
 if ( $git_ver[0] -eq "v" ) {
 	$git_ver = $git_ver.substring(1)
 }
@@ -278,14 +185,10 @@ $Env:QVD_VERSION_FULL     = $git_ver
 if ( ! $Env:BUILD_NUMBER ) {
 	Write-Host "BUILD_NUMBER variable not set, using build counter"
 
-	$build_file = "${PSScriptRoot}/installer_data/build-num.txt"
+	$build_file = "${PSScriptRoot}/build-num.txt"
 
 	if ( ! (Test-Path "$build_file") ) {
 		Write-Host "No build counter found, creating"
-
-		if ( ! (Test-Path "$PSScriptRoot\\installer_data" )) {
-			$junk = New-Item -Path $PSScriptRoot -Name "installer_data" -ItemType Directory
-		}
 		Set-Content -Path "$build_file" -Value '1'
 	}
 
@@ -343,29 +246,26 @@ Write-Host -ForegroundColor blue -NoNewLine "Issued by: "
 Write-Host "$issuer"
 Write-Host ""
 
-try {
-	$build_dir = New-TemporaryDirectory
-	Set-Location -Path "$build_dir"
+$build_dir = New-TemporaryDirectory
+Set-Location -Path "$build_dir"
 
-	# msvc experiment:
-	# -D CMAKE_C_COMPILER=cl CMAKE_CXX_COMPILER=cl
-	cmake  "${PSScriptRoot}\..\qtclient" -G Ninja
+# msvc experiment:
+# -D CMAKE_C_COMPILER=cl CMAKE_CXX_COMPILER=cl
+cmake  "${PSScriptRoot}\..\qtclient" -G Ninja
 
-	if ( $LastExitCode -gt 0 ) {
-		throw "cmake failed with status $LastExitCode !"
-	}
+if ( $LastExitCode -gt 0 ) {
+	throw "cmake failed with status $LastExitCode !"
+}
 
-	iex "$MAKETOOL $MAKETOOL_ARGS"
-	if ( $LastExitCode -gt 0 ) {
-		throw "$MAKETOOL failed with status $LastExitCode !"
-	}
-} finally {
-	Set-Location -Path "$PSScriptRoot"
+iex "$MAKETOOL $MAKETOOL_ARGS"
+if ( $LastExitCode -gt 0 ) {
+	throw "$MAKETOOL failed with status $LastExitCode !"
 }
 
 
 Header "Copying data"
 
+Set-Location -Path "$PSScriptRoot"
 
 if ( Test-Path "packages\com.qindel.qvd\data" ) {
 	Remove-Item "packages\com.qindel.qvd\data" -Recurse -Force
@@ -384,7 +284,6 @@ Write-Host "Copying build files..."
 Copy-Item -Path "..\LICENSE"                             -Destination "$data\LICENSE.txt"
 Copy-Item -Path "$build_dir\gui\*.exe"                   -Destination "$data"
 Copy-Item -Path "$build_dir\libqvdclient\*.dll"          -Destination "$data"
-Copy-Item -Path "$Env:SystemRoot\System32\ucrtbased.dll" -Destination "$data"
 
 Write-Host "Copying dependencies..."
 Copy-Item -Path "$FilesPath\pulseaudio"                  -Destination "$data" -Recurse
@@ -397,7 +296,7 @@ Copy-Item -Path "$SSL_BIN_PATH\libssl*"                  -Destination "$data"
 Copy-Item -Path "install_scripts\*"                      -Destination "$data\scripts\"
 
 # GCC requires some extra libraries. We find out whether this is needed by
-# checking which compiler was used to build the .exe. This is embedded into the 
+# checking which compiler was used to build the .exe. This is embedded into the
 # Comments VERSIONINFO field by CMake.
 $ver=[System.Diagnostics.FileVersionInfo]::GetVersionInfo("$data_abspath\QVD_Client.exe")
 if ($ver.Comments -like 'Built with GNU*') {

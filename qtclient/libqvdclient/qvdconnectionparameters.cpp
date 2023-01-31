@@ -101,9 +101,19 @@ QString QVDConnectionParameters::nxagent_extra_args() const
     return m_nxagent_extra_args;
 }
 
+QString QVDConnectionParameters::nxproxy_extra_args() const
+{
+    return m_nxproxy_extra_args;
+}
+
 void QVDConnectionParameters::setNxagent_extra_args(const QString &nxagent_extra_args)
 {
     m_nxagent_extra_args = nxagent_extra_args;
+}
+
+void QVDConnectionParameters::setNxproxy_extra_args(const QString &nxproxy_extra_args)
+{
+    m_nxproxy_extra_args = nxproxy_extra_args;
 }
 
 bool QVDConnectionParameters::fullscreen() const
@@ -214,11 +224,12 @@ QDebug operator<<(QDebug debug, const QVDConnectionParameters &p)
                     << "; Port = " << p.port()
                     << "; User = '" << p.username() << "'"
                     << "; Password = '" << "********" /* p.password() */ << "'"
-                    << "; SecondFactor =" << "******"
+                    << "; Second factor = " << p.secondFactor()
                     << "; Speed = " << p.connectionSpeed()
                     << "; Geometry = " << p.geometry()
                     << "; Keyboard = '" << p.keyboard() << "'"
                     << "; ExtraArgs = '" << p.nxagent_extra_args() << "'"
+                    << "; NxProxyExtraArgs = '" << p.nxproxy_extra_args() << "'"
                     << "; FullScreen = " << p.fullscreen()
                     << "; Printing = " << p.printing()
                     << "; USBForwarding = " << p.usb_forwarding()

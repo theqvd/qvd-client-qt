@@ -1,6 +1,6 @@
 // Default dimensions to use. These ensure the size in the UI file doesn't matter.
-const int MAIN_WINDOW_WIDTH = 500;
-const int MAIN_WINDOW_HEIGHT = 700;
+const int MAIN_WINDOW_WIDTH = 438;
+const int MAIN_WINDOW_HEIGHT = 544;
 
 
 
@@ -12,7 +12,7 @@ const int MAIN_WINDOW_HEIGHT = 700;
 #include "ui_sslerrordialog.h"
 #include "backends/qvdnxbackend.h"
 #include "qvdconnectionparameters.h"
-#include "totpenrollment.h"
+
 
 #include <QCommandLineParser>
 #include <QCommandLineOption>
@@ -48,15 +48,12 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(m_client, &QVDClient::sslErrors, this, &MainWindow::sslErrors);
     QObject::connect(m_client, &QVDClient::vmConnected, this, &MainWindow::vmConnected);
     QObject::connect(m_client, &QVDClient::vmPoweredDown, this, &MainWindow::vmPoweredDown);
-    connect(m_client, &QVDClient::twoFactorAuthenticationRequired, this, &MainWindow::twoFactorAuthenticationRequired);
-    connect(m_client, &QVDClient::twoFactorEnrollment, this, &MainWindow::twoFactorEnrollment);
+
 
     ui->setupUi(this);
 
     setWindowIcon(QIcon(":/pixmaps/qvd.ico"));
 
-
-    connect(ui->serverLineEdit, &QLineEdit::editingFinished, this, &MainWindow::updateTwoFactorField);
 
 
     ui->connectionTypeComboBox->addItem( "Modem", QVDConnectionParameters::ConnectionSpeed::Modem );
@@ -97,18 +94,22 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&m_traffic_timer, &QTimer::timeout, this, &MainWindow::printTraffic);
 
 
+
+
     // Ensure the window's size is the smallest possible
     resize(MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGHT);
 
     updateVersionInfo();
     loadSettings();
+
+    // Set default object focus
+    ui->username->setFocus();
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
 }
-
 
 
 /**
@@ -134,20 +135,17 @@ void MainWindow::setUI(bool enabled) {
     if ( enabled ) {
         ui->progressBar->setMaximum(100);
         ui->progressBar->setValue(0);
-        m_traffic_timer.stop();
-
-        // Clear second factor on each login attempt
-        ui->secondFactor->setText("");
-
+        ui->connectButton->setEnabled(true);
         ui->cancelButton->setEnabled(false);
+        m_traffic_timer.stop();
     }
     else
     {
         ui->progressBar->setMaximum(0);
         ui->progressBar->setValue(0);
-        m_traffic_timer.start(15000);
-
+        ui->connectButton->setEnabled(false);
         ui->cancelButton->setEnabled(true);
+        m_traffic_timer.start(15000);
     }
 
 }
@@ -187,33 +185,61 @@ void MainWindow::connectToVM() {
     settings.beginGroup("Connection");
     QVDConnectionParameters params;
 
-    //if ( ui->enablePrintingCheck->isChecked() ) {
-    //    params.setPrinting(true);
-    //}
+    if ( ui->enablePrintingCheck->isChecked() ) {
+        params.setPrinting(true);
+    }
+
+    if ( ui->fullScreenCheck->isChecked() ) {
+        params.setFullscreen(true);
+    }
 
     if ( ui->enableSharedFoldersCheck->isChecked() ) {
         params.setSharedFolders(m_shared_folders);
     }
 
     params.setKeyboard( KeyboardDetector::getKeyboardLayout() );
-    params.setUsername(ui->username->text());
-    params.setPassword(ui->password->text());
-
-    if ( ui->secondFactor->isVisible()) {
+    
+    
+    if (ui->enableTwoFactorAuthCheck->isChecked()) {
         params.setSecondFactor(ui->secondFactor->text());
+    } else {
+        params.setSecondFactor("");
     }
 
-    params.setHost(ui->serverLineEdit->text());
-    params.setPort( quint16( settings.value("port", 8443).toInt() ));
+    QString host = ui->serverLineEdit->text();
+
+    if ( host.contains(':') ) {
+         params.setHost(host.split(':')[0]);
+         params.setPort( quint16( settings.value("port", host.split(':')[1]).toInt() ));
+    } else {
+         params.setHost( ui->serverLineEdit->text() );
+         params.setPort( quint16( settings.value("port", "8443").toInt() ));
+   }
+        
     params.setConnectionSpeed(speed);
-    params.setPrinting( ui->enablePrintingCheck->isChecked() );
-    params.setFullscreen( ui->fullScreenCheck->isChecked() );
 
     params.setUsb_forwarding( ui->enableUSBRedirectionCheck->isChecked() );
     params.setSharedUsbDevices( m_usb_device_model.getSelectedDevices() );
     params.setAudio( ui->enableAudioCheck->isChecked() );
     params.setMicrophone( ui->enableMicrophoneCheck->isChecked() );
     params.setTimezone(getTimeZone());
+
+    params.setUsername(ui->username->text());
+    params.setPassword(ui->password->text());
+    
+    if(settings.contains("nxproxy_extra_args")) {
+       params.setNxproxy_extra_args(settings.value("nxproxy_extra_args").toString());
+    }
+
+    if(settings.contains("nxagent_extra_args")) {
+       params.setNxagent_extra_args(settings.value("nxagent_extra_args").toString());
+    }
+
+    if(settings.contains("geometry")) {
+       params.setGeometry(QSize(settings.value("geometry").toSize()));
+    }
+
+    settings.endGroup();
 
     qInfo() << "Connecting with parameters " << params;
 
@@ -263,19 +289,16 @@ void MainWindow::socketError(QAbstractSocket::SocketError error)
     qWarning() << "Socket error: " << m_client->getSocket()->errorString();
     qWarning() << "Socket error: " << m_client->getSocket()->error();
 
-
-
-    if ( connectionActive() ) {
+    if ( ! connectionActive() ) {
         // This ensures the error only happens once
-        QString message = QString(tr("Failed to connect to QVD at %1:%2\n%3"))
+        QString message = QString("Failed to connect to QVD at %1:%2\n%3")
                                 .arg(m_client->getParameters().host())
                                 .arg(m_client->getParameters().port())
                                 .arg(m_client->getSocket()->errorString());
 
         this->show();
-        QMessageBox::critical(this, tr("QVD"), message);
+	QMessageBox::critical(this, tr("QVD"), message);
 
-        m_client->disconnectFromQVD();
         setUI(true);
         m_stats_window.disconnectBackend();
     }
@@ -298,14 +321,13 @@ void MainWindow::vmPoweredDown(int id)
     m_client->connectToVM(id);
 }
 
-void MainWindow::connectionError(QVDClient::ConnectionError error, const QString& error_desc, const QMap<QString, QString>& headers)
+void MainWindow::connectionError(QVDClient::ConnectionError error, QString error_desc)
 {
     QString errstr;
 
     switch(error) {
     case QVDClient::ConnectionError::None: errstr = tr("Bug: no error"); break;
     case QVDClient::ConnectionError::AuthenticationError: errstr = tr("Authentication error"); break;
-    case QVDClient::ConnectionError::SecondFactorRequired: errstr = tr("Authentication error"); break;
     case QVDClient::ConnectionError::ProtocolError: errstr = tr("Protocol error"); break;
     case QVDClient::ConnectionError::Unexpected: errstr = tr("Internal error"); break;
     case QVDClient::ConnectionError::Timeout: errstr = tr("Timeout"); break;
@@ -314,19 +336,16 @@ void MainWindow::connectionError(QVDClient::ConnectionError error, const QString
     case QVDClient::ConnectionError::ServerError: errstr = tr("Server error"); break;
     case QVDClient::ConnectionError::XServerError: errstr = tr("X Server error"); break;
     case QVDClient::ConnectionError::BackendError: errstr = tr("Backend error"); break;
+
     }
 
-    qCritical() << "Connection error " << (int)error << ": " << error_desc;
+    qCritical() << "Connection error " << error << ": " << error_desc;
 
-    if (!m_skip_auth_error_messagebox) {
-        // We skip this if we've shown the TOTP enrollment window
-        QMessageBox::critical(this, tr("QVD"), errstr + "\n" + error_desc);
-    }
-
-    m_skip_auth_error_messagebox = false;
+    QMessageBox::critical(this, tr("QVD"), errstr + "\n" + error_desc);
 
     setUI(true);
     m_stats_window.disconnectBackend();
+
 }
 
 void MainWindow::connectionTerminated()
@@ -338,7 +357,6 @@ void MainWindow::connectionTerminated()
 }
 
 void   MainWindow::sslErrors(const QList<QSslError> &errors, const QList<QSslCertificate> &cert_chain, bool &continueConnection)
-//void MainWindow::sslErrors(const QList<QSslError> &errors, const QList<QSslCertificate> &cert_chain)
 {
     QList<QString> certList;
     QSet<QString> nonAcceptedHashes;
@@ -369,9 +387,6 @@ void   MainWindow::sslErrors(const QList<QSslError> &errors, const QList<QSslCer
     }
     settings.endArray();
     settings.endGroup();
-
-
-
 
     if ( nonAcceptedHashes.empty() ) {
         qInfo() << "All certs in the chain have been previously accepted";
@@ -438,53 +453,6 @@ void MainWindow::enableSharedFoldersClicked()
     ui->removeSharedFolderButton->setEnabled( enabled );
 }
 
-void MainWindow::twoFactorAuthenticationRequired(QVDClient::SecondFactorType type, int min_length, int max_length)
-{
-
-
-    QSettings settings;
-    QString host = m_client->getParameters().host().toLower().trimmed();
-
-
-    if ( type == QVDClient::SecondFactorType::None ) {
-        qDebug() << "Server" << host << "doesn't use two factor authentication";
-    } else {
-        qDebug() << "Server" << host << "requires two factor authentication. Factor type " << (int)type << ", length from " << min_length << " to " << max_length << "characters";
-    }
-
-    settings.beginGroup("TwoFactorServers");
-
-    switch(type) {
-    case QVDClient::SecondFactorType::None:
-        // This server doesn't have 2FA enabled
-        settings.remove(host);
-        break;
-    case QVDClient::SecondFactorType::TOTP:
-        QMap<QString, QVariant> data;
-        data.insert("Type", (int)type);
-        data.insert("MinLength", min_length);
-        data.insert("MaxLength", max_length);
-
-        settings.setValue(host, data);
-        break;
-    }
-
-    settings.endGroup();
-    emit updateTwoFactorField();
-}
-
-void MainWindow::twoFactorEnrollment(const QVDClient::SecondFactorEnrollmentData &data)
-{
-    qInfo() << "Server requests second factor enrollment";
-
-    m_skip_auth_error_messagebox = true;
-
-    auto totp_window = new TotpEnrollment(this);
-    totp_window->setData(data);
-    totp_window->setModal(true);
-    totp_window->show();
-}
-
 void MainWindow::cancelButtonClicked()
 {
     qWarning() << "Cancelling active connection";
@@ -502,36 +470,6 @@ void MainWindow::printTraffic()
     qInfo() << "Traffic avg in =" << m_avg_in_15s.getAverage() << "bytes/s; out =" << m_avg_out_15s.getAverage() << "bytes/s";
 }
 
-void MainWindow::updateTwoFactorField()
-{
-    QSettings settings;
-
-    settings.beginGroup("TwoFactorServers");
-    QString server = ui->serverLineEdit->text().trimmed().toLower();
-
-    QVariant sdata = settings.value(server);
-    if (!sdata.isNull()) {
-        // Got settings for this server
-        QMap<QString, QVariant> data = sdata.toMap();
-        if ( data["Type"] == (int)QVDClient::SecondFactorType::TOTP ) {
-            int max_len = data["MaxLength"].toInt();
-
-            qInfo() << "Server" << server << "requires TOTP with" << max_len << "characters";
-
-            ui->secondFactorLabel->setVisible(true);
-            ui->secondFactor->setVisible(true);
-            ui->secondFactor->setMaxLength(max_len);
-            ui->secondFactor->setText("");
-            ui->secondFactor->setValidator(new QIntValidator(this));
-            return;
-        }
-    }
-    settings.endGroup();
-
-    ui->secondFactorLabel->setVisible(false);
-    ui->secondFactor->setVisible(false);
-}
-
 void MainWindow::saveSettings() {
     QSettings settings;
 
@@ -547,7 +485,19 @@ void MainWindow::saveSettings() {
     settings.endGroup();
 
     settings.beginGroup("Connection");
-    settings.setValue("host", ui->serverLineEdit->text() );
+
+    QString host = ui->serverLineEdit->text();
+    
+    if ( ! host.isEmpty() ) {
+        if ( host.contains(":") ) {
+            settings.setValue("host", host.split(':')[0]);
+            settings.setValue("port", host.split(':')[1]);
+        } else {
+            settings.setValue("host", ui->serverLineEdit->text());
+            settings.setValue("port", "8443");
+        }
+    }
+
     settings.setValue("speed", ui->connectionTypeComboBox->currentData());
     settings.setValue("username", ui->username->text() );
     settings.setValue("remember_password", ui->rememberPasswordCheck->isChecked() );
@@ -558,16 +508,18 @@ void MainWindow::saveSettings() {
         settings.setValue("password", "");
     }
 
+    settings.setValue("enable_two_factor_auth", ui->enableTwoFactorAuthCheck->isChecked() );
     settings.setValue("enable_file_sharing", ui->enableSharedFoldersCheck->isChecked() );
     settings.setValue("enable_audio", ui->enableAudioCheck->isChecked() );
     settings.setValue("enable_microphone", ui->enableMicrophoneCheck->isChecked() );
+    settings.setValue("enable_printing", ui->enablePrintingCheck->isChecked() );
+    settings.setValue("fullscreen", ui->fullScreenCheck->isChecked() );
 
     settings.setValue("shared_folders", m_shared_folders);
 
     QStringList shared_devices;
 
     settings.setValue("enable_usb_redirection", ui->enableUSBRedirectionCheck->isChecked());
-
 
     settings.beginWriteArray("shared_usb_devices");
     int pos = 0;
@@ -578,8 +530,9 @@ void MainWindow::saveSettings() {
         settings.setValue("serial", dev.serial());
         pos++;
     }
-    settings.endArray();
 
+    settings.endArray();
+    settings.endGroup();
 
 }
 
@@ -600,11 +553,16 @@ void MainWindow::loadSettings() {
     ui->rememberPasswordCheck->setVisible(rememberPasswordVisible);
     ui->restartSession->setVisible(restartSessionVisible);
 
-
+    settings.endGroup();
 
     settings.beginGroup("Connection");
 
-    ui->serverLineEdit->setText( settings.value("host", "").toString());
+    QString host = settings.value("host").toString();
+    QString port = settings.value("port").toString(); 
+    
+    if ( ! host.isEmpty() ) {
+         ui->serverLineEdit->setText(host + ":" + port);
+    }
 
     for(int i=0;i<ui->connectionTypeComboBox->count(); i++) {
         ui->connectionTypeComboBox->setCurrentIndex(i);
@@ -612,13 +570,12 @@ void MainWindow::loadSettings() {
             break;
     }
 
-    ui->username->setText( settings.value("username").toString());
-    ui->rememberPasswordCheck->setChecked( settings.value("remember_password").toBool());
-    ui->password->setText(  QString::fromUtf8( QByteArray::fromBase64( settings.value("password").toByteArray() )));
-
-    ui->enableSharedFoldersCheck->setChecked(  settings.value("enable_file_sharing").toBool() );
+    ui->enableTwoFactorAuthCheck->setChecked( settings.value("enable_two_factor_auth").toBool() );
+    ui->enableSharedFoldersCheck->setChecked( settings.value("enable_file_sharing").toBool() );
     ui->enableAudioCheck->setChecked( settings.value("enable_audio").toBool() );
-    ui->enableMicrophoneCheck->setChecked( settings.value("enable_microphone").toBool());
+    ui->enableMicrophoneCheck->setChecked( settings.value("enable_microphone").toBool() );
+    ui->enablePrintingCheck->setChecked( settings.value("enable_printing").toBool() );
+    ui->fullScreenCheck->setChecked( settings.value("fullscreen").toBool() );
 
     m_shared_folders = settings.value("shared_folders").toStringList();
     m_shared_folders_model.setStringList(m_shared_folders);
@@ -636,8 +593,22 @@ void MainWindow::loadSettings() {
         m_usb_device_model.selectDevice(vendor, product, serial);
     }
     settings.endArray();
+    settings.endGroup();
 
-    emit updateTwoFactorField();
+
+    settings.endGroup();
+    settings.beginGroup("Connection");
+
+    ui->username->setText( settings.value("username").toString());
+    ui->rememberPasswordCheck->setChecked( settings.value("remember_password").toBool());
+    ui->password->setText(  QString::fromUtf8( QByteArray::fromBase64( settings.value("password").toByteArray() )));
+
+    settings.endGroup();
+
+    // Ensure the second factor auth field is appropriately visible or not
+    on_enableTwoFactorAuthCheck_toggled(ui->enableTwoFactorAuthCheck->isChecked() );
+
+    settings.endGroup();
 }
 
 void MainWindow::updateVersionInfo()
@@ -646,10 +617,10 @@ void MainWindow::updateVersionInfo()
     QTextStream verStr(&verText);
 
     if ( VersionInfo::isRunningFromSource() ) {
-        verStr << tr("Running from source\n");
+	verStr << tr("Running from source\n");
     } else {
         verStr << "QVD Client " << VersionInfo::getFullVersion() << "\n";
-        verStr << QString::fromUtf8(u8"\u00a9 Qindel Group 2022\n\n");
+	verStr << QString::fromUtf8(u8"\u00a9 Qindel Group 2022\n\n");
         verStr << "Build " << VersionInfo::getBuild() << "\n";
     }
 
@@ -667,17 +638,7 @@ void MainWindow::closeEvent(QCloseEvent *event) {
 //    if (settings_cert.value("Accept").toString() != "0")
 //    {
         event->accept();
-        //    }
-}
-
-void MainWindow::showEvent(QShowEvent *event)
-{
-    QWidget::showEvent(event);
-
-    if ( m_misc_params.autoLogin ) {
-        qInfo() << "Automatically logging in";
-        emit connectToVM();
-    }
+//    }
 }
 
 void MainWindow::setMiscParameters(CommandLineParser::MiscParameters misc_params)
@@ -690,9 +651,9 @@ void MainWindow::setMiscParameters(CommandLineParser::MiscParameters misc_params
 void MainWindow::setConnectionParms(const QVDConnectionParameters &params)
 {
     m_params = params;
-    ui->username->setText(m_params.username());
-    ui->password->setText(m_params.password());
-    ui->serverLineEdit->setText(m_params.host());
+    //ui->username->setText(m_params.username());
+    //ui->password->setText(m_params.password());
+    //ui->serverLineEdit->setText(m_params.host());
 }
 
 QString MainWindow::getTimeZone() {
@@ -705,7 +666,11 @@ void MainWindow::setTabVisibility(QWidget *tab, bool visibility)
 {
     for(int i=0;i<ui->mainTabWidget->count();i++) {
         if ( ui->mainTabWidget->widget(i) == tab) {
+#if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
+            ui->mainTabWidget->setTabEnabled(i, visibility);
+#else
             ui->mainTabWidget->setTabVisible(i, visibility);
+#endif
         }
     }
 }
@@ -713,4 +678,10 @@ void MainWindow::setTabVisibility(QWidget *tab, bool visibility)
 void MainWindow::writeDefaultSetting(QSettings &settings, const QString &name, QVariant defaultValue)
 {
     settings.setValue(name, settings.value(name, defaultValue));
+}
+
+void MainWindow::on_enableTwoFactorAuthCheck_toggled(bool checked)
+{
+    ui->secondFactorLabel->setVisible( checked );
+    ui->secondFactor->setVisible( checked );
 }

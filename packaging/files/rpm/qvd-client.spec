@@ -4,6 +4,7 @@ Release:    1
 Summary:    QVD Client
 License:    GPL-3
 Source0:    qvd-client-qt_%{version}.orig.tar.xz
+Requires:   nxproxy >= 3.5.99.26, xhost >= 1.0.6
 %global debug_package %{nil}
 
 %description
@@ -19,9 +20,11 @@ make %{?_smp_mflags}
 %install
 mkdir -p %{buildroot}/usr/share/applications/
 mkdir -p %{buildroot}/usr/share/pixmaps/
+mkdir -p %{buildroot}/usr/share/QVD_Client/i18n/
 mkdir -p %{buildroot}/usr/bin/
 
 install -m 755 gui/pixmaps/* %{buildroot}/usr/share/pixmaps/
+install -m 755 %{_builddir}/%{name}-%{version}/build/gui/i18n/* %{buildroot}/usr/share/QVD_Client/i18n/
 make install_files DESTDIR=%{buildroot} PREFIX=/usr
 
 cat > %{buildroot}/usr/share/applications/%{name}.desktop <<'EOF'
@@ -64,6 +67,7 @@ rm -rf %{buildroot}
 %files
 /usr/bin/QVD_Client
 /usr/lib64/libqvdclient.so*
+/usr/share/QVD_Client/i18n/*.qm
 %{_datadir}/applications/%{name}.desktop
 %{_datadir}/pixmaps/*
 

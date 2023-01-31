@@ -115,6 +115,7 @@ if [ -n "$OSX" ] ; then
 else
 	cp -v $build_dir/libqvdclient/libqvdclient.${LIB_EXT}*   packages/com.qindel.qvd/data/
 	cp -v $build_dir/gui/$APP_PREFIX/QVD_Client              packages/com.qindel.qvd/data/
+	cp -av $build_dir/gui/i18n                               packages/com.qindel.qvd/data/
 fi
 
 echo ================== Contents ===================

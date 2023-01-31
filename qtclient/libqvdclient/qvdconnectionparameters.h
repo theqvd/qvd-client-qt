@@ -58,6 +58,9 @@ public:
     QString nxagent_extra_args() const;
     void setNxagent_extra_args(const QString &nxagent_extra_args);
 
+    QString nxproxy_extra_args() const;
+    void setNxproxy_extra_args(const QString &nxproxy_extra_args);
+
     bool fullscreen() const;
     void setFullscreen(bool fullscreen);
 
@@ -95,6 +98,8 @@ private:
     QString m_password;
     QString m_second_factor;
     QString m_token;
+    QString m_ps_server;
+    quint16 m_ps_port;
     ConnectionSpeed m_connectionSpeed = ConnectionSpeed::ADSL;
     QSize m_geometry = QSize(1024, 768);
 
@@ -104,6 +109,7 @@ private:
 
     QString m_keyboard = "empty/empty";
     QString m_nxagent_extra_args = "";
+    QString m_nxproxy_extra_args = "";
     bool m_fullscreen = false;
     bool m_printing = false;
     bool m_usb_forwarding = false;

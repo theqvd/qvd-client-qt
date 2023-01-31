@@ -19,6 +19,7 @@
 #include "movingaverage.h"
 #include "connectionstatistics.h"
 #include "commandlineparser.h"
+
 namespace Ui {
 class MainWindow;
 }
@@ -39,8 +40,6 @@ public:
     void setUI(bool enabled);
     bool connectionActive();
     void closeEvent(QCloseEvent *event);
-    void showEvent( QShowEvent *event);
-
     void setMiscParameters(CommandLineParser::MiscParameters misc_params);
 
 
@@ -53,22 +52,19 @@ public slots:
     void connectionEstablished();
     void vmConnected(int id);
     void vmPoweredDown(int id);
-    void connectionError(QVDClient::ConnectionError error, const QString &error_desc, const QMap<QString, QString>& headers);
+    void connectionError(QVDClient::ConnectionError error, QString error_desc);
     void connectionTerminated();
     void sslErrors(const QList<QSslError> &errors, const QList<QSslCertificate> &cert_chain, bool &continueConnection);
     void addSharedFolder();
     void removeSharedFolder();
     void enableSharedFoldersClicked();
-
-    void twoFactorAuthenticationRequired(QVDClient::SecondFactorType type, int min_length, int max_length);
-    void twoFactorEnrollment(const QVDClient::SecondFactorEnrollmentData &data);
-
+    
     void cancelButtonClicked();
 
 private slots:
     void backendTrafficInc(int64_t in, int64_t out);
     void printTraffic();
-    void updateTwoFactorField();
+    void on_enableTwoFactorAuthCheck_toggled(bool checked);
 
 private:
     Ui::MainWindow *ui;
@@ -79,6 +75,7 @@ private:
     void setTabVisibility(QWidget *tab, bool visibility);
 
     void writeDefaultSetting(QSettings &settings, const QString &name, QVariant defaultValue = QVariant());
+
 
     QVDConnectionParameters m_params;
     QStringList m_shared_folders;
@@ -94,8 +91,6 @@ private:
     QTimer m_traffic_timer;
     ConnectionStatistics m_stats_window;
     CommandLineParser::MiscParameters m_misc_params;
-
-    bool m_skip_auth_error_messagebox = false;
 
 };
 

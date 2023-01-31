@@ -58,6 +58,7 @@ private:
     int m_update_interval{250};
     int m_max_history_length{60*4};
 
+
     QDateTime m_start_time;
     QVDBackend *m_backend{nullptr};
     MovingAverage m_in_avg{100};

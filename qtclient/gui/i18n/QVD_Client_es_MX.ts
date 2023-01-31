@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="es_ES">
+<TS version="2.1" language="es_MX">
 <context>
     <name>ConnectionStatistics</name>
     <message>
@@ -67,9 +67,33 @@
         <translation>Reiniciar sesión</translation>
     </message>
     <message>
+        <source>Conexión</source>
+        <translation type="vanished">Conexión</translation>
+    </message>
+    <message>
+        <source>Nombre de Usuario</source>
+        <translation type="vanished">Nombre de Usuario</translation>
+    </message>
+    <message>
+        <source>Contraseña</source>
+        <translation type="vanished">Contraseña</translation>
+    </message>
+    <message>
         <location line="-40"/>
         <source>Second factor</source>
         <translation>Segundo Factor</translation>
+    </message>
+    <message>
+        <source>Recordar Contraseña</source>
+        <translation type="vanished">Recordar Contraseña</translation>
+    </message>
+    <message>
+        <source>Reinicio de Sesión</source>
+        <translation type="vanished">Reinicio de Sesión</translation>
+    </message>
+    <message>
+        <source>Conectar</source>
+        <translation type="vanished">Conectar</translation>
     </message>
     <message>
         <location line="-31"/>
@@ -79,17 +103,17 @@
     <message>
         <location line="+81"/>
         <source>Return</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+49"/>
         <source>Cancel the connection attempt</source>
-        <translation type="unfinished"></translation>
+        <translation>Cancelar la conexión en curso</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Cancel</source>
-        <translation type="unfinished">Cancelar</translation>
+        <translation>Cancelar</translation>
     </message>
     <message>
         <location line="+10"/>

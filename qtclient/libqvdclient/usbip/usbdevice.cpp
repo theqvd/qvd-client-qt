@@ -21,12 +21,12 @@ USBDevice USBDevice::fromPath(const QDir &path, const UsbDatabase &db)
     }
 
     if ( QVDFileHelpers::readFile(path.filePath("idVendor"), data) ) {
-        qDebug() << "Reading from  " << path.filePath("idVendor") << "; got " << data;
+        qInfo() << "Reading from  " << path.filePath("idVendor") << "; got " << data;
         ret.setVendorId(data.toInt(nullptr, 16));
     }
 
     if ( QVDFileHelpers::readFile(path.filePath("idProduct"), data) ) {
-        qDebug() << "Reading from  " << path.filePath("idProduct") << "; got " << data;
+        qInfo() << "Reading from  " << path.filePath("idProduct") << "; got " << data;
         ret.setProductId(data.toInt(nullptr, 16));
     }
 
@@ -39,7 +39,7 @@ USBDevice USBDevice::fromPath(const QDir &path, const UsbDatabase &db)
     }
 
     if ( QVDFileHelpers::readFile(path.filePath("manufacturer"), data) ) {
-        qDebug() << "Reading from  " << path.filePath("manufacturer") << "; got " << data;
+        qInfo() << "Reading from  " << path.filePath("manufacturer") << "; got " << data;
         ret.setManufacturer(data);
     }
 

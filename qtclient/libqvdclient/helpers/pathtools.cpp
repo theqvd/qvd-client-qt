@@ -161,6 +161,7 @@ QString PathTools::findBin(const QString &name, const QStringList dirs)
     search_paths.append(QDir::current());
     search_paths.append(QDir("/usr/lib/qvd/bin"));
     search_paths.append(QDir("/usr/bin"));
+    search_paths.append(QDir("/usr/local/bin"));
     search_paths.append(QDir("/bin"));
     search_paths.append(QDir("/usr/libexec/openssh"));
     search_paths.append(QDir("/usr/lib/openssh"));

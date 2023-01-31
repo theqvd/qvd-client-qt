@@ -15,7 +15,7 @@ ConnectAudio::ConnectAudio(quint16 port)
     QObject::connect(&m_pulse, &PulseAudio::stopped, this, &ConnectAudio::pulseStopped );
     QObject::connect(&m_pulse, &PulseAudio::error  , this, &ConnectAudio::pulseError );
 
-#ifdef Q_OS_LINUX
+#if defined(Q_OS_LINUX) || defined(Q_OS_FREEBSD)
     // Only on Linux systems, we also connect to the system's PulseAudio so that we can ask
     // it to load modules.
     //
@@ -41,7 +41,7 @@ ConnectAudio::~ConnectAudio()
 void ConnectAudio::run()
 {
     qInfo() << "Starting pulseaudio";
-#ifdef Q_OS_LINUX
+#if defined(Q_OS_LINUX) || defined(Q_OS_FREEBSD)
     m_system_pulse.connectExisting();
 #else
     QUuid random_id = QUuid::createUuid();
