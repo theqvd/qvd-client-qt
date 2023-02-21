@@ -2,6 +2,7 @@ FROM rockylinux:9.1
 
 # Prepare system
 RUN dnf update -y
+RUN dnf install -y 'dnf-command(config-manager)'
 RUN dnf config-manager --enable crb
 RUN dnf install -y epel-release
 
