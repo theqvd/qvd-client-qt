@@ -1,0 +1,43 @@
+#!/bin/bash
+
+tar=`../make_tar`
+tar_filename=`basename "$tar"`
+tar_dir=`basename "$tar" .orig.tar.xz | sed 's/qt_/qt-/'`
+
+[ -d "/tmp/rocky-files" ] && rm -rf /tmp/rocky-files
+mkdir -p /tmp/rocky-files
+cp -Rpv files/rpm/*  /tmp/rocky-files/
+cp -Rpv "$tar"       /tmp/rocky-files/
+cp -v ../LICENSE ../README.md /tmp/rocky-files/
+
+curdir=`pwd`
+
+BUILD_NX=$1
+
+if [ "$BUILD_NX" == "{true}" ] ; then
+
+   [ -d "$curdir/output/rocky9_nx-libs" ] && rm -rf $curdir/output/rocky9_nx-libs
+   mkdir -p $curdir/output/rocky9_nx-libs
+   docker_image=`docker images -q nx-libs:rocky9`
+
+   if [ -z "$docker_image" ] ; then
+      cd docker/rocky-9/nx-libs
+      docker build . -t nx-libs:rocky9 
+      cd $curdir
+      docker run -i --privileged -u root -v $curdir/output/rocky9_nx-libs:/builddir nx-libs:rocky9 /build.sh
+   else
+      docker run -i --privileged -u root -v $curdir/output/rocky9_nx-libs:/builddir nx-libs:rocky9 /build.sh
+   fi
+
+fi
+
+docker_image=`docker images -q qvd-build-rocky:9`
+
+if [ -z "$docker_image" ] ; then
+   cd docker/rocky-9
+   bash -x build
+   cd "$curdir"
+   docker run -i -v /tmp/rocky-files:/files:Z -v $curdir/output/rocky9:/out qvd-build-rocky:9 /files/build_nx
+else
+   docker run -i -v /tmp/rocky-files:/files:Z -v $curdir/output/rocky9:/out qvd-build-rocky:9 /files/build_nx
+fi
