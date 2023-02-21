@@ -1,0 +1,5 @@
+#!/bin/bash
+
+docker build . -t ubuntu-devtools:22.04-1
+docker run --name qvd-build-ubuntu-22.04 -i --security-opt seccomp=unconfined ubuntu-devtools:22.04-1 /build
+[ $? -eq 0 ] && docker commit qvd-build-ubuntu-22.04 ubuntu-devtools:22.04-1 && docker rm qvd-build-ubuntu-22.04
