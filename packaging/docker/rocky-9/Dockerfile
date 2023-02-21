@@ -2,7 +2,7 @@ FROM rockylinux:9.1
 
 # Prepare system
 RUN dnf update -y
-RUN sed -i 's/enabled=0/enabled=1/' /etc/yum.repos.d/CentOS-Linux-PowerTools.repo
+RUN dnf config-manager --enable crb
 RUN dnf install -y epel-release
 
 # Base build tools
