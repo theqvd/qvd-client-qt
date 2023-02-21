@@ -1,3 +1,3 @@
-FROM ubuntu:hirsute
+FROM ubuntu:jammy
 
 COPY scripts/build /build

@@ -14,16 +14,16 @@ cp -v "$tar"         /tmp/ubuntu-files/
 cp -av files/deb/* /tmp/ubuntu-files/
 cp -v ../LICENSE ../README.md /tmp/ubuntu-files/
 
-docker_image=`docker images -q ubuntu-devtools:21.04-1`
+docker_image=`docker images -q ubuntu-devtools:22.04-1`
 
 if [ -z "$docker_image" ] ; then
-   cd docker/ubuntu-21.04
+   cd docker/ubuntu-22.04
    bash -x build
    cd "$curdir"
-   mkdir -p output/ubuntu21.04
-   docker run -i -v /tmp/ubuntu-files:/files:Z -v $curdir/output/ubuntu21.04:/out ubuntu-devtools:21.04-1 /files/build
+   mkdir -p output/ubuntu22.04
+   docker run -i -v /tmp/ubuntu-files:/files:Z -v $curdir/output/ubuntu22.04:/out ubuntu-devtools:22.04-1 /files/build
 else
    cd "$curdir"
-   mkdir -p output/ubuntu21.04
-   docker run -i -v /tmp/ubuntu-files:/files:Z -v $curdir/output/ubuntu21.04:/out ubuntu-devtools:21.04-1 /files/build
+   mkdir -p output/ubuntu22.04
+   docker run -i -v /tmp/ubuntu-files:/files:Z -v $curdir/output/ubuntu22.04:/out ubuntu-devtools:22.04-1 /files/build
 fi
