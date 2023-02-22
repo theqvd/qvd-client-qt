@@ -37,7 +37,7 @@ BuildRequires:  imake
 # For xkbcomp.pc.
 %if 0%{?suse_version}
 # Earlier versions don't have xkbcomp.pc at all.
-%if 0%{?suse_version} >= 1210
+%if 0%{?suse_version} >= 1210 || 0%{?rhel} >= 9
 BuildRequires:  xkbcomp-devel
 %endif
 %else
@@ -332,11 +332,11 @@ Requires:       xkeyboard-config
 %endif
 
 # For /usr/bin/xkbcomp
-%if 0%{?fedora} || 0%{?rhel}
+%if 0%{?fedora} || 0%{?rhel} <= 8
 Requires:       xorg-x11-xkb-utils
 %else
 %if 0%{?suse_version}
-%if 0%{?suse_version} >= 1310
+%if 0%{?suse_version} >= 1310 || 0%{?rhel} >= 9
 Requires:       xkbcomp
 %else
 # Older *SUSE versions bundle xkbcomp in xorg-x11. Ugly, but nothing we could change.
