@@ -3,7 +3,7 @@ Section: x11
 Priority: optional
 Maintainer: QVD Team <qvd@qindel.com>
 Build-Depends: debhelper-compat (= 12), qtbase5-dev, qtdeclarative5-dev, qttools5-dev, libxt-dev, libxkbfile-dev
-Standards-Version: 4.3.0
+Standards-Version: 4.2.0
 Homepage: https://qindel.com
 #Vcs-Browser: https://salsa.debian.org/debian/qvd-client-qt
 #Vcs-Git: https://salsa.debian.org/debian/qvd-client-qt.git

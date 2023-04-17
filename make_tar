@@ -1,5 +1,5 @@
 #!/bin/bash
-VERSION=4.3
+VERSION=4.2
 
 FILENAME="qvd-client-qt_${VERSION}"
 DIRNAME="qvd-client-qt-${VERSION}"
@@ -10,6 +10,8 @@ cd "$rootdir"
 tempdir=`mktemp -d`
 
 cp -Rp qtclient "$tempdir/$DIRNAME"
+cp -Rp README.md "$tempdir/$DIRNAME"
+cp -Rp LICENSE "$tempdir/$DIRNAME"
 cd "$tempdir"
 rm -rf $DIRNAME/libqvdclient/doc $DIRNAME/*user* $DIRNAME/build
 find "$DIRNAME" \( -name '*.o' -or -name '*save*' -or -name '*swp' -or -name '*out' -or -name '*stash' \) -print0 | xargs -0 rm -f

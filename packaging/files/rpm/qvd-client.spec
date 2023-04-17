@@ -1,6 +1,6 @@
 Name:       qvd-client-qt
-Version:    4.3
-Release:    1
+Version:    4.2
+Release:    0
 Summary:    QVD Client
 License:    GPL-3
 Source0:    qvd-client-qt_%{version}.orig.tar.xz
