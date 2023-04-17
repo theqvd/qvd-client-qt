@@ -91,11 +91,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->sharedResourcesTabWidget->removeTab(usb_redir_index);
 #endif
 
-    connect(&m_traffic_timer, &QTimer::timeout, this, &MainWindow::printTraffic);
-
-
-
-
     // Ensure the window's size is the smallest possible
     resize(MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGHT);
 
@@ -175,14 +170,15 @@ void MainWindow::connectToVM() {
 
     auto speed = static_cast<QVDConnectionParameters::ConnectionSpeed>( ui->connectionTypeComboBox->currentData().toInt() );
 
-    settings.beginGroup("paths");
+    settings.beginGroup("Connection");
 
     QVDNXBackend *nx_backend = new QVDNXBackend(this);
-    connect(nx_backend, &QVDBackend::totalTrafficIncrement, this, &MainWindow::backendTrafficInc);
 
-    settings.endGroup();
+    if ( settings.value("enable_networkTraffic").toBool() ) {
+        connect(nx_backend, &QVDBackend::totalTrafficIncrement, this, &MainWindow::backendTrafficInc);
+        connect(&m_traffic_timer, &QTimer::timeout, this, &MainWindow::printTraffic);
+    }
 
-    settings.beginGroup("Connection");
     QVDConnectionParameters params;
 
     if ( ui->enablePrintingCheck->isChecked() ) {
@@ -214,7 +210,7 @@ void MainWindow::connectToVM() {
     } else {
          params.setHost( ui->serverLineEdit->text() );
          params.setPort( quint16( settings.value("port", "8443").toInt() ));
-   }
+    }
         
     params.setConnectionSpeed(speed);
 
@@ -356,7 +352,7 @@ void MainWindow::connectionTerminated()
     show();
 }
 
-void   MainWindow::sslErrors(const QList<QSslError> &errors, const QList<QSslCertificate> &cert_chain, bool &continueConnection)
+void MainWindow::sslErrors(const QList<QSslError> &errors, const QList<QSslCertificate> &cert_chain, bool &continueConnection)
 {
     QList<QString> certList;
     QSet<QString> nonAcceptedHashes;
@@ -559,9 +555,13 @@ void MainWindow::loadSettings() {
 
     QString host = settings.value("host").toString();
     QString port = settings.value("port").toString(); 
-    
+
     if ( ! host.isEmpty() ) {
-         ui->serverLineEdit->setText(host + ":" + port);
+         if ( ! port.isEmpty() ) {
+              ui->serverLineEdit->setText(host + ":" + port);
+         } else {
+              ui->serverLineEdit->setText(host);
+        }     
     }
 
     for(int i=0;i<ui->connectionTypeComboBox->count(); i++) {
@@ -595,6 +595,18 @@ void MainWindow::loadSettings() {
     settings.endArray();
     settings.endGroup();
 
+
+    settings.endGroup();
+    settings.beginGroup("Connection");
+
+    ui->username->setText( settings.value("username").toString());
+    ui->rememberPasswordCheck->setChecked( settings.value("remember_password").toBool());
+    ui->password->setText(  QString::fromUtf8( QByteArray::fromBase64( settings.value("password").toByteArray() )));
+
+    settings.endGroup();
+
+    // Ensure the second factor auth field is appropriately visible or not
+    on_enableTwoFactorAuthCheck_toggled(ui->enableTwoFactorAuthCheck->isChecked() );
 
     settings.endGroup();
     settings.beginGroup("Connection");
