@@ -1,6 +1,7 @@
 FROM rockylinux:9.1
 
 RUN yum update -y && yum install -y epel-release git glibc-headers rpm-sign expect
+RUN sed -i 's/enabled=0/enabled=1/' /etc/yum.repos.d/rocky-devel.repo
 RUN yum install -y 'dnf-command(config-manager)'
 RUN yum  config-manager --add-repo http://yum.oracle.com/repo/OracleLinux/OL9/distro/builder/x86_64/
 RUN yum install -y mock
