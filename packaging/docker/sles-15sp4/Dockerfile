@@ -18,7 +18,7 @@ RUN zypper in -y  libqt5-qtbase-devel libQt5Charts5-devel libqt5-linguist-devel 
 
 
 # nxproxy dependencies
-RUN zypper in -y libxml2 zlib-devel libxml2-devel libpixman-1-0-devel libtool libtirpc-devel libpng16-devel libXtst-devel libjpeg62-devel libXrandr-devel libXpm-devel libXinerama-devel libXfont2-devel libXdmcp-devel libXcomposite-devel imake libexpat-devel automake autoconf python3-devel quilt
+RUN zypper in -y libxml2-2 zlib-devel libxml2-devel libpixman-1-0-devel libtool libtirpc-devel libpng16-devel libXtst-devel libjpeg62-devel libXrandr-devel libXpm-devel libXinerama-devel libXfont2-devel libXdmcp-devel libXcomposite-devel imake libexpat-devel automake autoconf python3-devel quilt
 
 RUN mkdir -p /root/rpmbuild/
 RUN ln -s /usr/src/packages/{SOURCES,SPECS,BUILD,BUILDROOT,RPMS,SRPMS} /root/rpmbuild/
