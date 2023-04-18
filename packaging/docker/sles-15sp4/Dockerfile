@@ -7,6 +7,7 @@ RUN zypper ar http://cpan-mirror.qindel.com/sles15-sp4/installer-full-Media1/Mod
 RUN zypper ar http://cpan-mirror.qindel.com/sles15-sp4/installer-full-Media1/Module-Python3/ Module-Python3
 RUN zypper ar http://cpan-mirror.qindel.com/sles15-sp4/installer-full-Media1/Module-Desktop-Applications/ Module-Desktop-Applications
 RUN zypper ar -G -K http://download.opensuse.org/repositories/openSUSE:/Backports:/SLE-15-SP4/standard/ Backports\ SLE-15-SP4
+RUN zypper ar -G -K http://download.opensuse.org/repositories/home:Dead_Mozay/15.4/home:Dead_Mozay.repo
 RUN zypper ref && zypper update -y
 
 # Base build tools
