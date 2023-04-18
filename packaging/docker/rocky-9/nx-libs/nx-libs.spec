@@ -34,12 +34,11 @@ BuildRequires:  xorg-x11-util-devel
 %else
 BuildRequires:  imake
 %endif
+
 # For xkbcomp.pc.
-%if 0%{?suse_version}
 # Earlier versions don't have xkbcomp.pc at all.
-%if 0%{?suse_version} >= 1210 || 0%{?rhel} >= 9
+%if 0%{?suse_version} >= 1210 || 0%{?rhel} >= 9 || 0%{?rocky} >= 9
 BuildRequires:  xkbcomp-devel
-%endif
 %else
 BuildRequires:  xorg-x11-xkb-utils-devel
 %endif
