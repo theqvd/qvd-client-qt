@@ -3,6 +3,11 @@
 #include <QDebug>
 
 #ifdef Q_OS_WIN32
+#include <QJsonObject>
+#include <QJsonDocument>
+#include <QJsonParseError>
+#include <QJsonArray>
+#include <iostream>
 #include <windows.h>
 #include <tchar.h>
 #include <setupapi.h>
@@ -45,56 +50,93 @@ void UsbDeviceList::refresh() {
 #endif
 #ifdef WIN32
 
-    QString binary_path = PathTools::findBin("usbip");
+    QString binary_path = PathTools::findBin("usbipd");
     if ( binary_path.isEmpty() ) {
-        qCritical() << "Failed to find usbip binary";
-        emit updated(false);
+       qCritical() << "Failed to find usbip binary";
+       emit updated(false);
     } else {
 
-        m_usbip_process.execute(binary_path, QStringList{"list", "-p", "-l"});
+       QObject::connect(&m_usbip_process, SIGNAL(started()), this, SLOT(processStarted()));
+       QObject::connect(&m_usbip_process, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(processFinished(int, QProcess::ExitStatus)));
+       QObject::connect(&m_usbip_process, SIGNAL(readyReadStandardError()), this, SLOT(processStderrReady()));
+       QObject::connect(&m_usbip_process, SIGNAL(readyReadStandardOutput()), this, SLOT(processStdoutReady()));
+
+       m_usbip_process.setProgram(binary_path);
+       m_usbip_process.setArguments({"state"});
+       m_usbip_process.start();
     }
-#endif
-#if 0
-    // Left here for a later time, alternative win32 implementation
-    HDEVINFO                         devInfoHandle;
-    SP_DEVICE_INTERFACE_DATA         devIntData;
-    PSP_DEVICE_INTERFACE_DETAIL_DATA devIntDetailData;
-    SP_DEVINFO_DATA                  devData;
-
-    devInfoHandle = SetupDiGetClassDevs( &GUID_DEVINTERFACE_USB_DEVICE, NULL, 0, DIGCF_DEVICEINTERFACE | DIGCF_PRESENT );
-    if ( devInfoHandle == INVALID_HANDLE_VALUE ) {
-        qCritical() << "Failed to get handle for  GUID_DEVINTERFACE_USB_DEVICE";
-        return ret;
-    }
-
-    devIntData.cbSize = sizeof(devIntData);
-    DWORD index = 0;
-
-    SetupDiEnumDeviceInterfaces(devInfoHandle, NULL, &GUID_DEVINTERFACE_USB_DEVICE, index, &devIntData);
-    while( GetLastError() != ERROR_NO_MORE_ITEMS ) {
-        qInfo() << "Found interface " << index;
-
-        DWORD detail_size;
-        devData.cbSize = sizeof(devData);
-        SetupDiGetDeviceInterfaceDetail(devInfoHandle, &devIntData, NULL, 0, &detail_size, NULL);
-
-        devIntDetailData = (PSP_DEVICE_INTERFACE_DETAIL_DATA)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, detail_size);
-        devIntDetailData->cbSize = sizeof(*devIntDetailData);
-
-        if ( SetupDiGetDeviceInterfaceDetail(devInfoHandle, &devIntData, devIntDetailData, detail_size, &detail_size, &devData)) {
-            qInfo() << "Detail: " << devIntDetailData->DevicePath;
-            //devIntDetailData->
-        } else {
-            qCritical() << "Failed to get detail info for index " << index;
-        }
-
-        HeapFree(GetProcessHeap(), 0, devIntDetailData);
-
-        SetupDiEnumDeviceInterfaces(devInfoHandle, NULL, &GUID_DEVINTERFACE_USB_DEVICE, ++index, &devIntData);
-    }
-
 #endif
 }
+#ifdef WIN32
+void UsbDeviceList::processStarted()
+{
+	    qInfo() << "USBIP started";
+}
+
+void UsbDeviceList::processFinished(int exitCode, QProcess::ExitStatus exitStatus)
+{
+	    qInfo() << "USBIP exited with code " << exitCode << ", status " << exitStatus;
+}
+
+void UsbDeviceList::processStderrReady()
+{
+	   if (!m_usbip_process.waitForStarted()) {
+              qDebug() << "Failed to get usb devices!!";
+	      const QString error = m_usbip_process.readAllStandardError();
+	      if (!error.isEmpty()) {
+		 qDebug () << "Exit status: " << m_usbip_process.exitStatus() << ", Error: " << error;
+	      }
+	      return;
+           }
+        
+}
+
+void UsbDeviceList::processStdoutReady()
+{
+	    QByteArray data = m_usbip_process.readAllStandardOutput();
+	    qInfo() << "USBIP OUT: " << data;
+}
+
+QList<QString> UsbDeviceList::getWinUSBDevices()
+{
+           QByteArray data = m_usbip_process.readAllStandardOutput();
+           
+           QJsonParseError jsonError;
+           QJsonDocument document = QJsonDocument::fromJson( data, &jsonError );	   
+
+	   if( jsonError.error != QJsonParseError::NoError )
+	   {
+	      std::cerr << "fromJson failed: " << jsonError.errorString().toStdString() << endl;
+           }
+
+	   if( document.isObject() )
+	   {
+	     QJsonObject jsonObj = document.object();
+	     const auto devices = jsonObj["Devices"];
+
+             QString windev;
+	     QString busid;
+	     QString desc;
+	     QString instanceid;
+             
+	     for (const auto device: devices.toArray()) {
+		  const auto obj = device.toObject();
+                  busid      = obj.value("BusId").toString();
+                  desc       = obj.value("Description").toString();
+		  instanceid = obj.value("InstanceId").toString();
+
+                  windev = busid + desc + instanceid;
+
+		  win_m_devices << windev;
+	     }    
+	   }
+
+	   qInfo() << "Device list done.";
+	   emit updated(true);
+
+           return win_m_devices;
+}
+#endif
 
 QList<USBDevice> UsbDeviceList::getDevices()
 {

@@ -47,6 +47,14 @@ public:
      */
     QList<USBDevice> getDevices();
 
+#ifdef WIN32
+    /**
+     * @brief readWinDevices
+     * @return Current Windows USB connected devices
+     */
+     QList<QString> getWinUSBDevices();
+#endif
+
 
 
 signals:
@@ -63,9 +71,13 @@ private:
 
 #ifdef WIN32
     QProcess m_usbip_process;
+    QList<QString> win_m_devices;
 
 private slots:
-
+    void processStarted();
+    void processFinished(int exitCode, QProcess::ExitStatus exitStatus);
+    void processStdoutReady();
+    void processStderrReady();
 #endif
 };
 
