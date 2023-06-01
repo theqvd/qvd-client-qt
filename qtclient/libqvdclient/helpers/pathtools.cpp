@@ -137,6 +137,8 @@ QString PathTools::findBin(const QString &name, const QStringList dirs)
     dirs_copy.append("QVD Client");
     dirs_copy.append("QVD Client\\pulseaudio");
 
+    dirs_copy.append("usbipd-win");
+
     QList<QDir> root_dirs{ QDir(qgetenv("PROGRAMFILES")), QDir(qgetenv("PROGRAMFILES(x86)")), QDir(QCoreApplication::applicationDirPath()) };
 
     for( auto dir : dirs_copy ) {
