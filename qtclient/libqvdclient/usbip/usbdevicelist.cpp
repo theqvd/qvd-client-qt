@@ -99,42 +99,42 @@ void UsbDeviceList::processStdoutReady()
 
 QList<QString> UsbDeviceList::getWinUSBDevices()
 {
-           QByteArray data = m_usbip_process.readAllStandardOutput();
-           
-           QJsonParseError jsonError;
-           QJsonDocument document = QJsonDocument::fromJson( data, &jsonError );	   
+    QByteArray data = m_usbip_process.readAllStandardOutput();
 
-	   if( jsonError.error != QJsonParseError::NoError )
-	   {
-	      std::cerr << "fromJson failed: " << jsonError.errorString().toStdString() << endl;
-           }
+    QJsonParseError jsonError;
+    QJsonDocument document = QJsonDocument::fromJson( data, &jsonError );
 
-	   if( document.isObject() )
-	   {
-	     QJsonObject jsonObj = document.object();
-	     const auto devices = jsonObj["Devices"];
+    if( jsonError.error != QJsonParseError::NoError ) {
+          qCritical() << "fromJson failed: " << jsonError.errorString() << Qt::endl;
+    }
 
-             QString windev;
-	     QString busid;
-	     QString desc;
-	     QString instanceid;
-             
-	     for (const auto device: devices.toArray()) {
-		  const auto obj = device.toObject();
-                  busid      = obj.value("BusId").toString();
-                  desc       = obj.value("Description").toString();
-		  instanceid = obj.value("InstanceId").toString();
+    if( document.isObject() ) {
+        QJsonObject jsonObj = document.object();
+        const auto devices = jsonObj["Devices"];
 
-                  windev = busid + desc + instanceid;
+        QString windev;
+        QString busid;
+        QString desc;
+        QString instanceid;
 
-		  win_m_devices << windev;
-	     }    
-	   }
+        auto deviceArray = devices.toArray();
 
-	   qInfo() << "Device list done.";
-	   emit updated(true);
+        for (const auto& device: deviceArray) {
+            const auto obj = device.toObject();
+            busid      = obj.value("BusId").toString();
+            desc       = obj.value("Description").toString();
+            instanceid = obj.value("InstanceId").toString();
 
-           return win_m_devices;
+            windev = busid + desc + instanceid;
+
+            win_m_devices << windev;
+        }
+    }
+
+    qInfo() << "Device list done.";
+    emit updated(true);
+
+    return win_m_devices;
 }
 #endif
 
