@@ -17,7 +17,7 @@ $CertificateThumbprint = "77084494d76d635a8700a6405a9adb8781604522" # SSL.com EV
 
 $Certificate = Get-ChildItem cert:\CurrentUser\My -CodeSigningCert | Where-Object { $_.Thumbprint -eq "$CertificateThumbprint" }
 
-if ( ! $Certificate ) {
+if ( !$Certificate -and !$NoSign ) {
 	Throw "Failed to find certificate $CertificateThumbprint"
 }
 
@@ -236,15 +236,17 @@ Write-Host -ForegroundColor blue -NoNewLine "Build    : "
 Write-Host "$Env:QVD_BUILD"
 
 
-$subj=$Certificate.Subject.Split(",")[0].Replace("CN=","").Replace('"','')
-$issuer=$Certificate.Issuer.Split(",")[0].Replace("CN=","").Replace('"','')
-$valid=$Certificate.NotAfter
+if (!$NoSign) {
+	$subj=$Certificate.Subject.Split(",")[0].Replace("CN=","").Replace('"','')
+	$issuer=$Certificate.Issuer.Split(",")[0].Replace("CN=","").Replace('"','')
+	$valid=$Certificate.NotAfter
 
-Write-Host -ForegroundColor blue -NoNewLine "Cert     : "
-Write-Host "$subj (Valid until $valid)"
-Write-Host -ForegroundColor blue -NoNewLine "Issued by: "
-Write-Host "$issuer"
-Write-Host ""
+	Write-Host -ForegroundColor blue -NoNewLine "Cert     : "
+	Write-Host "$subj (Valid until $valid)"
+	Write-Host -ForegroundColor blue -NoNewLine "Issued by: "
+	Write-Host "$issuer"
+	Write-Host ""
+}
 
 $build_dir = New-TemporaryDirectory
 Set-Location -Path "$build_dir"
@@ -291,6 +293,7 @@ Copy-Item -Path "$FilesPath\vcxsrv"                      -Destination "$data" -R
 Copy-Item -Path "$ExtFiles\nx\*"                         -Destination "$data\bin\" -Recurse
 Copy-Item -Path "$FilesPath\win-sftp-server.exe"         -Destination "$data"
 Copy-Item -Path "$FilesPath\redist\*.exe"                -Destination "$data"
+Copy-Item -Path "$FilesPath\redist\*.msi"                -Destination "$data"
 Copy-Item -Path "$SSL_BIN_PATH\libcrypto*"               -Destination "$data"
 Copy-Item -Path "$SSL_BIN_PATH\libssl*"                  -Destination "$data"
 Copy-Item -Path "install_scripts\*"                      -Destination "$data\scripts\"
@@ -320,11 +323,13 @@ if ( $LastExitCode -gt 0 ) {
 }
 
 
-Header "Signing"
+if (!$NoSign) {
+	Header "Signing"
 
-$binaries = Get-ChildItem -Path $data -Filter '*.exe' -Recurse -ErrorAction SilentlyContinue -Force
-foreach ($bin in $binaries) {
-	$signature = Sign $bin.FullName
+	$binaries = Get-ChildItem -Path $data -Filter '*.exe' -Recurse -ErrorAction SilentlyContinue -Force
+	foreach ($bin in $binaries) {
+		$signature = Sign $bin.FullName
+	}
 }
 
 
@@ -356,7 +361,9 @@ if ( $LastExitCode -gt 0 ) {
 }
 
 
-$installer_signature = Sign $installer_file
+if (!$NoSign) {
+	$installer_signature = Sign $installer_file
+}
 
 $installer_hash = (Get-FileHash $installer_file).Hash
 $installer_mb = [math]::round( (Get-Item $installer_file).Length / 1MB, 2 )

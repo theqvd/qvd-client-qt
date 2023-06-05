@@ -96,6 +96,19 @@ installVCRedist = function(name, arch, major_version, build, exe_file) {
     }
 }
 
+installMSI = function(msi_file) {
+	var dir = installer.value("TargetDir");
+	var inst_msi = dir + "\\" + msi_file;
+	
+	console.log("Will install MSI " + msi_file + " redistributable install: " + inst_msi);
+
+	component.addElevatedOperation("Execute", "{0,1638,3010,5100}", "msi_exec", "/qn", "/i", inst_msi);
+
+	component.addOperation("Delete", inst_msi);
+	
+	
+}
+
 Component.prototype.createOperations = function() {
 	component.createOperations();
 
@@ -123,6 +136,9 @@ Component.prototype.createOperations = function() {
 		// This is needed for our code.
 		installVCRedist("2019", "x64", "14.0", 29325, "VC_redist.x64.exe");
 
+		// This is for USBIP
+		installMSI("usbipd-win_3.0.0.msi");
+		
 		// Configure the firewall
 		setupFirewall();
 	}
