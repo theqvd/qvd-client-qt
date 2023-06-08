@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QDir>
 #include <QDebug>
+#include <QUuid>
 
 #include "qvdclient_global.h"
 #include "usbdatabase.h"
@@ -86,6 +87,35 @@ public:
         return QString("%1-%2").arg(busnum()).arg(devpath());
     }
 
+    /**
+     * @brief instanceId
+     * @note Windows only
+     * @return
+     */
+    QString instanceId() const { return m_instance_id; }
+
+    /**
+     * @brief setInstanceId
+     * @note Windows only
+     * @param id
+     */
+    void setInstanceId(const QString &id) { m_instance_id = id; }
+
+    /**
+     * @brief persistedGuid
+     * @note Windows only
+     * @return
+     */
+    QUuid persistedGuid() const { return m_persisted_guid; }
+
+    /**
+     * @brief setPersistedGuid
+     * @note Windows only
+     * @param uuid
+     */
+    void setPersistedGuid(const QUuid &uuid) { m_persisted_guid = uuid; }
+
+
 private:
 
     QString     m_manufacturer;
@@ -94,6 +124,9 @@ private:
     int         m_product_id = 0;
     DeviceClass m_device_class = UseDescriptor;
     QString     m_serial;
+    QString     m_instance_id;
+    QUuid       m_persisted_guid;
+
 
     QString     m_busnum;
     QString     m_devpath;

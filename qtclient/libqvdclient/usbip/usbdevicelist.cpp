@@ -80,62 +80,65 @@ void UsbDeviceList::processFinished(int exitCode, QProcess::ExitStatus exitStatu
 
 void UsbDeviceList::processStderrReady()
 {
-	   if (!m_usbip_process.waitForStarted()) {
-              qDebug() << "Failed to get usb devices!!";
-	      const QString error = m_usbip_process.readAllStandardError();
-	      if (!error.isEmpty()) {
-		 qDebug () << "Exit status: " << m_usbip_process.exitStatus() << ", Error: " << error;
-	      }
-	      return;
-           }
-        
+    if (!m_usbip_process.waitForStarted()) {
+        qDebug() << "Failed to get usb devices!!";
+        const QString error = m_usbip_process.readAllStandardError();
+
+        if (!error.isEmpty()) {
+            qDebug () << "Exit status: " << m_usbip_process.exitStatus() << ", Error: " << error;
+        }
+        return;
+    }
 }
 
 void UsbDeviceList::processStdoutReady()
 {
-	    QByteArray data = m_usbip_process.readAllStandardOutput();
-	    qInfo() << "USBIP OUT: " << data;
-}
+        QByteArray data = m_usbip_process.readAllStandardOutput();
+        qInfo() << "USBIP OUT: " << data;
 
-QList<QString> UsbDeviceList::getWinUSBDevices()
-{
-    QByteArray data = m_usbip_process.readAllStandardOutput();
+        QJsonParseError jsonError;
+        QJsonDocument document = QJsonDocument::fromJson( data, &jsonError );
 
-    QJsonParseError jsonError;
-    QJsonDocument document = QJsonDocument::fromJson( data, &jsonError );
-
-    if( jsonError.error != QJsonParseError::NoError ) {
-          qCritical() << "fromJson failed: " << jsonError.errorString() << Qt::endl;
-    }
-
-    if( document.isObject() ) {
-        QJsonObject jsonObj = document.object();
-        const auto devices = jsonObj["Devices"];
-
-        QString windev;
-        QString busid;
-        QString desc;
-        QString instanceid;
-
-        auto deviceArray = devices.toArray();
-
-        for (const auto& device: deviceArray) {
-            const auto obj = device.toObject();
-            busid      = obj.value("BusId").toString();
-            desc       = obj.value("Description").toString();
-            instanceid = obj.value("InstanceId").toString();
-
-            windev = busid + desc + instanceid;
-
-            win_m_devices << windev;
+        if( jsonError.error != QJsonParseError::NoError ) {
+              qCritical() << "fromJson failed: " << jsonError.errorString() << Qt::endl;
         }
-    }
 
-    qInfo() << "Device list done.";
-    emit updated(true);
+        if( document.isObject() ) {
+            QJsonObject jsonObj = document.object();
+            const auto devices = jsonObj["Devices"];
 
-    return win_m_devices;
+            QString windev;
+            QString busid;
+            QString desc;
+            QString instanceid;
+
+            m_devices.clear();
+            auto deviceArray = devices.toArray();
+
+            for (const auto& device: deviceArray) {
+                const auto obj = device.toObject();
+                busid      = obj.value("BusId").toString();
+                desc       = obj.value("Description").toString();
+                instanceid = obj.value("InstanceId").toString();
+
+                QUuid uuid;
+                if (!obj.value("PersistedGuid").isUndefined()) {
+                    uuid = QUuid::fromString(obj.value("PersistedGuid").toString());
+                }
+
+                USBDevice dev;
+                dev.setBusnum(busid);
+                dev.setProduct(desc);
+                dev.setInstanceId(instanceid);
+
+                m_devices.append(dev);
+            }
+        }
+
+        qInfo() << "Device list done.";
+        emit updated(true);
 }
+
 #endif
 
 QList<USBDevice> UsbDeviceList::getDevices()
