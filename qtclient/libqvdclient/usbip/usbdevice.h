@@ -40,6 +40,7 @@ public:
 
     USBDevice();
 
+
     static USBDevice fromPath(const QString &path, const UsbDatabase &db) {
         return fromPath(QDir(path), db);
     }

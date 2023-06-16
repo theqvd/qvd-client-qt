@@ -77,6 +77,14 @@ USBDevice USBDevice::fromPath(const QDir &path, const UsbDatabase &db)
 
 QString USBDevice::manufacturer() const
 {
+    if ( m_manufacturer.isEmpty() ) {
+        if ( vendorId() == 0 ) {
+            return "Unknown";
+        } else {
+            return QString("[VID %1]").arg(vendorId());
+        }
+    }
+
     return m_manufacturer;
 }
 
@@ -127,7 +135,7 @@ void USBDevice::setDeviceClass(DeviceClass device_class)
 
 QString USBDevice::product() const
 {
-    return m_product;
+    return m_product.isEmpty() ? QString("[PID %1]").arg(productId()) : m_product;
 }
 
 void USBDevice::setProduct(const QString &product)
