@@ -59,10 +59,10 @@ void UsbDeviceList::refresh() {
        emit updated(false);
     } else {
 
-       QObject::connect(&m_usbip_process, SIGNAL(started()), this, SLOT(processStarted()));
-       QObject::connect(&m_usbip_process, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(processFinished(int, QProcess::ExitStatus)));
-       QObject::connect(&m_usbip_process, SIGNAL(readyReadStandardError()), this, SLOT(processStderrReady()));
-       QObject::connect(&m_usbip_process, SIGNAL(readyReadStandardOutput()), this, SLOT(processStdoutReady()));
+       QObject::connect(&m_usbip_process, &QProcess::started, this, &UsbDeviceList::processStarted);
+       QObject::connect(&m_usbip_process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this,  &UsbDeviceList::processFinished);
+       QObject::connect(&m_usbip_process, &QProcess::readyReadStandardError, this, &UsbDeviceList::processStderrReady);
+       QObject::connect(&m_usbip_process, &QProcess::readyReadStandardOutput, this, &UsbDeviceList::processStdoutReady);
 
        m_usbip_process.setProgram(binary_path);
        m_usbip_process.setArguments({"state"});
