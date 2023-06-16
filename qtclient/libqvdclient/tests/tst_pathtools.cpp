@@ -50,7 +50,7 @@ void tst_PathTools::logDir()
     QVERIFY( logdir.exists() );
     QVERIFY( logdir.isDir() );
     QVERIFY( logdir.isWritable() );
-    QWARN( logdir.absolutePath().toUtf8() );
+    //QWARN( logdir.absolutePath().toUtf8() );
 }
 
 void tst_PathTools::getPulseaudioHome()
@@ -59,7 +59,7 @@ void tst_PathTools::getPulseaudioHome()
     QVERIFY( pahome.exists() );
     QVERIFY( pahome.isDir() );
     QVERIFY( pahome.isWritable() );
-    QWARN( pahome.absolutePath().toUtf8() );
+    //QWARN( pahome.absolutePath().toUtf8() );
 
 }
 
@@ -69,7 +69,7 @@ void tst_PathTools::getPulseaudioStateDir()
     QVERIFY( pastate.exists() );
     QVERIFY( pastate.isDir() );
     QVERIFY( pastate.isWritable() );
-    QWARN( pastate.absolutePath().toUtf8() );
+    //QWARN( pastate.absolutePath().toUtf8() );
 }
 
 void tst_PathTools::getPulseaudioBaseConfig()
@@ -78,7 +78,7 @@ void tst_PathTools::getPulseaudioBaseConfig()
     QVERIFY( pastate.exists() );
     QVERIFY( !pastate.isDir() );
     QVERIFY( pastate.isReadable() );
-    QWARN( pastate.absolutePath().toUtf8() );
+    //QWARN( pastate.absolutePath().toUtf8() );
 }
 
 void tst_PathTools::getPulseaudioModulesDir()
@@ -86,7 +86,7 @@ void tst_PathTools::getPulseaudioModulesDir()
     QFileInfo moddir(PathTools::getPulseaudioModuleDir());
     QVERIFY( moddir.exists());
     QVERIFY( moddir.isDir());
-    QWARN( moddir.absolutePath().toUtf8());
+    //QWARN( moddir.absolutePath().toUtf8());
 }
 
 
