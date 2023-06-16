@@ -85,6 +85,8 @@ void tst_UsbIp::listDevices() {
     for(const auto& dev : qAsConst(devices)) {
         qDebug() << dev;
     }
+
+    QVERIFY(devices.count() > 0);
 }
 
 QTEST_MAIN(tst_UsbIp)
