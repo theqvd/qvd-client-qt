@@ -39,6 +39,9 @@ void tst_UsbIp::cleanupTestCase() {
 }
 void tst_UsbIp::parseDatabase()
 {
+#ifdef Q_OS_WIN
+    QSKIP("Parsing database disabled on Windows");
+#else
     UsbDatabase db;
     QBENCHMARK {
         QVERIFY( db.load() );
