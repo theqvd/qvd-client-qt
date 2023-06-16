@@ -7,6 +7,9 @@
 #include <QJsonDocument>
 #include <QJsonParseError>
 #include <QJsonArray>
+#include <QRegularExpression>
+#include <QRegularExpressionMatch>
+
 #include <iostream>
 #include <windows.h>
 #include <tchar.h>
@@ -127,9 +130,33 @@ void UsbDeviceList::processStdoutReady()
                 }
 
                 USBDevice dev;
+
+                // An example instanceId is:
+                // USB\\VID_0951&PID_1643\\001CC0EC347CFC70671C2409
+                //
+                // We split this into parts:
+                //  USB                        -- Discard
+                //  VID_0951&PID_1643          -- USB Vendor and Product IDs
+                //  001CC0EC347CFC70671C2409   -- Serial. May not be the actual serial number
+
+                QStringList parts = instanceid.split("\\");
+                parts.removeFirst(); // Remove the "USB" part, useless
+                QString vidpid = parts.takeFirst();
+                QString serial = parts.takeFirst();
+
+                QRegularExpression reIds("VID_(\\d+)&PID_(\\d+)");
+                auto match = reIds.match(vidpid);
+                if ( match.hasMatch() ) {
+                    dev.setVendorId( match.captured(1).toInt() );
+                    dev.setProductId( match.captured(2).toInt() );
+                } else {
+                    qWarning() << "Failed to parse VID/PID part: " << vidpid;
+                }
+
                 dev.setBusnum(busid);
                 dev.setProduct(desc);
                 dev.setInstanceId(instanceid);
+                dev.setSerial(serial);
 
                 m_devices.append(dev);
             }
