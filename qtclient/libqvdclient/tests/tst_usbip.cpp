@@ -81,7 +81,8 @@ void tst_UsbIp::listDevices() {
     QVERIFY(qvariant_cast<bool>(first_argument));
 
 
-    for(const auto& dev : devList.getDevices()) {
+    auto devices = devList.getDevices();
+    for(const auto& dev : qAsConst(devices)) {
         qDebug() << dev;
     }
 }
