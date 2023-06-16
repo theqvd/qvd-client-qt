@@ -36,6 +36,10 @@ public:
 
     /**
      * @brief Refresh the list of devices
+     *
+     * @warning This is an asynchronous operation on some operating systems, which calls
+     * a process and parses its output. Don't call getDevices() right away, but
+     * handle the updated() signal instead.
      */
     void refresh();
 
