@@ -113,6 +113,25 @@ target_link_libraries(test_keyboard_detector PRIVATE Qt5::Test qvdclient)
 
 
 
+if (WIN32)
+    # Find the windeployqt executable
+    get_target_property(QMAKE_EXECUTABLE Qt5::qmake IMPORTED_LOCATION)
+    get_filename_component(QT_BINARY_DIR "${QMAKE_EXECUTABLE}" DIRECTORY)
+    find_program(WINDEPLOYQT_EXECUTABLE NAMES windeployqt HINTS "${QT_BINARY_DIR}")
+    message(STATUS "Found WinDeployQt: ${WINDEPLOYQT_EXECUTABLE}")
+
+    # Add a custom command that is run POST_BUILD to deploy the Qt libraries
+    add_custom_command(TARGET test_linebuffer POST_BUILD
+        COMMAND "${WINDEPLOYQT_EXECUTABLE}"
+        ARGS --verbose 1 -core -network --no-opengl-sw "$<TARGET_FILE_DIR:test_linebuffer>"
+        COMMENT "Running windeployqt..."
+    )
+
+endif()
+
+
+
+
 
 install(TARGETS qvdclient
        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
