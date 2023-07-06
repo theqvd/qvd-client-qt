@@ -74,8 +74,9 @@ void ConnectAudio::run()
     m_temp_files.append(random_filename);
 
     //m_pulse.set
-    m_pulse.start();
 #endif
+
+    m_pulse.start();
 }
 
 void ConnectAudio::stop()
