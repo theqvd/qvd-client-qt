@@ -72,9 +72,10 @@ void ConnectAudio::run()
 
     m_pulse.setQvdPulseaudioConfig(random_filename);
     m_temp_files.append(random_filename);
-#endif
+
     //m_pulse.set
     m_pulse.start();
+#endif
 }
 
 void ConnectAudio::stop()
