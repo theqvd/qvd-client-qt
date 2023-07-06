@@ -49,7 +49,7 @@ void QVDSlaveClient::socket_connected()
 void QVDSlaveClient::command_successful()
 {
     emit commandSuccessful(*m_command);
-    emit finished();
+    //emit finished();
 }
 
 void QVDSlaveClient::command_failed()
