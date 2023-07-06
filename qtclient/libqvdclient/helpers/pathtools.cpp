@@ -108,7 +108,30 @@ QString PathTools::getPulseaudioBaseConfig()
     qCritical() << "Failed to find default.pa";
     return "";
 #else
-    qCritical() << "Not implemented on this OS";
+    QDir app_dir(QCoreApplication::applicationDirPath());
+    qDebug() << "Trying to find default.pa under " << app_dir;
+
+    if ( app_dir.exists("pulseaudio/default.pa") ) {
+        qDebug() << "default.pa found in " << app_dir;
+        return QDir::toNativeSeparators( app_dir.absoluteFilePath("pulseaudio/default.pa")  );
+    }
+
+    QList<QDir> root_dirs{ QDir("/usr/lib/qvd/etc"), QDir(QCoreApplication::applicationDirPath()) };
+    for(auto dir : root_dirs ) {
+        qDebug() << "Trying to find default.pa under " << dir;
+
+        if ( dir.exists("default.pa") ) {
+            qDebug() << "default.pa found in " << dir;
+            return QDir::toNativeSeparators( dir.absoluteFilePath("default.pa"));
+        }
+        if ( dir.exists("pulseaudio/default.pa") ) {
+            qDebug() << "default.pa found in " << dir;
+            return QDir::toNativeSeparators( dir.absoluteFilePath("pulseaudio/default.pa"));
+        }
+
+    }
+
+    qCritical() << "Failed to find default.pa";
     return "";
 #endif
 }
