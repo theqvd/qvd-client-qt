@@ -46,6 +46,7 @@ add_library(qvdclient SHARED
     usbip/usbdevicelist.cpp
     usbip/usbdevice.cpp
     usbip/usbdatabase.cpp
+    usbip/usbip.cpp
 #    backends/qvdlibnxbackend.cpp
     ${CMAKE_CURRENT_BINARY_DIR}/version.rc
 )
@@ -108,7 +109,7 @@ add_executable(test_keyboard_detector tests/tst_keyboard_detector.cpp)
 target_link_libraries(test_linebuffer        PRIVATE Qt5::Test qvdclient)
 target_link_libraries(test_pulseaudio        PRIVATE Qt5::Test Qt5::Network qvdclient)
 target_link_libraries(test_pathtools         PRIVATE Qt5::Test qvdclient)
-target_link_libraries(test_usbip             PRIVATE Qt5::Test qvdclient)
+target_link_libraries(test_usbip             PRIVATE Qt5::Test Qt5::Network qvdclient)
 target_link_libraries(test_keyboard_detector PRIVATE Qt5::Test qvdclient)
 
 

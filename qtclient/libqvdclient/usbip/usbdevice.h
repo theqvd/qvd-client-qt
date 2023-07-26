@@ -85,7 +85,12 @@ public:
     void setDevpath(const QString &devpath);
 
     QString fullDevPath() const {
+#ifdef Q_OS_WIN
+        // No devpath() on win32
+        return busnum();
+#else
         return QString("%1-%2").arg(busnum()).arg(devpath());
+#endif
     }
 
     /**

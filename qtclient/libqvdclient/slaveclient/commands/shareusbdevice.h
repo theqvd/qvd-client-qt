@@ -3,12 +3,13 @@
 
 #include <QObject>
 #include <QProcess>
+#include <QTcpSocket>
 
 #include "qvdslavecommand.h"
 
 #include "usbip/usbdevicelist.h"
 #include "usbip/usbdevice.h"
-
+#include "socketforwarder.h"
 
 class ShareUSBDevice : public QVDSlaveCommand
 {
@@ -51,6 +52,16 @@ private:
     // The last declared member will be the first to be destroyed, so QProcess has to be last here, ensuring
     // the rest of the class is still there to deal with any last-time events.
     QProcess m_usbip_process;
+
+#ifdef Q_OS_WIN
+    QTcpSocket       m_usbip_socket;
+    SocketForwarder *m_forwarder;
+
+private slots:
+    void socketConnected();
+    void socketError(QAbstractSocket::SocketError err);
+
+#endif
 };
 
 QDebug operator<< (QDebug d, const ShareUSBDevice &dev);

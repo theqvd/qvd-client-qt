@@ -8,6 +8,12 @@
 #include <fcntl.h>
 #endif
 
+#ifdef Q_OS_WIN
+#include "usbip/usbip.h"
+#endif
+
+
+
 
 ShareUSBDevice::ShareUSBDevice(const USBDevice &device) : QVDSlaveCommand(nullptr)
 {
@@ -17,6 +23,16 @@ ShareUSBDevice::ShareUSBDevice(const USBDevice &device) : QVDSlaveCommand(nullpt
 
 void ShareUSBDevice::run()
 {
+#ifdef Q_OS_WIN
+    UsbIp usbip;
+    if (usbip.bindDeviceByBusID(m_busid)) {
+        // TODO: Refactor, horrible hack
+        processFinished(0, QProcess::NormalExit);
+    } else {
+        qCritical() << "Failed to bind device" << m_busid << ", not sharing.";
+        emit commandFailed();
+    }
+#else
     qInfo() << "Will run " << m_usbip_command;
 
 
@@ -38,6 +54,7 @@ void ShareUSBDevice::run()
 
     //connect( &m_usbip_process, &QProcess::finished, this, &ShareUSBDevice::processFinished);
     m_usbip_process.start(m_usbip_command, QStringList() << "bind" << m_busid);
+#endif
 }
 
 void ShareUSBDevice::processFinished(int exitCode, QProcess::ExitStatus exitStatus)
@@ -71,14 +88,20 @@ void ShareUSBDevice::http_finished()
     char **argv = new char*[ static_cast<unsigned long>(args.count() + 1 )];
 
     for(int i=0;i<args.count();i++) {
-        argv[i] = strdup( args[i].toStdString().c_str() );
+        argv[i] = _strdup( args[i].toStdString().c_str() );
     }
 
     argv[args.count()] = nullptr;
 
 
 #if defined(Q_OS_WIN)
-    // not supported
+    UsbIp usbip;
+
+    connect(&m_usbip_socket, &QAbstractSocket::connected, this, &ShareUSBDevice::socketConnected);
+    connect(&m_usbip_socket, &QAbstractSocket::errorOccurred, this, &ShareUSBDevice::socketError);
+
+    qDebug() << "Connecting to Windows USBIP service on port" << usbip.getPort();
+    m_usbip_socket.connectToHost("localhost", usbip.getPort());
 #elif defined(Q_OS_MACOS)
     // not supported
 #else
@@ -116,9 +139,25 @@ void ShareUSBDevice::http_finished()
         perror("execv failed");
         exit(100);
     }
-#endif
+
     m_socket->close();
     emit commandSuccessful();
+#endif
+
+
+}
+
+void ShareUSBDevice::socketConnected()
+{
+    qDebug() << "Connected to USBIP socket, starting forwarder";
+    m_forwarder = new SocketForwarder(this, m_usbip_socket, *m_socket);
+    emit commandSuccessful();
+}
+
+void ShareUSBDevice::socketError(QAbstractSocket::SocketError err)
+{
+    qCritical() << "Failed to connect to USBIP socket," << err;
+    emit commandFailed();
 }
 
 QString ShareUSBDevice::busId() const

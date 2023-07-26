@@ -4,9 +4,14 @@
 #include <QFile>
 #include <QDir>
 #include <QFileInfo>
+#include <QTcpSocket>
+
 #include "usbip/usbdatabase.h"
 #include "usbip/usbdevicelist.h"
 #include "usbip/usbdevice.h"
+#include "usbip/usbip.h"
+
+
 
 class tst_UsbIp : public QObject
 {
@@ -21,6 +26,13 @@ private slots:
     void cleanupTestCase();
     void parseDatabase();
     void listDevices();
+    void attachDevice();
+    void detachDevice();
+    void connectToUsbipd();
+
+private:
+    QString TEST_DEVICE{"0951:1643"};
+    int USBIP_PORT{3240};
 };
 
 
@@ -84,9 +96,51 @@ void tst_UsbIp::listDevices() {
     auto devices = devList.getDevices();
     for(const auto& dev : qAsConst(devices)) {
         qDebug() << dev;
+        QVERIFY(!dev.busnum().isEmpty());
+
+        // Test for parsing bug. Bus IDs have a form like '1-16'
+        QVERIFY(!dev.busnum().endsWith("-"));
+        QVERIFY(!dev.fullDevPath().endsWith("-"));
     }
 
     QVERIFY(devices.count() > 0);
+}
+
+void tst_UsbIp::attachDevice() {
+    UsbIp usbip;
+    qDebug() << "Attaching device";
+    QVERIFY(usbip.bindDeviceByHardwareID(TEST_DEVICE) == 0);
+
+}
+
+void tst_UsbIp::detachDevice() {
+    UsbIp usbip;
+    qDebug() << "Detaching device";
+    QVERIFY(usbip.unbindDeviceByHardwareID(TEST_DEVICE) == 0);
+
+}
+
+void tst_UsbIp::connectToUsbipd() {
+    QTcpSocket sock;
+    QTestEventLoop loop;
+
+    QObject::connect(&sock, &QAbstractSocket::connected, &loop, [&]() {
+        qDebug() << "Connected, peer port " << sock.peerPort();
+        QVERIFY(true);
+        loop.exitLoop();
+    });
+
+    QObject::connect(&sock, &QAbstractSocket::errorOccurred, &loop, [&](QAbstractSocket::SocketError err) {
+        qWarning() << "Failed to connect with error" << err;
+        QVERIFY(false);
+        loop.exitLoop();
+    });
+
+    sock.connectToHost("localhost", USBIP_PORT);
+
+    loop.enterLoop(5);
+    QVERIFY(!loop.timeout());
+
 }
 
 QTEST_MAIN(tst_UsbIp)

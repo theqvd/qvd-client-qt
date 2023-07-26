@@ -21,6 +21,16 @@ DEFINE_GUID(GUID_DEVINTERFACE_USB_DEVICE, 0xA5DCBF10L, 0x6530, 0x11D2, 0x90, 0x1
 #endif
 
 
+UsbDeviceList::~UsbDeviceList()
+{
+#ifdef Q_OS_WIN
+    if ( m_usbip_process.state() == QProcess::Running ) {
+        m_usbip_process.terminate();
+        m_usbip_process.waitForFinished(500);
+    }
+#endif
+}
+
 QDir UsbDeviceList::getDevicePath() const
 {
     return m_device_path;

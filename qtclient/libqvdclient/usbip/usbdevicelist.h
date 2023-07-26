@@ -19,6 +19,8 @@ class LIBQVDCLIENT_EXPORT UsbDeviceList : public QObject
 
 public:
 
+    ~UsbDeviceList();
+
     /**
      * @brief Path where devices are looked for
      * @return
